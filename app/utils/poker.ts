@@ -1,5 +1,7 @@
+import { objectEnumValues } from "@prisma/client/runtime";
 import * as _ from "lodash";
 import { forEach } from "lodash";
+import { Player } from "~/routes";
 
 /*
 Example implementation used in the Think Functional course
@@ -209,23 +211,80 @@ export const CardsCreator = (() => {
   };
 })();
 
-export const determineWinner = (playerHands: any[]) => {
-  const ranks = Object.keys(PokerRating);
+export const determineWinner = (playerWithDealerCards: any[]) => {
+  const playerHands = playerWithDealerCards.map((obj: any) => [
+    ...obj.dealerCards,
+    ...obj.player.cards,
+  ]);
 
   console.log(playerHands);
 
-  const playerHandsRanks = playerHands.map((hand) => PokerHandRate(new RateableCards(hand)));
+  const ranks = Object.keys(PokerRating);
 
-  console.log(playerHandsRanks);
+  const playerHandsRanks = playerHands.map((hand) =>
+    PokerHandRate(new RateableCards(hand))
+  );
 
   let winner = playerHandsRanks[0];
+  let winnerIndicies = [0];
+  let winnerCards = [playerHands[0]];
 
-  playerHandsRanks.forEach((hand) => {
-    console.log(hand);
-    if (hand > ranks.indexOf(winner)) {
-      winner = hand;
+  playerHandsRanks.forEach((playerHand, index) => {
+    console.log(playerHand);
+    let playerRank = ranks.indexOf(playerHand);
+    let currentWinnerRank = ranks.indexOf(winner);
+    console.log(playerRank, currentWinnerRank);
+    if (playerRank < currentWinnerRank) {
+      winnerIndicies = [index];
+      winner = playerHandsRanks[index];
+      currentWinnerRank = playerRank;
+      winnerCards = [playerHands[index]];
+    } else if (
+      playerRank == currentWinnerRank &&
+      !winnerIndicies.includes(index)
+    ) {
+      winnerIndicies = [...winnerIndicies, index];
+      winnerCards = [...winnerCards, playerHands[index]];
     }
   });
 
-  return winner;
+  console.log(winnerIndicies);
+
+  const result = playerWithDealerCards
+    .filter((player, index) => winnerIndicies.includes(index))
+    .map((player, index) => {
+      return { ...player, hand: playerHands[index], finalCards: winnerCards[index] };
+    });
+
+  let sortedResult = sortByBestHand(result);
+
+  return { winners: result, winnerIndicies, hand: winner, sortedResult };
 };
+
+const sortByBestHand = (players: Player[]) => {
+  const finalCardsArray = players.map((player, index) => { 
+    return { finalCards: player.finalCards, index }
+  });
+  const sortedPlayers = finalCardsArray.sort((a, b) => byCountFirst(players.map((player) => player.finalCards), new RateableCards(a.finalCards).suitTimes, new RateableCards(b.finalCards).suitTimes));
+  return sortedPlayers;
+};
+
+const counts = (cards: any[]) => cards.reduce(count, {});
+
+const byCountFirst = (cardsArray: any[], a: number, b: number) => {
+  console.log('in by count first');
+  const tempCounts = counts(cardsArray);
+  console.log(cardsArray);
+  console.log(tempCounts);
+  console.log(a, b);
+  //Counts are in reverse order - bigger is better
+  const countDiff = tempCounts[b] - tempCounts[a];
+  if (countDiff) return countDiff;
+  return b > a ? -1 : b === a ? 0 : 1;
+}
+
+const count: any = (c: { [x: string]: any; }, a: string | number, index: any) => {
+  console.log(c[a]);
+  c[a] = (c[a] || 0) + 1;
+  return c;
+}

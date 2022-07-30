@@ -28,6 +28,8 @@ export interface Player {
   cards: CardProps[];
   chips: number;
   folded: boolean;
+  finalCards?: any | any[];
+  [key: string]: string | number | boolean | CardProps[];
 }
 
 const initialPlayers: Player[] = [
@@ -82,6 +84,8 @@ export default function Index() {
   const [winner, setWinner] = useState<string | undefined>("");
   const [gameOver, setGameOver] = useState(false);
 
+  const [hands, setHands] = useState<any[]>([]);
+
   const handleCheckOrCall = () => {
     let tempPlayers = [...playersInTheHand];
     let tempActivePlayer = tempPlayers.find(
@@ -93,7 +97,7 @@ export default function Index() {
     setPots(tempPots);
     setPlayersInTheHand(tempPlayers);
     advancePlayer();
-    setTurnNumber(turnNumber + 1);
+
     setSnackbarMessage(
       activeBet
         ? `${activePlayer.name} called $${activeBet}`
@@ -101,14 +105,20 @@ export default function Index() {
     );
     setIsSnackbarOpen(true);
 
-    if (turnNumber === tempPlayers.length - 1) {
+    if (turnNumber + 1 === playersInTheHand.length) {
+      console.log("advancing game, setting turn number to 0");
       advanceGame();
       setTurnNumber(0);
+    } else {
+      setTurnNumber(turnNumber + 1);
     }
   };
 
   const handleStartGame = () => {
+    setGameState("Preflop");
     setGameStarted(true);
+    setGameOver(false);
+    setDealtCards([]);
     let tempPlayers = [...players];
     tempPlayers.forEach((player, index) => {
       let newCards = createCards(52, 2, dealtCards, index === 0);
@@ -118,6 +128,23 @@ export default function Index() {
     setDealerCards(createCards(52, 3, dealtCards, false));
     setPlayers(tempPlayers);
     setPlayersInTheHand(tempPlayers.filter((player) => !player.folded));
+  };
+
+  const handleNewGame = () => {
+    setGameState("Preflop");
+    setGameStarted(true);
+    setGameOver(false);
+    setDealtCards([]);
+    setDealerCards([]);
+    setWinner("");
+    let tempDealtCards: any[] = [];
+    setPlayers((prevPlayers: Player[]) =>
+      prevPlayers.map((prev: Player, index) => {
+        let newCards = createCards(52, 2, tempDealtCards, index === 0);
+        tempDealtCards.push(...newCards);
+        return { ...initialPlayers[index], chips: prev.chips, cards: [], folded: false };
+      })
+    );
   };
 
   const handleFold = () => {
@@ -137,7 +164,10 @@ export default function Index() {
     setSnackbarMessage(`${activePlayer.name} folded`);
     setIsSnackbarOpen(true);
 
-    if (turnNumber + 1 == tempPlayers.length) {
+    if (
+      turnNumber + 1 ===
+      tempPlayers.filter((player) => !player.folded).length
+    ) {
       advanceGame();
       setTurnNumber(0);
     }
@@ -164,12 +194,11 @@ export default function Index() {
     handleFold();
     setSnackbarMessage(`${activePlayer.name} timed out and auto-folded`);
     setIsSnackbarOpen(true);
-    advancePlayer();
   };
 
   const advancePlayer = () => {
     let tempActivePlayerIndex = activePlayerIndex;
-    if (tempActivePlayerIndex + 1 >= players.length) {
+    if (tempActivePlayerIndex + 1 >= playersInTheHand.length) {
       tempActivePlayerIndex = 0;
     } else {
       tempActivePlayerIndex++;
@@ -187,7 +216,6 @@ export default function Index() {
       });
       setDealerCards(tempDealerCards);
     } else if (gameState === "Flop") {
-      console.log("flop time");
       setGameState("Turn");
       let newCards = createCards(52, 1, undefined, true);
       setDealerCards([...dealerCards, ...newCards]);
@@ -211,17 +239,34 @@ export default function Index() {
       setDealerCards(tempDealerCards);
       let gameWinner = determineWinner(
         playersInTheHand.map((player) => {
-          return [...dealerCards, ...player.cards];
+          return { dealerCards, player };
         })
       );
       console.log(gameWinner);
-      setWinner(gameWinner);
+      setWinner(
+        `${
+          gameWinner.winners.length === 1
+            ? (gameWinner.winners[0] as { player: Player }).player.name
+            : gameWinner.winners
+                .map((winner: any) => winner.player.name)
+                .join(", ")
+                .replace(/, ((?:.(?!, ))+)$/, ", and $1")
+        } ${gameWinner.winners.length === 1 ? "won" : "split the pot"} with ${
+          gameWinner.hand
+        }`
+      );
       setGameOver(true);
     }
   };
 
   const handleClose = () => {
     setIsSnackbarOpen(false);
+  };
+
+  const advanceHands = () => {
+    let tempHands = [...hands];
+    tempHands.push(winner);
+    handleNewGame();
   };
 
   return (
@@ -242,15 +287,27 @@ export default function Index() {
       </Snackbar>
       <main className="relative min-h-screen bg-[rgb(0,90,0)] sm:flex sm:items-center sm:justify-center">
         <div className="relative sm:pb-16 sm:pt-8">
-          <div className="mx-auto flex w-[100vw] flex-col">
-            {!gameStarted ? (
+          <div className="mx-auto flex h-[100vh] w-[100vw] flex-col">
+            {!gameStarted && (
               <button
-                className="self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                className="absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
                 onClick={handleStartGame}
               >
                 Start Game
               </button>
-            ) : (
+            )}
+
+            {gameOver && (
+              <button
+                id="next-btn"
+                className="absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                onClick={() => advanceHands()}
+              >
+                Next Hand
+              </button>
+            )}
+
+            {gameStarted ? (
               <>
                 <Table />
                 <div className="flex flex-col items-center justify-center">
@@ -464,7 +521,7 @@ export default function Index() {
                   </div>
                 </div>
               </>
-            )}
+            ) : null}
           </div>
         </div>
       </main>
