@@ -211,80 +211,107 @@ export const CardsCreator = (() => {
   };
 })();
 
+let hands = [
+  "4 of a Kind",
+  "Straight Flush",
+  "Straight",
+  "Flush",
+  "High Card",
+  "1 Pair",
+  "2 Pair",
+  "Royal Flush",
+  "3 of a Kind",
+  "Full House",
+];
+var A = 14,
+  K = 13,
+  Q = 12,
+  J = 11,
+  suitsObj = { "♠": 1, "♣": 2, "♥": 4, "♦": 8 };
+
+//Calculates the Rank of a 5 card Poker hand using bit manipulations.
+export const rankPokerHand = (cs: number[], ss: number[]) => {
+  var v,
+    i,
+    o,
+    s =
+      (1 << cs[0]) | (1 << cs[1]) | (1 << cs[2]) | (1 << cs[3]) | (1 << cs[4]);
+  for (i = -1, v = o = 0; i < 5; i++, o = Math.pow(2, cs[i] * 4)) {
+    v += o * (((v / o) & 15) + 1);
+  }
+  v = (v % 15) - (s / (s & -s) == 31 || s == 0x403c ? 3 : 1);
+  let checkForFlush = ss[0] == (ss[1] | ss[2] | ss[3] | ss[4]);
+  v -= +checkForFlush * (s == 0x7c00 ? -5 : 1);
+  return `${hands[v]} ${s == 0x403c ? " (Ace low)" : ""}`;
+};
+
+var Hand = require('pokersolver').Hand;
+
+export interface TotalCards {
+  dealerCards: any[];
+  player: Player;
+}
+
 export const determineWinner = (playerWithDealerCards: any[]) => {
-  const playerHands = playerWithDealerCards.map((obj: any) => [
-    ...obj.dealerCards,
-    ...obj.player.cards,
-  ]);
 
-  console.log(playerHands);
+  console.log(playerWithDealerCards);
 
-  const ranks = Object.keys(PokerRating);
+  const dealerCards = playerWithDealerCards[0].dealerCards;
 
-  const playerHandsRanks = playerHands.map((hand) =>
-    PokerHandRate(new RateableCards(hand))
-  );
+  const dealerCardsArray = dealerCards.map((card: CardProps) => `${card.rank == '10' ? 'T' : card.rank}${card.suit.charAt(0)}`);
 
-  let winner = playerHandsRanks[0];
-  let winnerIndicies = [0];
-  let winnerCards = [playerHands[0]];
-
-  playerHandsRanks.forEach((playerHand, index) => {
-    console.log(playerHand);
-    let playerRank = ranks.indexOf(playerHand);
-    let currentWinnerRank = ranks.indexOf(winner);
-    console.log(playerRank, currentWinnerRank);
-    if (playerRank < currentWinnerRank) {
-      winnerIndicies = [index];
-      winner = playerHandsRanks[index];
-      currentWinnerRank = playerRank;
-      winnerCards = [playerHands[index]];
-    } else if (
-      playerRank == currentWinnerRank &&
-      !winnerIndicies.includes(index)
-    ) {
-      winnerIndicies = [...winnerIndicies, index];
-      winnerCards = [...winnerCards, playerHands[index]];
-    }
+  const handsArray = playerWithDealerCards.map((player: TotalCards) => {
+    return [...dealerCardsArray, ...player.player.cards.map((card: CardProps) => `${card.rank == '10' ? 'T' : card.rank}${card.suit.charAt(0)}`)];
   });
 
-  console.log(winnerIndicies);
+  console.log(handsArray);
 
-  const result = playerWithDealerCards
-    .filter((player, index) => winnerIndicies.includes(index))
-    .map((player, index) => {
-      return { ...player, hand: playerHands[index], finalCards: winnerCards[index] };
-    });
+  let solvedHands = handsArray.map((hand: string[]) => Hand.solve(hand));
 
-  let sortedResult = sortByBestHand(result);
+  var win = Hand.winners(solvedHands);
 
-  return { winners: result, winnerIndicies, hand: winner, sortedResult };
+  let tempIndicies: number[] = [];
+
+  solvedHands.filter((item, index) => {
+    if (win[0].descr == item.descr) {
+      tempIndicies.push(index);
+      return true;
+    }
+    return false;
+  });
+
+  return { winners: playerWithDealerCards.filter((item, index) => tempIndicies.includes(index)), win, winnerIndicies: tempIndicies, hand: win[0].descr };
 };
 
 const sortByBestHand = (players: Player[]) => {
-  const finalCardsArray = players.map((player, index) => { 
-    return { finalCards: player.finalCards, index }
+  const finalCardsArray = players.map((player, index) => {
+    return { finalCards: player.finalCards, index };
   });
-  const sortedPlayers = finalCardsArray.sort((a, b) => byCountFirst(players.map((player) => player.finalCards), new RateableCards(a.finalCards).suitTimes, new RateableCards(b.finalCards).suitTimes));
+  const sortedPlayers = finalCardsArray.sort((a, b) =>
+    byCountFirst(
+      players.map((player) => player.finalCards),
+      new RateableCards(a.finalCards).suitTimes,
+      new RateableCards(b.finalCards).suitTimes
+    )
+  );
   return sortedPlayers;
 };
 
 const counts = (cards: any[]) => cards.reduce(count, {});
 
 const byCountFirst = (cardsArray: any[], a: number, b: number) => {
-  console.log('in by count first');
   const tempCounts = counts(cardsArray);
-  console.log(cardsArray);
-  console.log(tempCounts);
-  console.log(a, b);
   //Counts are in reverse order - bigger is better
   const countDiff = tempCounts[b] - tempCounts[a];
   if (countDiff) return countDiff;
   return b > a ? -1 : b === a ? 0 : 1;
-}
+};
 
-const count: any = (c: { [x: string]: any; }, a: string | number, index: any) => {
-  console.log(c[a]);
+const count: any = (
+  c: { [x: string]: any },
+  a: string | number,
+  index: any
+) => {
   c[a] = (c[a] || 0) + 1;
   return c;
-}
+};

@@ -4,7 +4,7 @@ import cardStyles from "../styles/cards.css";
 import progressStyles from "../styles/progress.css";
 import { createCards } from "~/utils/cards";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
-import { CardProps, determineWinner } from "~/utils/poker";
+import { CardProps, CardsCreator, determineWinner, TotalCards } from "~/utils/poker";
 import Table from "~/components/Table";
 import PlayerDisplay from "~/components/PlayerDisplay";
 import Snackbar from "@mui/material/Snackbar";
@@ -86,6 +86,8 @@ export default function Index() {
 
   const [hands, setHands] = useState<any[]>([]);
 
+  let cardsCreator = CardsCreator.getInstance();
+
   const handleCheckOrCall = () => {
     let tempPlayers = [...playersInTheHand];
     let tempActivePlayer = tempPlayers.find(
@@ -106,7 +108,6 @@ export default function Index() {
     setIsSnackbarOpen(true);
 
     if (turnNumber + 1 === playersInTheHand.length) {
-      console.log("advancing game, setting turn number to 0");
       advanceGame();
       setTurnNumber(0);
     } else {
@@ -119,6 +120,7 @@ export default function Index() {
     setGameStarted(true);
     setGameOver(false);
     setDealtCards([]);
+    cardsCreator.clearPassed();
     let tempPlayers = [...players];
     tempPlayers.forEach((player, index) => {
       let newCards = createCards(52, 2, dealtCards, index === 0);
@@ -137,14 +139,36 @@ export default function Index() {
     setDealtCards([]);
     setDealerCards([]);
     setWinner("");
-    let tempDealtCards: any[] = [];
+    cardsCreator.clearPassed();
     setPlayers((prevPlayers: Player[]) =>
       prevPlayers.map((prev: Player, index) => {
-        let newCards = createCards(52, 2, tempDealtCards, index === 0);
-        tempDealtCards.push(...newCards);
-        return { ...initialPlayers[index], chips: prev.chips, cards: [], folded: false };
+        let newCards = createCards(52, 2, undefined, index === 0);
+        return {
+          ...initialPlayers[index],
+          chips: prev.chips,
+          cards: newCards,
+          folded: false,
+        };
       })
     );
+    setDealerCards(createCards(52, 3, undefined, false));
+
+    let nextDealerIndex = hands.length % playersInTheHand.length;
+    let nextLittleBlindIndex = (hands.length + 1) % playersInTheHand.length;
+    let nextBigBlindIndex = (hands.length + 2) % playersInTheHand.length;
+
+    setDealer(initialPlayers[nextDealerIndex]);
+    setLittleBlind(initialPlayers[nextLittleBlindIndex]);
+    setBigBlind(initialPlayers[nextBigBlindIndex]);
+
+    setActivePlayerIndex(nextLittleBlindIndex);
+    setActivePlayer(initialPlayers[nextLittleBlindIndex]);
+
+    setPots([0]);
+
+    let tempHands = [...hands];
+    tempHands.push(winner);
+    setHands(tempHands);
   };
 
   const handleFold = () => {
@@ -238,23 +262,24 @@ export default function Index() {
       setPlayers(tempPlayers);
       setDealerCards(tempDealerCards);
       let gameWinner = determineWinner(
-        playersInTheHand.map((player) => {
-          return { dealerCards, player };
+        players.filter((player) => playersInTheHand.map((pith) => pith.name).includes(player.name)).map((player) => {
+          return { dealerCards, player } as TotalCards;
         })
       );
+
       console.log(gameWinner);
-      setWinner(
-        `${
-          gameWinner.winners.length === 1
-            ? (gameWinner.winners[0] as { player: Player }).player.name
-            : gameWinner.winners
-                .map((winner: any) => winner.player.name)
-                .join(", ")
-                .replace(/, ((?:.(?!, ))+)$/, ", and $1")
-        } ${gameWinner.winners.length === 1 ? "won" : "split the pot"} with ${
-          gameWinner.hand
-        }`
-      );
+
+      const winnerString = `${
+        gameWinner.winners.length === 1
+          ? (gameWinner.winners[0] as { player: Player }).player.name
+          : gameWinner.winners
+              .map((winner: any) => winner.player.name)
+              .join(", ")
+              .replace(/, ((?:.(?!, ))+)$/, ", and $1")
+      } ${gameWinner.winners.length === 1 ? "won" : "split the pot"} with ${
+        gameWinner.hand
+      }`;
+      setWinner(winnerString);
       setGameOver(true);
     }
   };
@@ -264,8 +289,6 @@ export default function Index() {
   };
 
   const advanceHands = () => {
-    let tempHands = [...hands];
-    tempHands.push(winner);
     handleNewGame();
   };
 
@@ -319,12 +342,12 @@ export default function Index() {
                     <h1>{winner}</h1>
                   </div>
                   <div className="absolute top-[30%] w-[100vw] items-center justify-center self-center text-center">
-                    {`Blinds: ${blinds[0]}/${blinds[1]} Pot: $${pots[0]}`}
+                    {`Blinds: ${blinds[0]}/${blinds[1]} Pot: $${pots[0]} Hand #${hands.length + 1}`}
                   </div>
                   <div className="playingCards simpleCards absolute bottom-[45%] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
                       <Card
-                        key={index}
+                        key={`${index}-${card.suit}-${card.rank}`}
                         suit={card.suit}
                         rank={card.rank}
                         faceUp={card.faceUp}
@@ -336,7 +359,7 @@ export default function Index() {
                   <div className="fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center">
                     <PlayerDisplay
                       player={players[1]}
-                      active={activePlayer === players[1]}
+                      active={activePlayer.name === players[1].name}
                       onTimeout={() => handlePlayerTimeout(players[1])}
                       prevPlayer={players[0]}
                       gameOver={gameOver}
@@ -345,14 +368,14 @@ export default function Index() {
                   <div className="playingCards simpleCards fixed bottom-[45%] right-[25%] flex w-[100vw] rotate-90 flex-row items-center justify-center">
                     {players[1].cards.map((card, index) => (
                       <Card
-                        key={index}
+                        key={`${index}-${card.suit}-${card.rank}`}
                         suit={card.suit}
                         rank={card.rank}
                         faceUp={card.faceUp}
                       />
                     ))}
                   </div>
-                  {dealer === players[1] ? (
+                  {dealer.name === players[1].name ? (
                     <div className="fixed bottom-[50%] flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/black-dealer-button.png"
@@ -360,7 +383,7 @@ export default function Index() {
                         className="object-cover"
                       />
                     </div>
-                  ) : littleBlind === players[1] ? (
+                  ) : littleBlind.name === players[1].name ? (
                     <div className="fixed bottom-[50%] flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/littleblind.png"
@@ -370,7 +393,7 @@ export default function Index() {
                         className="object-cover"
                       />
                     </div>
-                  ) : bigBlind === players[1] ? (
+                  ) : bigBlind.name === players[1].name ? (
                     <div className="fixed bottom-[50%] flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/bigblind.png"
@@ -386,7 +409,7 @@ export default function Index() {
                   <div className="fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center">
                     <PlayerDisplay
                       player={players[2]}
-                      active={activePlayer === players[2]}
+                      active={activePlayer.name === players[2].name}
                       onTimeout={() => handlePlayerTimeout(players[2])}
                       prevPlayer={players[1]}
                       gameOver={gameOver}
@@ -395,14 +418,14 @@ export default function Index() {
                   <div className="playingCards simpleCards fixed bottom-[45%] left-[25%] flex w-[100vw] -rotate-90 flex-row items-center justify-center">
                     {players[2].cards.map((card, index) => (
                       <Card
-                        key={index}
+                        key={`${index}-${card.suit}-${card.rank}`}
                         suit={card.suit}
                         rank={card.rank}
                         faceUp={card.faceUp}
                       />
                     ))}
                   </div>
-                  {dealer === players[2] ? (
+                  {dealer.name === players[2].name ? (
                     <div className="fixed bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/black-dealer-button.png"
@@ -410,7 +433,7 @@ export default function Index() {
                         className="object-cover"
                       />
                     </div>
-                  ) : littleBlind === players[2] ? (
+                  ) : littleBlind.name === players[2].name ? (
                     <div className="fixed bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/littleblind.png"
@@ -420,7 +443,7 @@ export default function Index() {
                         className="object-cover"
                       />
                     </div>
-                  ) : bigBlind === players[2] ? (
+                  ) : bigBlind.name === players[2].name ? (
                     <div className="fixed bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/bigblind.png"
@@ -435,7 +458,7 @@ export default function Index() {
                 <div className="playingCards simpleCards fixed bottom-[20%] flex w-[100vw] flex-row items-center justify-center">
                   {players[0].cards.map((card, index) => (
                     <Card
-                      key={index}
+                      key={`${index}-${card.suit}-${card.rank}`}
                       suit={card.suit}
                       rank={card.rank}
                       faceUp={card.faceUp}
@@ -445,13 +468,13 @@ export default function Index() {
                 <div className="fixed bottom-[7.5%] flex w-[100vw] flex-col items-center justify-center">
                   <PlayerDisplay
                     player={players[0]}
-                    active={activePlayer === players[0]}
+                    active={activePlayer.name === players[0].name}
                     onTimeout={() => handlePlayerTimeout(players[0])}
                     prevPlayer={players[players.length - 1]}
                     gameOver={gameOver}
                   />
                 </div>
-                {dealer === players[0] ? (
+                {dealer.name === players[0].name ? (
                   <div className="fixed bottom-[1%] flex w-[100vw] flex-row items-center justify-center">
                     <img
                       src="images/black-dealer-button.png"
@@ -459,7 +482,7 @@ export default function Index() {
                       className="object-cover"
                     />
                   </div>
-                ) : littleBlind === players[0] ? (
+                ) : littleBlind.name === players[0].name ? (
                   <div className="fixed bottom-[1%] flex w-[100vw] flex-row items-center justify-center">
                     <img
                       src="images/littleblind.png"
@@ -469,7 +492,7 @@ export default function Index() {
                       className="object-cover"
                     />
                   </div>
-                ) : bigBlind === players[0] ? (
+                ) : bigBlind.name === players[0].name ? (
                   <div className="fixed bottom-[1%] flex w-[100vw] flex-row items-center justify-center">
                     <img
                       src="images/bigblind.png"
@@ -480,7 +503,7 @@ export default function Index() {
                     />
                   </div>
                 ) : null}
-                <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8">
+                {!gameOver ? <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8">
                   <div className="flex w-[100%] flex-row items-end">
                     <div className="m-2">
                       <input
@@ -519,7 +542,7 @@ export default function Index() {
                       Bet
                     </button>
                   </div>
-                </div>
+                </div> : null}
               </>
             ) : null}
           </div>
