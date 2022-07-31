@@ -89,7 +89,7 @@ export default function Index() {
   let cardsCreator = CardsCreator.getInstance();
 
   const handleCheckOrCall = () => {
-    let tempPlayers = [...playersInTheHand];
+    let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
       (player) => player.name === activePlayer.name
     );
@@ -97,6 +97,7 @@ export default function Index() {
     let tempPots = [...pots];
     tempPots[0] += activeBet;
     setPots(tempPots);
+    setPlayers(tempPlayers);
     setPlayersInTheHand(tempPlayers);
     advancePlayer();
 
@@ -107,7 +108,7 @@ export default function Index() {
     );
     setIsSnackbarOpen(true);
 
-    if (turnNumber + 1 === playersInTheHand.length) {
+    if (turnNumber + 1 === tempPlayers.length) {
       advanceGame();
       setTurnNumber(0);
     } else {
@@ -140,17 +141,17 @@ export default function Index() {
     setDealerCards([]);
     setWinner("");
     cardsCreator.clearPassed();
-    setPlayers((prevPlayers: Player[]) =>
-      prevPlayers.map((prev: Player, index) => {
-        let newCards = createCards(52, 2, undefined, index === 0);
-        return {
-          ...initialPlayers[index],
-          chips: prev.chips,
-          cards: newCards,
-          folded: false,
-        };
-      })
-    );
+    const tempPlayers = (prevPlayers: Player[]) =>
+    prevPlayers.map((prev: Player, index) => {
+      let newCards = createCards(52, 2, undefined, index === 0);
+      return {
+        ...initialPlayers[index],
+        chips: prev.chips,
+        cards: newCards,
+        folded: false,
+      };
+    });
+    setPlayers((prevPlayers) => tempPlayers(prevPlayers));
     setDealerCards(createCards(52, 3, undefined, false));
 
     let nextDealerIndex = hands.length % playersInTheHand.length;
@@ -169,6 +170,7 @@ export default function Index() {
     let tempHands = [...hands];
     tempHands.push(winner);
     setHands(tempHands);
+    setPlayersInTheHand((prev) => tempPlayers(prev).filter((player) => !player.folded));
   };
 
   const handleFold = () => {
@@ -182,9 +184,9 @@ export default function Index() {
     });
     tempActivePlayer!.folded = true;
     setPlayers(tempPlayers);
+    console.log(tempPlayers);
     setPlayersInTheHand(tempPlayers.filter((player) => !player.folded));
     advancePlayer();
-    setTurnNumber(turnNumber + 1);
     setSnackbarMessage(`${activePlayer.name} folded`);
     setIsSnackbarOpen(true);
 
@@ -222,13 +224,13 @@ export default function Index() {
 
   const advancePlayer = () => {
     let tempActivePlayerIndex = activePlayerIndex;
-    if (tempActivePlayerIndex + 1 >= playersInTheHand.length) {
+    if ((tempActivePlayerIndex + 1) >= playersInTheHand.length) {
       tempActivePlayerIndex = 0;
     } else {
       tempActivePlayerIndex++;
     }
     setActivePlayerIndex(tempActivePlayerIndex);
-    setActivePlayer(playersInTheHand[tempActivePlayerIndex]);
+    setActivePlayer(players[tempActivePlayerIndex]);
   };
 
   const advanceGame = () => {
