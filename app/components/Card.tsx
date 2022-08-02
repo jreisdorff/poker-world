@@ -4,10 +4,12 @@ interface CardProps {
   rank: string;
   suit: string;
   faceUp: boolean;
+  folded: boolean;
+  winner?: boolean;
 }
 
 export default function Card(props: CardProps) {
-  const { rank, suit, faceUp } = props;
+  const { rank, suit, faceUp, folded, winner = false } = props;
 
   const getUnicodeSuit = (inputSuit: any) => {
     switch (inputSuit) {
@@ -25,14 +27,14 @@ export default function Card(props: CardProps) {
   };
 
   return (
-    <div className="relative p-0">
-      <div className={`card rank-${rank} ${suit}`}>
+    <div className={`relative p-0 ${winner ? '-mt-8 transition-all duration-1000' : ''}`}>
+      <div className={`card rank-${rank} ${suit} ${winner ? 'winner border-4 border-lime-500' : ''}`}>
         <span className="rank">{rank}</span>
         <span className="suit">{getUnicodeSuit(suit)}</span>
       </div>
       {!faceUp && (
         <div className="absolute top-0">
-          <div className="card back" />
+          <div className={`card back ${folded ? 'folded' : ''}`} />
         </div>
       )}
     </div>

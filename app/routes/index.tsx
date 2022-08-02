@@ -1,14 +1,19 @@
-import { useState } from "react";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { useLocation, useMatches } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import Card from "~/components/Card";
+import PlayerDisplay from "~/components/PlayerDisplay";
+import Table from "~/components/Table";
+import { createCards } from "~/utils/cards";
+import { AdvanceGameProps, advanceHoldEmGame, GameState } from "~/utils/game";
+import { CardProps, CardsCreator, PokerWinner } from "~/utils/poker";
 import cardStyles from "../styles/cards.css";
 import progressStyles from "../styles/progress.css";
-import { createCards } from "~/utils/cards";
-import { LinksFunction, MetaFunction } from "@remix-run/node";
-import { CardProps, CardsCreator, determineWinner, TotalCards } from "~/utils/poker";
-import Table from "~/components/Table";
-import PlayerDisplay from "~/components/PlayerDisplay";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+
+import { io } from "socket.io-client";
+import { useSocket } from "~/context";
 
 export const links: LinksFunction = () => {
   return [
@@ -22,6 +27,10 @@ export const meta: MetaFunction = () => ({
   title: "Poker World",
   viewport: "width=device-width,initial-scale=1",
 });
+
+// export const loader: LoaderFunction = async ({ request }) => {
+//     return null;
+// }
 
 export interface Player {
   name: string;
@@ -53,8 +62,11 @@ const initialPlayers: Player[] = [
   },
 ];
 
+let isMount = true;
 export default function Index() {
-  const [gameState, setGameState] = useState("Preflop");
+  const [gameState, setGameState] = useState(GameState.Preflop);
+
+  const socket = useSocket();
 
   const [gameStarted, setGameStarted] = useState(false);
   const [bet, setBet] = useState(0);
@@ -70,10 +82,6 @@ export default function Index() {
     initialPlayers[activePlayerIndex]
   );
 
-  const [playersInTheHand, setPlayersInTheHand] = useState(
-    players.filter((player) => !player.folded)
-  );
-
   const [dealer, setDealer] = useState(initialPlayers[0]);
   const [littleBlind, setLittleBlind] = useState(initialPlayers[1]);
   const [bigBlind, setBigBlind] = useState(initialPlayers[2]);
@@ -81,15 +89,29 @@ export default function Index() {
   const [activeBet, setActiveBet] = useState(0);
   const [turnNumber, setTurnNumber] = useState(0);
   const [blinds, setBlinds] = useState([10, 20]);
-  const [winner, setWinner] = useState<string | undefined>("");
+  const [winner, setWinner] = useState<{
+    winner: PokerWinner;
+    description: string;
+  } | null>(null);
   const [gameOver, setGameOver] = useState(false);
 
   const [hands, setHands] = useState<any[]>([]);
+  const [activePlayerCount, setActivePlayerCount] = useState(3);
+  const [winningCards, setWinningCards] = useState<any[]>([]);
+  const [wonAmount, setWonAmount] = useState(0);
+  const [playerName, setPlayerName] = useState("");
+  const [buttonClicked, setButtonClicked] = useState(false);
+
+  const [playerCount, setPlayerCount] = useState(0);
+  const [messageSent, setMessageSent] = useState(false);
+
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [playerNames, setPlayerNames] = useState<any[]>([]);
 
   let cardsCreator = CardsCreator.getInstance();
 
   const handleCheckOrCall = () => {
-    let tempPlayers = [...playersInTheHand];
+    let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
       (player) => player.name === activePlayer.name
     );
@@ -97,7 +119,7 @@ export default function Index() {
     let tempPots = [...pots];
     tempPots[0] += activeBet;
     setPots(tempPots);
-    setPlayersInTheHand(tempPlayers);
+    setPlayers(tempPlayers);
     advancePlayer();
 
     setSnackbarMessage(
@@ -107,55 +129,69 @@ export default function Index() {
     );
     setIsSnackbarOpen(true);
 
-    if (turnNumber + 1 === playersInTheHand.length) {
-      advanceGame();
-      setTurnNumber(0);
-    } else {
-      setTurnNumber(turnNumber + 1);
-    }
+    advance();
   };
 
-  const handleStartGame = () => {
-    setGameState("Preflop");
-    setGameStarted(true);
-    setGameOver(false);
-    setDealtCards([]);
-    cardsCreator.clearPassed();
-    let tempPlayers = [...players];
-    tempPlayers.forEach((player, index) => {
-      let newCards = createCards(52, 2, dealtCards, index === 0);
-      player.cards = newCards;
-      setDealtCards([...dealtCards, ...newCards]);
+  useEffect(() => {
+    if (buttonClicked) {
+      if (!socket) return;
+      socket.emit("event", playerName);
+    }
+  }, [buttonClicked]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("event", (data) => {
+      setPlayerNames((prevPN) => [...prevPN, data]);
+      let newPlayerCount = 0;
+      setPlayerCount((prevPC) => {
+        newPlayerCount = prevPC + 1;
+        return newPlayerCount;
+      });
+      setButtonClicked(false);
     });
-    setDealerCards(createCards(52, 3, dealtCards, false));
-    setPlayers(tempPlayers);
-    setPlayersInTheHand(tempPlayers.filter((player) => !player.folded));
+  }, [socket]);
+
+  useEffect(() => {
+    if (playerCount === 3) {
+      handleStartGame();
+    }
+  }, [playerCount]);
+
+  const handleJoinGame = () => {
+    setButtonClicked(true);
   };
 
   const handleNewGame = () => {
-    setGameState("Preflop");
+    setGameState(GameState.Preflop);
     setGameStarted(true);
     setGameOver(false);
     setDealtCards([]);
     setDealerCards([]);
-    setWinner("");
+    setWinningCards([]);
+    setWinner(null);
+    setWonAmount(0);
+    setActivePlayerCount(3);
     cardsCreator.clearPassed();
     setPlayers((prevPlayers: Player[]) =>
       prevPlayers.map((prev: Player, index) => {
         let newCards = createCards(52, 2, undefined, index === 0);
-        return {
+        let newPlayer = {
           ...initialPlayers[index],
+          name: playerNames[index],
           chips: prev.chips,
           cards: newCards,
           folded: false,
         };
+        console.log("newPlayer", newPlayer);
+        return newPlayer;
       })
     );
     setDealerCards(createCards(52, 3, undefined, false));
 
-    let nextDealerIndex = hands.length % playersInTheHand.length;
-    let nextLittleBlindIndex = (hands.length + 1) % playersInTheHand.length;
-    let nextBigBlindIndex = (hands.length + 2) % playersInTheHand.length;
+    let nextDealerIndex = hands.length % players.length;
+    let nextLittleBlindIndex = (hands.length + 1) % players.length;
+    let nextBigBlindIndex = (hands.length + 2) % players.length;
 
     setDealer(initialPlayers[nextDealerIndex]);
     setLittleBlind(initialPlayers[nextLittleBlindIndex]);
@@ -165,10 +201,6 @@ export default function Index() {
     setActivePlayer(initialPlayers[nextLittleBlindIndex]);
 
     setPots([0]);
-
-    let tempHands = [...hands];
-    tempHands.push(winner);
-    setHands(tempHands);
   };
 
   const handleFold = () => {
@@ -181,24 +213,28 @@ export default function Index() {
       return card;
     });
     tempActivePlayer!.folded = true;
+
     setPlayers(tempPlayers);
-    setPlayersInTheHand(tempPlayers.filter((player) => !player.folded));
     advancePlayer();
-    setTurnNumber(turnNumber + 1);
+
     setSnackbarMessage(`${activePlayer.name} folded`);
     setIsSnackbarOpen(true);
 
-    if (
-      turnNumber + 1 ===
-      tempPlayers.filter((player) => !player.folded).length
-    ) {
+    advance();
+  };
+
+  const advance = () => {
+    if (turnNumber + 1 === activePlayerCount) {
       advanceGame();
+      setActivePlayerCount(players.filter((p) => !p.folded).length);
       setTurnNumber(0);
+    } else {
+      setTurnNumber(turnNumber + 1);
     }
   };
 
   const handleBet = (amount: number) => {
-    let tempPlayers = [...playersInTheHand];
+    let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
       (player) => player.name === activePlayer.name
     );
@@ -208,10 +244,12 @@ export default function Index() {
     setPots(tempPots);
     setPlayers(tempPlayers);
     advancePlayer();
-    setTurnNumber(0);
+
     setActiveBet(amount);
     setSnackbarMessage(`${activePlayer.name} bet $${amount}`);
     setIsSnackbarOpen(true);
+
+    advance();
   };
 
   const handlePlayerTimeout = (player: Player) => {
@@ -222,66 +260,50 @@ export default function Index() {
 
   const advancePlayer = () => {
     let tempActivePlayerIndex = activePlayerIndex;
-    if (tempActivePlayerIndex + 1 >= playersInTheHand.length) {
-      tempActivePlayerIndex = 0;
-    } else {
-      tempActivePlayerIndex++;
+    let activePlayerIndicies: number[] = [];
+    players.map((p, index) => {
+      if (!p.folded) {
+        activePlayerIndicies.push(index);
+      }
+    });
+
+    let nextActivePlayerIndex = tempActivePlayerIndex;
+
+    for (let i = 0; i < activePlayerIndicies.length; i++) {
+      if (activePlayerIndicies[i] > nextActivePlayerIndex) {
+        nextActivePlayerIndex = activePlayerIndicies[i];
+        break;
+      }
     }
-    setActivePlayerIndex(tempActivePlayerIndex);
-    setActivePlayer(playersInTheHand[tempActivePlayerIndex]);
+
+    if (nextActivePlayerIndex === tempActivePlayerIndex) {
+      nextActivePlayerIndex = activePlayerIndicies[0];
+    }
+
+    setActivePlayerIndex(nextActivePlayerIndex);
+    setActivePlayer(players[nextActivePlayerIndex]);
   };
 
   const advanceGame = () => {
-    if (gameState === "Preflop") {
-      setGameState("Flop");
-      let tempDealerCards = [...dealerCards];
-      tempDealerCards.forEach((card) => {
-        card.faceUp = true;
-      });
-      setDealerCards(tempDealerCards);
-    } else if (gameState === "Flop") {
-      setGameState("Turn");
-      let newCards = createCards(52, 1, undefined, true);
-      setDealerCards([...dealerCards, ...newCards]);
-    } else if (gameState === "Turn") {
-      setGameState("River");
-      let newCards = createCards(52, 1, undefined, true);
-      setDealerCards([...dealerCards, ...newCards]);
-    } else if (gameState === "River") {
-      setGameState("Showdown");
-      let tempDealerCards = [...dealerCards];
-      tempDealerCards.forEach((card) => {
-        card.faceUp = true;
-      });
-      let tempPlayers = [...players];
-      tempPlayers.forEach((player) => {
-        player.cards.forEach((card) => {
-          card.faceUp = true;
-        });
-      });
-      setPlayers(tempPlayers);
-      setDealerCards(tempDealerCards);
-      let gameWinner = determineWinner(
-        players.filter((player) => playersInTheHand.map((pith) => pith.name).includes(player.name)).map((player) => {
-          return { dealerCards, player } as TotalCards;
-        })
-      );
+    setActiveBet(0);
 
-      console.log(gameWinner);
+    const advanceGameProps: AdvanceGameProps = {
+      gameState,
+      setGameState,
+      dealerCards,
+      setDealerCards,
+      players,
+      setPlayers,
+      hands,
+      setHands,
+      setWinner,
+      setWinningCards,
+      setGameOver,
+      pots,
+      setWonAmount,
+    };
 
-      const winnerString = `${
-        gameWinner.winners.length === 1
-          ? (gameWinner.winners[0] as { player: Player }).player.name
-          : gameWinner.winners
-              .map((winner: any) => winner.player.name)
-              .join(", ")
-              .replace(/, ((?:.(?!, ))+)$/, ", and $1")
-      } ${gameWinner.winners.length === 1 ? "won" : "split the pot"} with ${
-        gameWinner.hand
-      }`;
-      setWinner(winnerString);
-      setGameOver(true);
-    }
+    advanceHoldEmGame(advanceGameProps);
   };
 
   const handleClose = () => {
@@ -290,6 +312,23 @@ export default function Index() {
 
   const advanceHands = () => {
     handleNewGame();
+  };
+
+  const handleStartGame = () => {
+      setGameState(GameState.Preflop);
+      setGameStarted(true);
+      setGameOver(false);
+      setDealtCards([]);
+      cardsCreator.clearPassed();
+      let tempPlayers = [...players];
+      tempPlayers.forEach((player, index) => {
+        let newCards = createCards(52, 2, dealtCards, index === 0);
+        player.cards = newCards;
+        player.name = playerNames[index];
+        setDealtCards([...dealtCards, ...newCards]);
+      });
+      setDealerCards(createCards(52, 3, dealtCards, false));
+      setPlayers(tempPlayers);
   };
 
   return (
@@ -312,12 +351,27 @@ export default function Index() {
         <div className="relative sm:pb-16 sm:pt-8">
           <div className="mx-auto flex h-[100vh] w-[100vw] flex-col">
             {!gameStarted && (
-              <button
-                className="absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                onClick={handleStartGame}
-              >
-                Start Game
-              </button>
+              <>
+                <input
+                  placeholder="Enter player name"
+                  type="text"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  className="absolute mt-24 self-center rounded bg-black px-4 py-2 text-white"
+                />
+                <button
+                  className="absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                  onClick={handleJoinGame}
+                >
+                  Join Game
+                </button>
+                <div className="absolute mt-48 self-center text-6xl text-black">
+                  {playerCount}
+                </div>
+                <div className="absolute mt-[50%] self-center text-6xl text-black">
+                  {playerNames.join(", ")}
+                </div>
+              </>
             )}
 
             {gameOver && (
@@ -335,22 +389,36 @@ export default function Index() {
                 <Table />
                 <div className="flex flex-col items-center justify-center">
                   <div
-                    className={`absolute top-[20%] w-full items-center justify-center self-center text-center text-white transition-all duration-1000 ${
-                      winner == "" ? "invisible" : "visible"
+                    className={`absolute top-[20%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
+                      !winner ? "opacity-0" : "opacity-100"
                     }`}
                   >
-                    <h1>{winner}</h1>
+                    <h1>{winner ? winner.description : null}</h1>
                   </div>
-                  <div className="absolute top-[30%] w-[100vw] items-center justify-center self-center text-center">
-                    {`Blinds: ${blinds[0]}/${blinds[1]} Pot: $${pots[0]} Hand #${hands.length + 1}`}
+                  <div className="absolute top-[30%] w-[100vw] items-center justify-center self-center text-center text-xl">
+                    {`Blinds: ${blinds[0]}/${blinds[1]} • Pot: ${pots.join(
+                      ", "
+                    )} • Hand #${hands.length + 1}`}
                   </div>
-                  <div className="playingCards simpleCards absolute bottom-[45%] flex w-[100vw] flex-row items-center justify-center">
+                  <div className="playingCards simpleCards absolute bottom-[48%] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
                       <Card
                         key={`${index}-${card.suit}-${card.rank}`}
                         suit={card.suit}
                         rank={card.rank}
                         faceUp={card.faceUp}
+                        folded={card.faceUp}
+                        winner={
+                          winningCards.length > 0
+                            ? winningCards.filter((w) => {
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                    card.rank
+                                );
+                              }).length > 0
+                            : false
+                        }
                       />
                     ))}
                   </div>
@@ -372,6 +440,18 @@ export default function Index() {
                         suit={card.suit}
                         rank={card.rank}
                         faceUp={card.faceUp}
+                        folded={players[1].folded}
+                        winner={
+                          winningCards.length > 0
+                            ? winningCards.filter((w) => {
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                    card.rank
+                                );
+                              }).length > 0
+                            : false
+                        }
                       />
                     ))}
                   </div>
@@ -422,6 +502,18 @@ export default function Index() {
                         suit={card.suit}
                         rank={card.rank}
                         faceUp={card.faceUp}
+                        folded={players[2].folded}
+                        winner={
+                          winningCards.length > 0
+                            ? winningCards.filter((w) => {
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                    card.rank
+                                );
+                              }).length > 0
+                            : false
+                        }
                       />
                     ))}
                   </div>
@@ -462,6 +554,18 @@ export default function Index() {
                       suit={card.suit}
                       rank={card.rank}
                       faceUp={card.faceUp}
+                      folded={players[0].folded}
+                      winner={
+                        winningCards.length > 0
+                          ? winningCards.filter((w) => {
+                              return (
+                                w.suit == card.suit.charAt(0) &&
+                                w.value.toString().replace("T", "10") ===
+                                  card.rank
+                              );
+                            }).length > 0
+                          : false
+                      }
                     />
                   ))}
                 </div>
@@ -503,46 +607,48 @@ export default function Index() {
                     />
                   </div>
                 ) : null}
-                {!gameOver ? <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8">
-                  <div className="flex w-[100%] flex-row items-end">
-                    <div className="m-2">
-                      <input
-                        type="range"
-                        className="form-range w-full p-0 focus:shadow-none focus:outline-none focus:ring-0"
-                        min="0"
-                        max="100"
-                        value={bet}
-                        onChange={(event) => {
-                          setBet(+event.target.value);
-                        }}
-                      />
+                {!gameOver ? (
+                  <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8">
+                    <div className="flex w-[100%] flex-row items-end">
+                      <div className="m-2">
+                        <input
+                          type="range"
+                          className="form-range w-full p-0 focus:shadow-none focus:outline-none focus:ring-0"
+                          min="0"
+                          max="100"
+                          value={bet}
+                          onChange={(event) => {
+                            setBet(+event.target.value);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1" />
+                      <button className="rounded bg-transparent px-4 py-2 text-white">
+                        ${bet}
+                      </button>
                     </div>
-                    <div className="flex-1" />
-                    <button className="rounded bg-transparent px-4 py-2 text-white">
-                      ${bet}
-                    </button>
+                    <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
+                      <button
+                        className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={handleFold}
+                      >
+                        Fold
+                      </button>
+                      <button
+                        className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={handleCheckOrCall}
+                      >
+                        {activeBet > 0 ? `Call $${activeBet}` : "Check"}
+                      </button>
+                      <button
+                        className="rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={() => handleBet(bet)}
+                      >
+                        Bet
+                      </button>
+                    </div>
                   </div>
-                  <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
-                    <button
-                      className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                      onClick={handleFold}
-                    >
-                      Fold
-                    </button>
-                    <button
-                      className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                      onClick={handleCheckOrCall}
-                    >
-                      {activeBet > 0 ? `Call $${activeBet}` : "Check"}
-                    </button>
-                    <button
-                      className="rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                      onClick={() => handleBet(bet)}
-                    >
-                      Bet
-                    </button>
-                  </div>
-                </div> : null}
+                ) : null}
               </>
             ) : null}
           </div>

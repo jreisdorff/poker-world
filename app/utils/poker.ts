@@ -252,10 +252,14 @@ export interface TotalCards {
   player: Player;
 }
 
-export const determineWinner = (playerWithDealerCards: any[]) => {
+export interface PokerWinner {
+  players: any[];
+  wins: Winner[];
+  winnerIndicies: number[];
+  hand: string;
+}
 
-  console.log(playerWithDealerCards);
-
+export const determineWinner: (pwdc: any[]) => PokerWinner = (playerWithDealerCards: any[]) => {
   const dealerCards = playerWithDealerCards[0].dealerCards;
 
   const dealerCardsArray = dealerCards.map((card: CardProps) => `${card.rank == '10' ? 'T' : card.rank}${card.suit.charAt(0)}`);
@@ -264,24 +268,37 @@ export const determineWinner = (playerWithDealerCards: any[]) => {
     return [...dealerCardsArray, ...player.player.cards.map((card: CardProps) => `${card.rank == '10' ? 'T' : card.rank}${card.suit.charAt(0)}`)];
   });
 
-  console.log(handsArray);
-
   let solvedHands = handsArray.map((hand: string[]) => Hand.solve(hand));
 
-  var win = Hand.winners(solvedHands);
+  var wins: Winner[] = Hand.winners(solvedHands);
 
-  let tempIndicies: number[] = [];
+  let winnerIndicies: number[] = [];
 
   solvedHands.filter((item, index) => {
-    if (win[0].descr == item.descr) {
-      tempIndicies.push(index);
+    if (wins.includes(item)) {
+      winnerIndicies.push(index);
       return true;
     }
     return false;
   });
 
-  return { winners: playerWithDealerCards.filter((item, index) => tempIndicies.includes(index)), win, winnerIndicies: tempIndicies, hand: win[0].descr };
+  const pokerWinner: PokerWinner = {
+    players: playerWithDealerCards.filter((item, index) => winnerIndicies.includes(index)),
+    wins,
+    winnerIndicies,
+    hand: wins[0].descr
+  };
+
+  return pokerWinner;
 };
+
+export interface Winner {
+  cards: any[],
+  cardPool: any[],
+  descr: string;
+  name: string;
+  rank: number;
+}
 
 const sortByBestHand = (players: Player[]) => {
   const finalCardsArray = players.map((player, index) => {

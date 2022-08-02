@@ -7,10 +7,11 @@ interface PlayerDisplayProps {
   onTimeout: () => void;
   prevPlayer: Player;
   gameOver: boolean;
+  wonAmount?: number;
 }
 
 export default function PlayerDisplay(props: PlayerDisplayProps) {
-  const { player, active, onTimeout, prevPlayer, gameOver } = props;
+  const { player, active, onTimeout, prevPlayer, gameOver, wonAmount = 0 } = props;
 
   const [progressCreated, setProgressCreated] = useState(false);
 
@@ -66,7 +67,7 @@ export default function PlayerDisplay(props: PlayerDisplayProps) {
             : null
         }`}
       >
-        {`${player.chips}`}
+        {wonAmount > 0 ? `${player.chips} + ${wonAmount}` : `${player.chips}`}
       </div>
       {active ? (
         <div id="progressbar"></div>

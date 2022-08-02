@@ -7,10 +7,15 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
+  useMatches,
 } from "@remix-run/react";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { getUser } from "./session.server";
+import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { SocketProvider } from "./context";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -29,6 +34,24 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export default function App() {
+  const [socket, setSocket] = useState<Socket>();
+
+  useEffect(() => {
+    const socket = io();
+    console.log('set socket');
+    setSocket(socket);
+    return () => {
+      socket.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("confirmation", (data) => {
+      console.log(data);
+    });
+  }, [socket]);
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -36,7 +59,9 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        <Outlet />
+        <SocketProvider socket={socket}>
+          <Outlet />
+        </SocketProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
