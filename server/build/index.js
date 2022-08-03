@@ -439,21 +439,34 @@ function Index() {
       turnNumber,
       playerSocket,
       gameState,
-      dealerCards
+      dealerCards,
+      activeBet
     };
-    console.log(checkOrCallProps), socket.emit("playerCheckedOrCalled", checkOrCallProps);
+    socket.emit("playerCheckedOrCalled", checkOrCallProps);
   };
   (0, import_react6.useEffect)(() => {
     !socket || (socket.on("confirmation", (data) => {
-      console.log("socket on confirmation", data), setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
+      setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
     }), socket.on("playerJoined", (data) => {
-      console.log("on player joined", data), setPlayerNames((prevPN) => [...prevPN, data.playerName]), setPlayerSockets((prevPS) => [...prevPS, data.socket]), data.socket === socket.id && (setPlayerSocket(data.socket), setPlayer(data), setJoinedGame(!0));
+      setPlayerNames((prevPN) => [...prevPN, data.playerName]), setPlayerSockets((prevPS) => [...prevPS, data.socket]), data.socket === socket.id && (setPlayerSocket(data.socket), setPlayer(data), setJoinedGame(!0));
       let newPlayerCount = 0;
       setPlayerCount((prevPC) => (newPlayerCount = prevPC + 1, newPlayerCount)), setButtonClicked(!1);
     }), socket.on("sendHoldEmData", (data) => {
-      console.log("sendHoldEm", data), setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(1), setActivePlayer(data.players[1]);
+      setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(1), setActivePlayer(data.players[1]);
+    }), socket.on("sendBetData", (data) => {
+      setPots(data.pots), setPlayers(data.players), setActiveBet(data.activeBet), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`), setIsSnackbarOpen(!0);
+      let advanceDataProps = {
+        activePlayer: data.activePlayer,
+        gameState: data.gameState,
+        dealerCards: data.dealerCards,
+        players: data.players,
+        hands,
+        pots: data.pots,
+        activeBet: data.activeBet
+      };
+      advance(data.turnNumber, advanceDataProps, "BET");
     }), socket.on("sendCheckOrCallData", (data) => {
-      setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setSnackbarMessage(activeBet ? `${data.players[data.prevActivePlayerIndex].name} called $${activeBet}` : `${data.players[data.prevActivePlayerIndex].name} checked`), setIsSnackbarOpen(!0);
+      setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setSnackbarMessage(data.activeBet ? `${data.players[data.prevActivePlayerIndex].name} called $${data.activeBet}` : `${data.players[data.prevActivePlayerIndex].name} checked`), setIsSnackbarOpen(!0);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -462,7 +475,7 @@ function Index() {
         hands,
         pots: data.pots
       };
-      console.log("advanceDataProps", advanceDataProps), advance(data.turnNumber, advanceDataProps, "CHECK");
+      advance(data.turnNumber, advanceDataProps, "CHECK");
     }), socket.on("sendFoldData", (data) => {
       setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0);
       let advanceDataProps = {
@@ -473,13 +486,12 @@ function Index() {
         hands,
         pots
       };
-      console.log(advanceDataProps), advance(data.turnNumber, advanceDataProps, "FOLD");
+      advance(data.turnNumber, advanceDataProps, "FOLD");
     }), socket.on("sendAdvanceData", (data) => {
-      console.log("before calling method", data), setGameState(data.gameState), setDealerCards(data.dealerCards), setHands(data.hands), data.winner && (setWinner(data.winner), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setPlayers(data.players), setGameOver(data.gameOver);
+      setActiveBet(0), setGameState(data.gameState), setDealerCards(data.dealerCards), setHands(data.hands), data.winner && (setWinner(data.winner), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setPlayers(data.players), setGameOver(data.gameOver);
     }));
   }, [socket]), (0, import_react6.useEffect)(() => {
     if (playerCount === 3 && playerSocket === playerSockets[2]) {
-      console.log("youre the man now dog");
       let startProps = {
         playerNames,
         playerSockets,
@@ -492,7 +504,7 @@ function Index() {
     if (buttonClicked) {
       if (!socket)
         return;
-      console.log("use effect", playerName), socket.emit("playerJoined", { newPlayerName: playerName });
+      socket.emit("playerJoined", { newPlayerName: playerName });
     }
   }, [buttonClicked]);
   let handleJoinGame = () => {
@@ -523,12 +535,25 @@ function Index() {
     };
     socket.emit("playerFolded", foldProps);
   }, advance = (tn, data, type) => {
-    tn >= activePlayerCount - 1 ? (console.log("yep"), data.activePlayer.socket === (socket == null ? void 0 : socket.id) && (console.log("advancing with", data), advanceGame(data)), setActivePlayerCount(players.filter((p) => !p.folded).length), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
+    tn >= activePlayerCount - 1 ? (console.log("got here"), data.activePlayer.socket === (socket == null ? void 0 : socket.id) && advanceGame(data), setActivePlayerCount(players.filter((p) => !p.folded).length), setTurnNumber(0)) : (console.log("else here"), setTurnNumber((prev) => prev + 1));
   }, handleBet = (amount) => {
     let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name);
     tempActivePlayer.chips -= amount;
     let tempPots = [...pots];
-    tempPots[0] += amount, setPots(tempPots), setPlayers(tempPlayers), getNextPlayerProps(), setActiveBet(amount), setSnackbarMessage(`${activePlayer.name} bet $${amount}`), setIsSnackbarOpen(!0);
+    tempPots[0] += amount;
+    let advanceProps = getNextPlayerProps(), betProps = {
+      players: tempPlayers,
+      pots: tempPots,
+      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
+      activePlayerIndex: advanceProps.activePlayerIndex,
+      activePlayer: advanceProps.activePlayer,
+      turnNumber,
+      playerSocket,
+      gameState,
+      dealerCards,
+      activeBet: amount
+    };
+    socket.emit("playerBet", betProps);
   }, handlePlayerTimeout = (player2) => {
     playerSocket === player2.socket && handleFold(), setSnackbarMessage(`${player2.name} timed out and auto-folded`), setIsSnackbarOpen(!0);
   }, getNextPlayerProps = () => {
@@ -548,7 +573,7 @@ function Index() {
       activePlayer: players[nextActivePlayerIndex]
     };
   }, advanceGame = (data) => {
-    setActiveBet(0), socket.emit("advanceHoldEmGame", data);
+    socket.emit("advanceHoldEmGame", data);
   }, handleClose = () => {
     setIsSnackbarOpen(!1);
   }, advanceHands = () => {
@@ -1215,7 +1240,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "f67fe7a5", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-RQ2V6Q4Q.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-I75SYBVA.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-F67FE7A5.js" };
+var assets_manifest_default = { version: "28de3cff", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-RQ2V6Q4Q.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-QNLEHA2H.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-28DE3CFF.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

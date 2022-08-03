@@ -9,6 +9,7 @@ export interface AdvanceGameProps {
     players: Player[];
     hands: any[];
     pots: any[];
+    activeBet?: number;
 };
 
 export interface NextProps {

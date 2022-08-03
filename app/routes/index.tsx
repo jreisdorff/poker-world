@@ -55,6 +55,7 @@ export interface SendCheckOrCallDataProps {
   playerSocket: string;
   gameState: number;
   dealerCards: any[];
+  activeBet: number;
 }
 
 export interface SendFoldDataProps {
@@ -65,6 +66,19 @@ export interface SendFoldDataProps {
   turnNumber: number;
   playerSocket: string;
   gameState: number;
+}
+
+export interface SendBetDataProps {
+  players: Player[];
+  pots: any[];
+  prevActivePlayerIndex: number;
+  activePlayerIndex: number;
+  activePlayer: Player;
+  turnNumber: number;
+  playerSocket: string;
+  gameState: number;
+  dealerCards: any[];
+  activeBet: number;
 }
 
 const GameState = Object.freeze({
@@ -171,6 +185,7 @@ export default function Index() {
       playerSocket,
       gameState,
       dealerCards,
+      activeBet,
     };
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
@@ -217,6 +232,28 @@ export default function Index() {
       setActivePlayer(data.players[1]);
     });
 
+    socket.on("sendBetData", (data: SendBetDataProps) => {
+      setPots(data.pots);
+      setPlayers(data.players);
+      setActiveBet(data.activeBet);
+      setActivePlayerIndex(data.activePlayerIndex);
+      setActivePlayer(data.activePlayer);
+      setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`);
+      setIsSnackbarOpen(true);
+
+      const advanceDataProps: AdvanceGameProps = {
+        activePlayer: data.activePlayer,
+        gameState: data.gameState,
+        dealerCards: data.dealerCards,
+        players: data.players,
+        hands,
+        pots: data.pots,
+        activeBet: data.activeBet,
+      };
+
+      advance(data.turnNumber, advanceDataProps, "BET");
+    });
+
     socket.on("sendCheckOrCallData", (data: SendCheckOrCallDataProps) => {
       setPots(data.pots);
       setPlayers(data.players);
@@ -225,10 +262,10 @@ export default function Index() {
       setActivePlayer(data.activePlayer);
 
       setSnackbarMessage(
-        activeBet
+        data.activeBet
           ? `${
               data.players[data.prevActivePlayerIndex].name
-            } called $${activeBet}`
+            } called $${data.activeBet}`
           : `${data.players[data.prevActivePlayerIndex].name} checked`
       );
       setIsSnackbarOpen(true);
@@ -269,6 +306,8 @@ export default function Index() {
     });
 
     socket.on("sendAdvanceData", (data: NextProps) => {
+
+      setActiveBet(0);
 
       setGameState(data.gameState);
       setDealerCards(data.dealerCards);
@@ -381,12 +420,14 @@ export default function Index() {
 
   const advance = (tn: number, data: AdvanceGameProps, type: string) => {
     if (tn >= activePlayerCount - 1) {
+      console.log('got here');
       if (data.activePlayer.socket === socket?.id) {
         advanceGame(data);
       }
       setActivePlayerCount(players.filter((p) => !p.folded).length);
       setTurnNumber(0);
     } else {
+      console.log('else here');
       setTurnNumber((prev) => prev + 1);
     }
   };
@@ -399,15 +440,23 @@ export default function Index() {
     tempActivePlayer!.chips -= amount;
     let tempPots = [...pots];
     tempPots[0] += amount;
-    setPots(tempPots);
-    setPlayers(tempPlayers);
-    getNextPlayerProps();
 
-    setActiveBet(amount);
-    setSnackbarMessage(`${activePlayer.name} bet $${amount}`);
-    setIsSnackbarOpen(true);
+    const advanceProps = getNextPlayerProps();
 
-    // advance(turnNumber);
+    const betProps: SendBetDataProps = {
+      players: tempPlayers,
+      pots: tempPots,
+      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
+      activePlayerIndex: advanceProps.activePlayerIndex,
+      activePlayer: advanceProps.activePlayer,
+      turnNumber,
+      playerSocket,
+      gameState,
+      dealerCards,
+      activeBet: amount,
+    };
+
+    socket!.emit("playerBet", betProps);
   };
 
   const handlePlayerTimeout = (player: Player) => {
@@ -449,7 +498,6 @@ export default function Index() {
   };
 
   const advanceGame = (data: AdvanceGameProps) => {
-    setActiveBet(0);
     socket!.emit("advanceHoldEmGame", data);
   };
 

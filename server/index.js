@@ -301,6 +301,10 @@ io.on("connection", (socket) => {
     io.emit("playerJoined", { playerName: data.newPlayerName, socket: socket.id });
   });
 
+  socket.on("playerBet", (data) => {
+    io.emit("sendBetData", data);
+  });
+
   socket.on("playerCheckedOrCalled", (data) => {
     io.emit("sendCheckOrCallData", data);
   });
