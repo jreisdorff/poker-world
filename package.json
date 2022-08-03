@@ -39,6 +39,7 @@
     "@remix-run/serve": "^1.6.5",
     "@remix-run/server-runtime": "^1.6.5",
     "bcryptjs": "^2.4.3",
+    "bufferutil": "^4.0.6",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
     "express": "^4.17.3",
@@ -52,7 +53,9 @@
     "serverless-http": "^3.0.1",
     "socket.io": "^4.5.1",
     "socket.io-client": "^4.5.1",
-    "tiny-invariant": "^1.2.0"
+    "tiny-invariant": "^1.2.0",
+    "utf-8-validate": "^5.0.9",
+    "ws": "^7.5.9"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.3.0",
