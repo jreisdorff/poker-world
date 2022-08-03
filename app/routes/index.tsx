@@ -1,18 +1,21 @@
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
-import { useLocation, useMatches } from "@remix-run/react";
+import { LinksFunction, MetaFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
 import Card from "~/components/Card";
 import PlayerDisplay from "~/components/PlayerDisplay";
 import Table from "~/components/Table";
 import { createCards } from "~/utils/cards";
-import { AdvanceGameProps, advanceHoldEmGame, GameState } from "~/utils/game";
-import { CardProps, CardsCreator, PokerWinner } from "~/utils/poker";
+import { AdvanceGameProps, NextProps } from "~/utils/game";
+import {
+  CardProps,
+  CardsCreator,
+  PokerWinner,
+  StartHoldEmGameProps,
+} from "~/utils/poker";
 import cardStyles from "../styles/cards.css";
 import progressStyles from "../styles/progress.css";
 
-import { io } from "socket.io-client";
 import { useSocket } from "~/context";
 
 export const links: LinksFunction = () => {
@@ -38,8 +41,39 @@ export interface Player {
   chips: number;
   folded: boolean;
   finalCards?: any | any[];
-  [key: string]: string | number | boolean | CardProps[];
+  socket?: string;
+  [key: string]: string | number | boolean | CardProps[] | (string | undefined);
 }
+
+export interface SendCheckOrCallDataProps {
+  players: Player[];
+  pots: any[];
+  prevActivePlayerIndex: number;
+  activePlayerIndex: number;
+  activePlayer: Player;
+  turnNumber: number;
+  playerSocket: string;
+  gameState: number;
+  dealerCards: any[];
+}
+
+export interface SendFoldDataProps {
+  players: Player[];
+  prevActivePlayerIndex: number;
+  activePlayerIndex: number;
+  activePlayer: Player;
+  turnNumber: number;
+  playerSocket: string;
+  gameState: number;
+}
+
+const GameState = Object.freeze({
+  Preflop: 0,
+  Flop: 1,
+  Turn: 2,
+  River: 3,
+  Showdown: 4,
+});
 
 const initialPlayers: Player[] = [
   {
@@ -107,42 +141,60 @@ export default function Index() {
 
   const [socketConnected, setSocketConnected] = useState(false);
   const [playerNames, setPlayerNames] = useState<any[]>([]);
+  const [playerSocket, setPlayerSocket] = useState<any>();
+  const [playerSockets, setPlayerSockets] = useState<any[]>([]);
+
+  const [player, setPlayer] = useState<Player>();
+
+  const [joinedGame, setJoinedGame] = useState(false);
 
   let cardsCreator = CardsCreator.getInstance();
 
   const handleCheckOrCall = () => {
     let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
-      (player) => player.name === activePlayer.name
+      (tempP) => tempP.name === activePlayer.name
     );
     tempActivePlayer!.chips -= activeBet;
     let tempPots = [...pots];
     tempPots[0] += activeBet;
-    setPots(tempPots);
-    setPlayers(tempPlayers);
-    advancePlayer();
 
-    setSnackbarMessage(
-      activeBet
-        ? `${activePlayer.name} called $${activeBet}`
-        : `${activePlayer.name} checked`
-    );
-    setIsSnackbarOpen(true);
+    const advanceProps = getNextPlayerProps();
 
-    advance();
+    const checkOrCallProps: SendCheckOrCallDataProps = {
+      players: tempPlayers,
+      pots: tempPots,
+      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
+      activePlayerIndex: advanceProps.activePlayerIndex,
+      activePlayer: advanceProps.activePlayer,
+      turnNumber,
+      playerSocket,
+      gameState,
+      dealerCards,
+    };
+
+    console.log(checkOrCallProps);
+
+    socket!.emit("playerCheckedOrCalled", checkOrCallProps);
   };
 
   useEffect(() => {
     if (buttonClicked) {
       if (!socket) return;
-      socket.emit("event", playerName);
+      socket.emit("playerJoined", playerName);
     }
   }, [buttonClicked]);
 
   useEffect(() => {
     if (!socket) return;
-    socket.on("event", (data) => {
-      setPlayerNames((prevPN) => [...prevPN, data]);
+    socket.on("playerJoined", (data) => {
+      setPlayerNames((prevPN) => [...prevPN, data.playerName]);
+      setPlayerSockets((prevPS) => [...prevPS, data.socket]);
+      if (data.socket === socket.id) {
+        setPlayerSocket(data.socket);
+        setPlayer(data);
+        setJoinedGame(true);
+      }
       let newPlayerCount = 0;
       setPlayerCount((prevPC) => {
         newPlayerCount = prevPC + 1;
@@ -150,11 +202,113 @@ export default function Index() {
       });
       setButtonClicked(false);
     });
+
+    socket.on("sendHoldEmData", (data: StartHoldEmGameProps) => {
+
+      console.log('sendHoldEm', data);
+
+      setGameState(data.gameState);
+      setGameStarted(data.gameStarted);
+      setGameOver(data.gameOver);
+      setDealtCards(data.dealtCards);
+      setDealerCards(data.dealerCards);
+      setPlayers(data.players);
+      setDealer(data.dealer);
+      setLittleBlind(data.littleBlind);
+      setBigBlind(data.bigBlind);
+
+      setActivePlayerIndex(1);
+      setActivePlayer(data.players[1]);
+    });
+
+    socket.on("sendCheckOrCallData", (data: SendCheckOrCallDataProps) => {
+      setPots(data.pots);
+      setPlayers(data.players);
+      setGameState(data.gameState);
+      setActivePlayerIndex(data.activePlayerIndex);
+      setActivePlayer(data.activePlayer);
+
+      setSnackbarMessage(
+        activeBet
+          ? `${
+              data.players[data.prevActivePlayerIndex].name
+            } called $${activeBet}`
+          : `${data.players[data.prevActivePlayerIndex].name} checked`
+      );
+      setIsSnackbarOpen(true);
+
+      const advanceDataProps: AdvanceGameProps = {
+        activePlayer: data.activePlayer,
+        gameState: data.gameState,
+        dealerCards: data.dealerCards,
+        players: data.players,
+        hands,
+        pots: data.pots,
+      };
+
+      console.log('advanceDataProps', advanceDataProps);
+
+      advance(data.turnNumber, advanceDataProps, "CHECK");
+    });
+
+    socket.on("sendFoldData", (data: SendFoldDataProps) => {
+      setPlayers(data.players);
+      setGameState(data.gameState);
+      setActivePlayerIndex(data.activePlayerIndex);
+      setActivePlayer(data.activePlayer);
+
+      setSnackbarMessage(
+        `${data.players[data.prevActivePlayerIndex].name} folded`
+      );
+      setIsSnackbarOpen(true);
+
+      const advanceDataProps: AdvanceGameProps = {
+        activePlayer: data.activePlayer,
+        gameState: data.gameState,
+        dealerCards,
+        players: data.players,
+        hands,
+        pots,
+      };
+
+      console.log(advanceDataProps);
+
+      advance(data.turnNumber, advanceDataProps, "FOLD");
+    });
+
+    socket.on("sendAdvanceData", (data: NextProps) => {
+      console.log("before calling method", data);
+
+      setGameState(data.gameState);
+      setDealerCards(data.dealerCards);
+      setHands(data.hands);
+
+      if (data.winner) {
+        setWinner(data.winner);
+        setWinningCards(data.winningCards);
+        setWonAmount(data.wonAmount);
+      }
+
+      setPlayers(data.players);
+      setGameOver(data.gameOver);
+    });
   }, [socket]);
 
   useEffect(() => {
     if (playerCount === 3) {
-      handleStartGame();
+      // if you're the third player, aka if you were the player
+      // who joined last, you'll be the one to emit the event
+      // to the server to kick off the game.
+      if (playerSocket === playerSockets[2]) {
+        console.log('youre the man now dog');
+        let startProps = {
+          playerNames,
+          playerSockets,
+          playerChips: players.map((p) => p.chips),
+          pastHands: hands,
+        };
+        socket!.emit("startHoldEmGame", startProps);
+      }
     }
   }, [playerCount]);
 
@@ -183,7 +337,6 @@ export default function Index() {
           cards: newCards,
           folded: false,
         };
-        console.log("newPlayer", newPlayer);
         return newPlayer;
       })
     );
@@ -214,22 +367,32 @@ export default function Index() {
     });
     tempActivePlayer!.folded = true;
 
-    setPlayers(tempPlayers);
-    advancePlayer();
+    const advanceProps = getNextPlayerProps();
 
-    setSnackbarMessage(`${activePlayer.name} folded`);
-    setIsSnackbarOpen(true);
+    const foldProps: SendFoldDataProps = {
+      players: tempPlayers,
+      activePlayerIndex: advanceProps.activePlayerIndex,
+      activePlayer: advanceProps.activePlayer,
+      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
+      turnNumber,
+      playerSocket,
+      gameState,
+    };
 
-    advance();
+    socket!.emit("playerFolded", foldProps);
   };
 
-  const advance = () => {
-    if (turnNumber + 1 === activePlayerCount) {
-      advanceGame();
+  const advance = (tn: number, data: AdvanceGameProps, type: string) => {
+    if (tn >= activePlayerCount - 1) {
+      console.log('yep');
+      if (data.activePlayer.socket === socket?.id) {
+        console.log('advancing with', data);
+        advanceGame(data);
+      }
       setActivePlayerCount(players.filter((p) => !p.folded).length);
       setTurnNumber(0);
     } else {
-      setTurnNumber(turnNumber + 1);
+      setTurnNumber((prev) => prev + 1);
     }
   };
 
@@ -243,22 +406,25 @@ export default function Index() {
     tempPots[0] += amount;
     setPots(tempPots);
     setPlayers(tempPlayers);
-    advancePlayer();
+    getNextPlayerProps();
 
     setActiveBet(amount);
     setSnackbarMessage(`${activePlayer.name} bet $${amount}`);
     setIsSnackbarOpen(true);
 
-    advance();
+    // advance(turnNumber);
   };
 
   const handlePlayerTimeout = (player: Player) => {
-    handleFold();
-    setSnackbarMessage(`${activePlayer.name} timed out and auto-folded`);
+    if (playerSocket === player.socket) {
+      handleFold();
+    }
+
+    setSnackbarMessage(`${player.name} timed out and auto-folded`);
     setIsSnackbarOpen(true);
   };
 
-  const advancePlayer = () => {
+  const getNextPlayerProps = () => {
     let tempActivePlayerIndex = activePlayerIndex;
     let activePlayerIndicies: number[] = [];
     players.map((p, index) => {
@@ -280,30 +446,16 @@ export default function Index() {
       nextActivePlayerIndex = activePlayerIndicies[0];
     }
 
-    setActivePlayerIndex(nextActivePlayerIndex);
-    setActivePlayer(players[nextActivePlayerIndex]);
+    return {
+      prevActivePlayerIndex: activePlayerIndex,
+      activePlayerIndex: nextActivePlayerIndex,
+      activePlayer: players[nextActivePlayerIndex],
+    };
   };
 
-  const advanceGame = () => {
+  const advanceGame = (data: AdvanceGameProps) => {
     setActiveBet(0);
-
-    const advanceGameProps: AdvanceGameProps = {
-      gameState,
-      setGameState,
-      dealerCards,
-      setDealerCards,
-      players,
-      setPlayers,
-      hands,
-      setHands,
-      setWinner,
-      setWinningCards,
-      setGameOver,
-      pots,
-      setWonAmount,
-    };
-
-    advanceHoldEmGame(advanceGameProps);
+    socket!.emit("advanceHoldEmGame", data);
   };
 
   const handleClose = () => {
@@ -312,23 +464,6 @@ export default function Index() {
 
   const advanceHands = () => {
     handleNewGame();
-  };
-
-  const handleStartGame = () => {
-      setGameState(GameState.Preflop);
-      setGameStarted(true);
-      setGameOver(false);
-      setDealtCards([]);
-      cardsCreator.clearPassed();
-      let tempPlayers = [...players];
-      tempPlayers.forEach((player, index) => {
-        let newCards = createCards(52, 2, dealtCards, index === 0);
-        player.cards = newCards;
-        player.name = playerNames[index];
-        setDealtCards([...dealtCards, ...newCards]);
-      });
-      setDealerCards(createCards(52, 3, dealtCards, false));
-      setPlayers(tempPlayers);
   };
 
   return (
@@ -360,10 +495,13 @@ export default function Index() {
                   className="absolute mt-24 self-center rounded bg-black px-4 py-2 text-white"
                 />
                 <button
-                  className="absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${
+                    joinedGame ? "disabled" : ""
+                  }`}
                   onClick={handleJoinGame}
+                  disabled={joinedGame}
                 >
-                  Join Game
+                  {!joinedGame ? "Join Game" : "Joined, awaiting players"}
                 </button>
                 <div className="absolute mt-48 self-center text-6xl text-black">
                   {playerCount}
@@ -439,7 +577,11 @@ export default function Index() {
                         key={`${index}-${card.suit}-${card.rank}`}
                         suit={card.suit}
                         rank={card.rank}
-                        faceUp={card.faceUp}
+                        faceUp={
+                          !players[1].folded &&
+                          players[1].socket === playerSocket &&
+                          activePlayer.socket === playerSocket
+                        }
                         folded={players[1].folded}
                         winner={
                           winningCards.length > 0
@@ -501,7 +643,11 @@ export default function Index() {
                         key={`${index}-${card.suit}-${card.rank}`}
                         suit={card.suit}
                         rank={card.rank}
-                        faceUp={card.faceUp}
+                        faceUp={
+                          !players[2].folded &&
+                          players[2].socket === playerSocket &&
+                          activePlayer.socket === playerSocket
+                        }
                         folded={players[2].folded}
                         winner={
                           winningCards.length > 0
@@ -553,7 +699,11 @@ export default function Index() {
                       key={`${index}-${card.suit}-${card.rank}`}
                       suit={card.suit}
                       rank={card.rank}
-                      faceUp={card.faceUp}
+                      faceUp={
+                        !players[0].folded &&
+                        players[0].socket === playerSocket &&
+                        activePlayer.socket === playerSocket
+                      }
                       folded={players[0].folded}
                       winner={
                         winningCards.length > 0
@@ -607,7 +757,7 @@ export default function Index() {
                     />
                   </div>
                 ) : null}
-                {!gameOver ? (
+                {!gameOver && activePlayer.socket === playerSocket ? (
                   <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">

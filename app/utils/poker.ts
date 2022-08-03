@@ -1,6 +1,4 @@
-import { objectEnumValues } from "@prisma/client/runtime";
-import * as _ from "lodash";
-import { forEach } from "lodash";
+import _ from "lodash";
 import { Player } from "~/routes";
 
 /*
@@ -31,6 +29,18 @@ const maxInARow = (weights: any) =>
     .orderBy("length" as any)
     .last()
     .value().length;
+
+export interface StartHoldEmGameProps {
+  gameState: number;
+  gameStarted: boolean;
+  gameOver: boolean;
+  dealtCards: any[];
+  players: Player[];
+  dealerCards: any[];
+  dealer: Player,
+  littleBlind: Player,
+  bigBlind: Player,
+};
 
 //
 // Playing Cards class definition and implementation
@@ -223,11 +233,6 @@ let hands = [
   "3 of a Kind",
   "Full House",
 ];
-var A = 14,
-  K = 13,
-  Q = 12,
-  J = 11,
-  suitsObj = { "♠": 1, "♣": 2, "♥": 4, "♦": 8 };
 
 //Calculates the Rank of a 5 card Poker hand using bit manipulations.
 export const rankPokerHand = (cs: number[], ss: number[]) => {
@@ -245,8 +250,6 @@ export const rankPokerHand = (cs: number[], ss: number[]) => {
   return `${hands[v]} ${s == 0x403c ? " (Ace low)" : ""}`;
 };
 
-var Hand = require('pokersolver').Hand;
-
 export interface TotalCards {
   dealerCards: any[];
   player: Player;
@@ -259,39 +262,6 @@ export interface PokerWinner {
   hand: string;
 }
 
-export const determineWinner: (pwdc: any[]) => PokerWinner = (playerWithDealerCards: any[]) => {
-  const dealerCards = playerWithDealerCards[0].dealerCards;
-
-  const dealerCardsArray = dealerCards.map((card: CardProps) => `${card.rank == '10' ? 'T' : card.rank}${card.suit.charAt(0)}`);
-
-  const handsArray = playerWithDealerCards.map((player: TotalCards) => {
-    return [...dealerCardsArray, ...player.player.cards.map((card: CardProps) => `${card.rank == '10' ? 'T' : card.rank}${card.suit.charAt(0)}`)];
-  });
-
-  let solvedHands = handsArray.map((hand: string[]) => Hand.solve(hand));
-
-  var wins: Winner[] = Hand.winners(solvedHands);
-
-  let winnerIndicies: number[] = [];
-
-  solvedHands.filter((item, index) => {
-    if (wins.includes(item)) {
-      winnerIndicies.push(index);
-      return true;
-    }
-    return false;
-  });
-
-  const pokerWinner: PokerWinner = {
-    players: playerWithDealerCards.filter((item, index) => winnerIndicies.includes(index)),
-    wins,
-    winnerIndicies,
-    hand: wins[0].descr
-  };
-
-  return pokerWinner;
-};
-
 export interface Winner {
   cards: any[],
   cardPool: any[],
@@ -299,36 +269,3 @@ export interface Winner {
   name: string;
   rank: number;
 }
-
-const sortByBestHand = (players: Player[]) => {
-  const finalCardsArray = players.map((player, index) => {
-    return { finalCards: player.finalCards, index };
-  });
-  const sortedPlayers = finalCardsArray.sort((a, b) =>
-    byCountFirst(
-      players.map((player) => player.finalCards),
-      new RateableCards(a.finalCards).suitTimes,
-      new RateableCards(b.finalCards).suitTimes
-    )
-  );
-  return sortedPlayers;
-};
-
-const counts = (cards: any[]) => cards.reduce(count, {});
-
-const byCountFirst = (cardsArray: any[], a: number, b: number) => {
-  const tempCounts = counts(cardsArray);
-  //Counts are in reverse order - bigger is better
-  const countDiff = tempCounts[b] - tempCounts[a];
-  if (countDiff) return countDiff;
-  return b > a ? -1 : b === a ? 0 : 1;
-};
-
-const count: any = (
-  c: { [x: string]: any },
-  a: string | number,
-  index: any
-) => {
-  c[a] = (c[a] || 0) + 1;
-  return c;
-};
