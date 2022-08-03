@@ -38,19 +38,11 @@ export default function App() {
 
   useEffect(() => {
     const socket = io();
-    console.log('set socket');
     setSocket(socket);
     return () => {
       socket.close();
     };
   }, []);
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.on("confirmation", (data) => {
-      console.log(data);
-    });
-  }, [socket]);
 
   return (
     <html lang="en" className="h-full">

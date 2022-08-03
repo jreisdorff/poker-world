@@ -216,14 +216,10 @@ function App() {
   let [socket, setSocket] = (0, import_react4.useState)();
   return (0, import_react4.useEffect)(() => {
     let socket2 = (0, import_socket.io)();
-    return console.log("set socket"), setSocket(socket2), () => {
+    return setSocket(socket2), () => {
       socket2.close();
     };
-  }, []), (0, import_react4.useEffect)(() => {
-    !socket || socket.on("confirmation", (data) => {
-      console.log(data);
-    });
-  }, [socket]), /* @__PURE__ */ React.createElement("html", {
+  }, []), /* @__PURE__ */ React.createElement("html", {
     lang: "en",
     className: "h-full"
   }, /* @__PURE__ */ React.createElement("head", null, /* @__PURE__ */ React.createElement(import_react3.Meta, null), /* @__PURE__ */ React.createElement(import_react3.Links, null)), /* @__PURE__ */ React.createElement("body", {
@@ -320,7 +316,7 @@ function PlayerDisplay(props) {
     }
   };
   return (0, import_react5.useEffect)(() => {
-    gameOver || createProgressbar("progressbar", "10s", function() {
+    gameOver || createProgressbar("progressbar", "30s", function() {
       onTimeout();
     });
   }), /* @__PURE__ */ React.createElement("div", {
@@ -448,14 +444,10 @@ function Index() {
     console.log(checkOrCallProps), socket.emit("playerCheckedOrCalled", checkOrCallProps);
   };
   (0, import_react6.useEffect)(() => {
-    if (buttonClicked) {
-      if (!socket)
-        return;
-      socket.emit("playerJoined", playerName);
-    }
-  }, [buttonClicked]), (0, import_react6.useEffect)(() => {
-    !socket || (socket.on("playerJoined", (data) => {
-      setPlayerNames((prevPN) => [...prevPN, data.playerName]), setPlayerSockets((prevPS) => [...prevPS, data.socket]), data.socket === socket.id && (setPlayerSocket(data.socket), setPlayer(data), setJoinedGame(!0));
+    !socket || (socket.on("confirmation", (data) => {
+      console.log("socket on confirmation", data), setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
+    }), socket.on("playerJoined", (data) => {
+      console.log("on player joined", data), setPlayerNames((prevPN) => [...prevPN, data.playerName]), setPlayerSockets((prevPS) => [...prevPS, data.socket]), data.socket === socket.id && (setPlayerSocket(data.socket), setPlayer(data), setJoinedGame(!0));
       let newPlayerCount = 0;
       setPlayerCount((prevPC) => (newPlayerCount = prevPC + 1, newPlayerCount)), setButtonClicked(!1);
     }), socket.on("sendHoldEmData", (data) => {
@@ -496,7 +488,13 @@ function Index() {
       };
       socket.emit("startHoldEmGame", startProps);
     }
-  }, [playerCount]);
+  }, [playerCount]), (0, import_react6.useEffect)(() => {
+    if (buttonClicked) {
+      if (!socket)
+        return;
+      console.log("use effect", playerName), socket.emit("playerJoined", { newPlayerName: playerName });
+    }
+  }, [buttonClicked]);
   let handleJoinGame = () => {
     setButtonClicked(!0);
   }, handleNewGame = () => {
@@ -1217,7 +1215,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "a33fc68d", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-WUWLOF7D.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-L2GKBFYQ.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-A33FC68D.js" };
+var assets_manifest_default = { version: "f67fe7a5", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-RQ2V6Q4Q.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-I75SYBVA.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-F67FE7A5.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

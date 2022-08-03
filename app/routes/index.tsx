@@ -173,20 +173,18 @@ export default function Index() {
       dealerCards,
     };
 
-    console.log(checkOrCallProps);
-
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
   };
 
   useEffect(() => {
-    if (buttonClicked) {
-      if (!socket) return;
-      socket.emit("playerJoined", playerName);
-    }
-  }, [buttonClicked]);
-
-  useEffect(() => {
     if (!socket) return;
+
+    socket.on("confirmation", (data: { playerNames: any[]; playerSockets: any[] }) => {
+      setPlayerNames(data.playerNames);
+      setPlayerSockets(data.playerSockets);
+      setPlayerCount(data.playerNames.length);
+    });
+
     socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]);
       setPlayerSockets((prevPS) => [...prevPS, data.socket]);
@@ -204,8 +202,6 @@ export default function Index() {
     });
 
     socket.on("sendHoldEmData", (data: StartHoldEmGameProps) => {
-
-      console.log('sendHoldEm', data);
 
       setGameState(data.gameState);
       setGameStarted(data.gameStarted);
@@ -246,8 +242,6 @@ export default function Index() {
         pots: data.pots,
       };
 
-      console.log('advanceDataProps', advanceDataProps);
-
       advance(data.turnNumber, advanceDataProps, "CHECK");
     });
 
@@ -271,13 +265,10 @@ export default function Index() {
         pots,
       };
 
-      console.log(advanceDataProps);
-
       advance(data.turnNumber, advanceDataProps, "FOLD");
     });
 
     socket.on("sendAdvanceData", (data: NextProps) => {
-      console.log("before calling method", data);
 
       setGameState(data.gameState);
       setDealerCards(data.dealerCards);
@@ -300,7 +291,6 @@ export default function Index() {
       // who joined last, you'll be the one to emit the event
       // to the server to kick off the game.
       if (playerSocket === playerSockets[2]) {
-        console.log('youre the man now dog');
         let startProps = {
           playerNames,
           playerSockets,
@@ -311,6 +301,13 @@ export default function Index() {
       }
     }
   }, [playerCount]);
+
+  useEffect(() => {
+    if (buttonClicked) {
+      if (!socket) return;
+      socket.emit("playerJoined", { newPlayerName: playerName });
+    }
+  }, [buttonClicked]);
 
   const handleJoinGame = () => {
     setButtonClicked(true);
@@ -384,9 +381,7 @@ export default function Index() {
 
   const advance = (tn: number, data: AdvanceGameProps, type: string) => {
     if (tn >= activePlayerCount - 1) {
-      console.log('yep');
       if (data.activePlayer.socket === socket?.id) {
-        console.log('advancing with', data);
         advanceGame(data);
       }
       setActivePlayerCount(players.filter((p) => !p.folded).length);

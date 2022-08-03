@@ -270,15 +270,35 @@ const createCards = (max, n, remaining = [], faceUp) => {
   return [...remaining, ...cardsCreator.getCards(faceUp, max, n)];
 };
 
+let playerNames = [];
+let playerSockets = [];
+
 // Then you can use `io` to listen the `connection` event and get a socket
 // from a client
 io.on("connection", (socket) => {
   // from this point you are on the WS connection with a specific client
   console.log(socket.id, "connected");
-  socket.emit("confirmation", "connected!");
+  socket.emit("confirmation", { playerNames, playerSockets });
+
+  socket.on("disconnect", (reason) => {
+    let playersIndex = playerSockets.indexOf(socket.id);
+    let playerName = playerNames[playersIndex];
+    let playerSocket = playerSockets[playersIndex];
+
+    let tempPlayerNames = [...playerNames];
+    let tempPlayerSockets = [...playerSockets];
+
+    tempPlayerNames = tempPlayerNames.filter((player) => player !== playerName);
+    tempPlayerSockets = tempPlayerSockets.filter((socket) => socket !== playerSocket);
+
+    playerNames = tempPlayerNames;
+    playerSockets = tempPlayerSockets;
+  });
 
   socket.on("playerJoined", (data) => {
-    io.emit("playerJoined", { playerName: data, socket: socket.id });
+    playerNames.push(data.newPlayerName);
+    playerSockets.push(socket.id);
+    io.emit("playerJoined", { playerName: data.newPlayerName, socket: socket.id });
   });
 
   socket.on("playerCheckedOrCalled", (data) => {
