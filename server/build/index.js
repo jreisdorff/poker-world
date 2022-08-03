@@ -82,7 +82,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-E65HFYSZ.css";
+var tailwind_default = "/build/_assets/tailwind-QJ37TGBI.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -92,7 +92,7 @@ var import_bcryptjs = __toESM(require("bcryptjs"));
 
 // app/db.server.ts
 var import_client = require("@prisma/client"), prisma;
-global.__db__ || (global.__db__ = new import_client.PrismaClient()), prisma = global.__db__, prisma.$connect();
+prisma = new import_client.PrismaClient();
 
 // app/models/user.server.ts
 async function getUserById(id) {
@@ -136,7 +136,7 @@ var sessionStorage = (0, import_node2.createCookieSessionStorage)({
     path: "/",
     sameSite: "lax",
     secrets: [process.env.SESSION_SECRET],
-    secure: !1
+    secure: !0
   }
 }), USER_SESSION_KEY = "userId";
 async function getSession(request) {
@@ -1217,7 +1217,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "73cf1524", entry: { module: "/build/entry.client-W4W4AZ6Q.js", imports: ["/build/_shared/chunk-LVZ5C3MS.js", "/build/_shared/chunk-NB6CB35D.js", "/build/_shared/chunk-MPGGF27F.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-XQJ24QI6.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-KFXDRCUJ.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-QAACZOEZ.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-JWBROJUR.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-OTYFOXEH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-JWBROJUR.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-VGNKTOVJ.js", imports: ["/build/_shared/chunk-JWBROJUR.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MBOQH5A5.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-4YRJDM6E.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-ITC62OZ5.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-73CF1524.js" };
+var assets_manifest_default = { version: "a33fc68d", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-WUWLOF7D.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-L2GKBFYQ.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-A33FC68D.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
@@ -1311,4 +1311,3 @@ module.exports = __toCommonJS(stdin_exports);
   publicPath,
   routes
 });
-//# sourceMappingURL=index.js.map

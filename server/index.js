@@ -7,8 +7,8 @@ const morgan = require("morgan");
 const fs = require("fs");
 const _ = require("lodash");
 const { createRequestHandler } = require("@remix-run/express");
-var Hand = require('pokersolver').Hand;
-
+var Hand = require("pokersolver").Hand;
+const PORT = process.env.PORT || 3000;
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), "server/build");
 
@@ -35,7 +35,6 @@ const GameState = Object.freeze({
 });
 
 const advanceHoldEmGame = (props) => {
-
   let nextProps = {
     gameState: props.gameState,
     dealerCards: props.dealerCards,
@@ -77,7 +76,7 @@ const advanceHoldEmGame = (props) => {
       props.players
         .filter(
           (player) =>
-          props.players.map((pith) => pith.name).includes(player.name) &&
+            props.players.map((pith) => pith.name).includes(player.name) &&
             !player.folded
         )
         .map((player) => {
@@ -89,7 +88,7 @@ const advanceHoldEmGame = (props) => {
 
     const winnerDescription = `${
       gameWinner.players.length === 1
-        ? (gameWinner.players[0]).player.name
+        ? gameWinner.players[0].player.name
         : gameWinner.players
             .map((winner) => winner.player.name)
             .join(", ")
@@ -124,10 +123,12 @@ const advanceHoldEmGame = (props) => {
           card.faceUp = true;
         });
       });
-    
-    tempPlayers.filter((p, index) => gameWinner.winnerIndicies.includes(index)).forEach((player) => {
+
+    tempPlayers
+      .filter((p, index) => gameWinner.winnerIndicies.includes(index))
+      .forEach((player) => {
         player.chips += wonAmount;
-    });
+      });
 
     nextProps.players = tempPlayers;
     nextProps.gameOver = true;
@@ -139,10 +140,17 @@ const advanceHoldEmGame = (props) => {
 const determineWinner = (playerWithDealerCards) => {
   const dealerCards = playerWithDealerCards[0].dealerCards;
 
-  const dealerCardsArray = dealerCards.map((card) => `${card.rank == '10' ? 'T' : card.rank}${card.suit.charAt(0)}`);
+  const dealerCardsArray = dealerCards.map(
+    (card) => `${card.rank == "10" ? "T" : card.rank}${card.suit.charAt(0)}`
+  );
 
   const handsArray = playerWithDealerCards.map((player) => {
-    return [...dealerCardsArray, ...player.player.cards.map((card) => `${card.rank == '10' ? 'T' : card.rank}${card.suit.charAt(0)}`)];
+    return [
+      ...dealerCardsArray,
+      ...player.player.cards.map(
+        (card) => `${card.rank == "10" ? "T" : card.rank}${card.suit.charAt(0)}`
+      ),
+    ];
   });
 
   let solvedHands = handsArray.map((hand) => Hand.solve(hand));
@@ -160,30 +168,31 @@ const determineWinner = (playerWithDealerCards) => {
   });
 
   const pokerWinner = {
-    players: playerWithDealerCards.filter((item, index) => winnerIndicies.includes(index)),
+    players: playerWithDealerCards.filter((item, index) =>
+      winnerIndicies.includes(index)
+    ),
     wins,
     winnerIndicies,
-    hand: wins[0].descr
+    hand: wins[0].descr,
   };
 
   return pokerWinner;
 };
 
 const getWonAmount = (winner, pots) => {
-    
   let daMoney = 0;
   let numberOfWinners = winner.winner.players.length;
 
   pots.forEach((pot) => {
-      daMoney += pot;
+    daMoney += pot;
   });
-  
+
   if (numberOfWinners === 1) {
-      return daMoney;
+    return daMoney;
   } else if (numberOfWinners > 1) {
-      return Math.floor(daMoney / numberOfWinners);
+    return Math.floor(daMoney / numberOfWinners);
   }
-}
+};
 
 const Ranks = Object.freeze([
   "2",
@@ -205,17 +214,15 @@ const Suits = Object.freeze(["hearts", "clubs", "diams", "spades"]);
 
 const Cards = (faceUp) => {
   return Object.entries(Ranks).reduce(
-    (cards, [weight, rank]) =>
-      [
-        ...cards,
-        ...Suits.map((suit) => ({ rank, suit, weight, faceUp })),
-      ],
+    (cards, [weight, rank]) => [
+      ...cards,
+      ...Suits.map((suit) => ({ rank, suit, weight, faceUp })),
+    ],
     []
   );
 };
 
 const CardsCreator = (() => {
-
   let instance;
 
   const init = () => {
@@ -288,7 +295,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("startHoldEmGame", (data) => {
-
     cardsCreator.clearPassed();
 
     let players = data.playerNames;
@@ -306,7 +312,7 @@ io.on("connection", (socket) => {
         cards: newCards,
         name: player,
         socket: data.playerSockets[index],
-        chips: playerChips[index]
+        chips: playerChips[index],
       };
 
       fullPlayers.push(newGuy);
@@ -332,8 +338,6 @@ io.on("connection", (socket) => {
 
     io.emit("sendHoldEmData", startHoldEmGameProps);
   });
-
-
 });
 
 app.use(compression());
