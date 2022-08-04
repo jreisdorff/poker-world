@@ -614,7 +614,7 @@ export default function Index() {
                       ", "
                     )} • Hand #${hands.length + 1}`}
                   </div>
-                  <div className="playingCards simpleCards absolute bottom-[48%] flex w-[100vw] flex-row items-center justify-center">
+                  <div className="playingCards simpleCards absolute bottom-[48%] flex w-[100vw] flex-row items-center justify-center z-[9999]">
                     {dealerCards.map((card, index) => (
                       <Card
                         key={`${index}-${card.suit}-${card.rank}`}
@@ -637,17 +637,8 @@ export default function Index() {
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-row gap-1">
-                  <div className="fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center">
-                    <PlayerDisplay
-                      player={players[1]}
-                      active={activePlayer.name === players[1].name}
-                      onTimeout={() => handlePlayerTimeout(players[1])}
-                      prevPlayer={players[0]}
-                      gameOver={gameOver}
-                    />
-                  </div>
-                  <div className="playingCards simpleCards fixed bottom-[45%] right-[25%] flex w-[100vw] rotate-90 flex-row items-center justify-center">
+                <div className="flex flex-col gap-1">
+                <div className="playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center">
                     {players[1].cards.map((card, index) => (
                       <Card
                         key={`${index}-${card.suit}-${card.rank}`}
@@ -672,6 +663,15 @@ export default function Index() {
                         }
                       />
                     ))}
+                  </div>
+                  <div className="fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center">
+                    <PlayerDisplay
+                      player={players[1]}
+                      active={activePlayer.name === players[1].name}
+                      onTimeout={() => handlePlayerTimeout(players[1])}
+                      prevPlayer={players[0]}
+                      gameOver={gameOver}
+                    />
                   </div>
                   {dealer.name === players[1].name ? (
                     <div className="fixed bottom-[50%] flex w-[100vw] flex-row pl-8">
@@ -703,17 +703,8 @@ export default function Index() {
                     </div>
                   ) : null}
                 </div>
-                <div className="flex flex-row gap-1">
-                  <div className="fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center">
-                    <PlayerDisplay
-                      player={players[2]}
-                      active={activePlayer.name === players[2].name}
-                      onTimeout={() => handlePlayerTimeout(players[2])}
-                      prevPlayer={players[1]}
-                      gameOver={gameOver}
-                    />
-                  </div>
-                  <div className="playingCards simpleCards fixed bottom-[45%] left-[25%] flex w-[100vw] -rotate-90 flex-row items-center justify-center">
+                <div className="flex flex-col gap-1">
+                <div className="playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center">
                     {players[2].cards.map((card, index) => (
                       <Card
                         key={`${index}-${card.suit}-${card.rank}`}
@@ -738,6 +729,15 @@ export default function Index() {
                         }
                       />
                     ))}
+                  </div>
+                  <div className="fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center">
+                    <PlayerDisplay
+                      player={players[2]}
+                      active={activePlayer.name === players[2].name}
+                      onTimeout={() => handlePlayerTimeout(players[2])}
+                      prevPlayer={players[1]}
+                      gameOver={gameOver}
+                    />
                   </div>
                   {dealer.name === players[2].name ? (
                     <div className="fixed bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8">

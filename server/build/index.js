@@ -77,7 +77,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-SQKQ2QUF.css";
+var tailwind_default = "/build/_assets/tailwind-IX4Z6PDB.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -405,7 +405,7 @@ function Index() {
       return;
     let advance = (tn, data, type) => {
       let tempTurnNumber = tn;
-      type === "BET" && (tempTurnNumber = 0, setTurnNumber(0)), type === "FOLD" && setActivePlayerCount((prev) => prev - 1), console.log("temp is", tempTurnNumber), console.log("data.turnsThisRound - 1", data.turnsThisRound - 1), tempTurnNumber >= data.turnsThisRound - 1 ? (console.log("got here"), console.log(data.activePlayer.socket), console.log(socket.id), data.activePlayer.socket === (socket == null ? void 0 : socket.id) && (console.log("call advance game", data), advanceGame(data)), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
+      type === "BET" && (tempTurnNumber = 0, setTurnNumber(0)), type === "FOLD" && setActivePlayerCount((prev) => prev - 1), tempTurnNumber >= data.turnsThisRound - 1 ? (data.activePlayer.socket === (socket == null ? void 0 : socket.id) && advanceGame(data), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
     };
     socket.on("confirmation", (data) => {
       setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
@@ -460,7 +460,7 @@ function Index() {
     }), socket.on("sendAdvanceHandsData", (data) => {
       setGameState(GameState.Preflop), setGameStarted(!0), setGameOver(!1), setDealtCards([]), setDealerCards([]), setWinningCards([]), setWinner(null), setWonAmount(0), setActivePlayerCount(3), setTurnsThisRound(3), setTurnsNextRound(3), setPlayers(data.players), setHands(data.hands);
       let nextDealerIndex = data.hands.length % data.players.length, nextLittleBlindIndex = (data.hands.length + 1) % data.players.length, nextBigBlindIndex = (data.hands.length + 2) % data.players.length;
-      setDealer(data.players[nextDealerIndex]), setLittleBlind(data.players[nextLittleBlindIndex]), setBigBlind(data.players[nextBigBlindIndex]), setActivePlayerIndex(nextLittleBlindIndex), console.log("setting active player to", data.players[nextLittleBlindIndex]), setActivePlayer(data.players[nextLittleBlindIndex]), setPots([0]);
+      setDealer(data.players[nextDealerIndex]), setLittleBlind(data.players[nextLittleBlindIndex]), setBigBlind(data.players[nextBigBlindIndex]), setActivePlayerIndex(nextLittleBlindIndex), setActivePlayer(data.players[nextLittleBlindIndex]), setPots([0]);
     });
   }, [socket]), (0, import_react6.useEffect)(() => {
     if (playerCount === 3 && playerSocket === playerSockets[2]) {
@@ -496,7 +496,7 @@ function Index() {
       turnsThisRound: turnsNextRound,
       hands
     };
-    console.log("fold props", foldProps), socket.emit("playerFolded", foldProps);
+    socket.emit("playerFolded", foldProps);
   }, handleBet = (amount) => {
     let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name);
     tempActivePlayer.chips -= amount;
@@ -537,11 +537,11 @@ function Index() {
       activePlayer: players[nextActivePlayerIndex]
     };
   }, advanceGame = (data) => {
-    console.log("advance game with data", data), socket.emit("advanceHoldEmGame", data);
+    socket.emit("advanceHoldEmGame", data);
   }, handleClose = () => {
     setIsSnackbarOpen(!1);
   }, advanceHands = () => {
-    console.log("advance hands", players, hands, playerSockets), socket.emit("advanceHands", { players, hands, playerSockets });
+    socket.emit("advanceHands", { players, hands, playerSockets });
   };
   return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(import_Snackbar.default, {
     open: isSnackbarOpen,
@@ -581,7 +581,7 @@ function Index() {
   }, /* @__PURE__ */ React.createElement("h1", null, winner ? winner.description : null)), /* @__PURE__ */ React.createElement("div", {
     className: "absolute top-[30%] w-[100vw] items-center justify-center self-center text-center text-xl"
   }, `Blinds: ${blinds[0]}/${blinds[1]} \u2022 Pot: ${pots.join(", ")} \u2022 Hand #${hands.length + 1}`), /* @__PURE__ */ React.createElement("div", {
-    className: "playingCards simpleCards absolute bottom-[48%] flex w-[100vw] flex-row items-center justify-center"
+    className: "playingCards simpleCards absolute bottom-[48%] flex w-[100vw] flex-row items-center justify-center z-[9999]"
   }, dealerCards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
     suit: card.suit,
@@ -590,17 +590,9 @@ function Index() {
     folded: card.faceUp,
     winner: winningCards.length > 0 ? winningCards.filter((w) => w.suit == card.suit.charAt(0) && w.value.toString().replace("T", "10") === card.rank).length > 0 : !1
   })))), /* @__PURE__ */ React.createElement("div", {
-    className: "flex flex-row gap-1"
+    className: "flex flex-col gap-1"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center"
-  }, /* @__PURE__ */ React.createElement(PlayerDisplay, {
-    player: players[1],
-    active: activePlayer.name === players[1].name,
-    onTimeout: () => handlePlayerTimeout(players[1]),
-    prevPlayer: players[0],
-    gameOver
-  })), /* @__PURE__ */ React.createElement("div", {
-    className: "playingCards simpleCards fixed bottom-[45%] right-[25%] flex w-[100vw] rotate-90 flex-row items-center justify-center"
+    className: "playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center"
   }, players[1].cards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
     suit: card.suit,
@@ -608,7 +600,15 @@ function Index() {
     faceUp: !players[1].folded && players[1].socket === playerSocket || card.faceUp,
     folded: players[1].folded,
     winner: winningCards.length > 0 ? winningCards.filter((w) => w.suit == card.suit.charAt(0) && w.value.toString().replace("T", "10") === card.rank).length > 0 : !1
-  }))), dealer.name === players[1].name ? /* @__PURE__ */ React.createElement("div", {
+  }))), /* @__PURE__ */ React.createElement("div", {
+    className: "fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center"
+  }, /* @__PURE__ */ React.createElement(PlayerDisplay, {
+    player: players[1],
+    active: activePlayer.name === players[1].name,
+    onTimeout: () => handlePlayerTimeout(players[1]),
+    prevPlayer: players[0],
+    gameOver
+  })), dealer.name === players[1].name ? /* @__PURE__ */ React.createElement("div", {
     className: "fixed bottom-[50%] flex w-[100vw] flex-row pl-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/black-dealer-button.png",
@@ -631,17 +631,9 @@ function Index() {
     height: "50px",
     className: "object-cover"
   })) : null), /* @__PURE__ */ React.createElement("div", {
-    className: "flex flex-row gap-1"
+    className: "flex flex-col gap-1"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center"
-  }, /* @__PURE__ */ React.createElement(PlayerDisplay, {
-    player: players[2],
-    active: activePlayer.name === players[2].name,
-    onTimeout: () => handlePlayerTimeout(players[2]),
-    prevPlayer: players[1],
-    gameOver
-  })), /* @__PURE__ */ React.createElement("div", {
-    className: "playingCards simpleCards fixed bottom-[45%] left-[25%] flex w-[100vw] -rotate-90 flex-row items-center justify-center"
+    className: "playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center"
   }, players[2].cards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
     suit: card.suit,
@@ -649,7 +641,15 @@ function Index() {
     faceUp: !players[2].folded && players[2].socket === playerSocket || card.faceUp,
     folded: players[2].folded,
     winner: winningCards.length > 0 ? winningCards.filter((w) => w.suit == card.suit.charAt(0) && w.value.toString().replace("T", "10") === card.rank).length > 0 : !1
-  }))), dealer.name === players[2].name ? /* @__PURE__ */ React.createElement("div", {
+  }))), /* @__PURE__ */ React.createElement("div", {
+    className: "fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center"
+  }, /* @__PURE__ */ React.createElement(PlayerDisplay, {
+    player: players[2],
+    active: activePlayer.name === players[2].name,
+    onTimeout: () => handlePlayerTimeout(players[2]),
+    prevPlayer: players[1],
+    gameOver
+  })), dealer.name === players[2].name ? /* @__PURE__ */ React.createElement("div", {
     className: "fixed bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/black-dealer-button.png",
@@ -1202,7 +1202,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "cd987d45", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-ID24DPHW.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-HJ4FOSB7.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-CD987D45.js" };
+var assets_manifest_default = { version: "ceffe518", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-6BN6IGML.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-VILGU2XY.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-CEFFE518.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
