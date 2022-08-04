@@ -904,7 +904,7 @@ export default function Index() {
                   </div>
                 ) : null}
                 {!gameOver && activePlayer.socket === playerSocket ? (
-                  <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8">
+                  <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8 z-[10999]">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">
                         <input
@@ -946,7 +946,7 @@ export default function Index() {
                   </div>
                 ) : null}
                 {gameOver && earlyWin && winner && winner.winner.players.map((p) => p.player.socket).includes(player!.socket) ? (
-                  <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8">
+                  <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8 z-[10999]">
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
                       <button
                         className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
