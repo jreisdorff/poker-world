@@ -106,7 +106,6 @@ const endHoldEmRound = (props) => {
   nextProps.players = tempPlayers;
   nextProps.gameOver = true;
 
-  console.log('next props', nextProps);
   return nextProps;
 };
 
@@ -174,8 +173,6 @@ const advanceHoldEmGame = (props) => {
     let winnar = { winner: gameWinner, description: winnerDescription };
 
     tempHands.push(winnar);
-
-    console.log("temp hands pushed winner", tempHands);
 
     nextProps.hands = tempHands;
     const winnerObj = { winner: gameWinner, description: winnerDescription };
@@ -416,6 +413,10 @@ io.on("connection", (socket) => {
   socket.on("endRound", (data) => {
     let endData = endHoldEmRound(data);
     io.emit("sendEndRoundData", endData);
+  });
+
+  socket.on("showCards", (data) => {
+    io.emit("sendShowCardsData", data);
   });
 
   socket.on("advanceHands", (data) => {

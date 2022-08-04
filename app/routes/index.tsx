@@ -170,6 +170,8 @@ export default function Index() {
   const [turnsThisRound, setTurnsThisRound] = useState(3);
   const [turnsNextRound, setTurnsNextRound] = useState(3);
 
+  const [earlyWin, setEarlyWin] = useState(false);
+
   const handleCheckOrCall = () => {
     let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
@@ -220,7 +222,6 @@ export default function Index() {
 
       if (tempActivePlayerCount === 1) {
         // need to end the round. last active player wins
-        console.log('end round');
         endRound(data);
         return;
       }
@@ -307,6 +308,10 @@ export default function Index() {
       advance(data.turnNumber, advanceDataProps, "BET");
     });
 
+    socket.on("sendShowCardsData", (data: { players: any[] }) => {
+      setPlayers(data.players);
+    });
+
     socket.on("sendCheckOrCallData", (data: SendCheckOrCallDataProps) => {
       setPots(data.pots);
       setPlayers(data.players);
@@ -368,12 +373,13 @@ export default function Index() {
       setActiveBet(0);
 
       setGameState(data.gameState);
-      setDealerCards(data.dealerCards);
 
       setActivePlayerCount(data.turnsNextRound);
 
       setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
       setTurnsNextRound(3); // reset turns next round
+
+      setEarlyWin(true);
 
       if (data.winner) {
         setWinner(data.winner);
@@ -422,12 +428,12 @@ export default function Index() {
 
       setTurnNumber(0);
 
+      setEarlyWin(false);
+
       setActivePlayerCount(3);
 
       setTurnsThisRound(3);
       setTurnsNextRound(3);
-
-      console.log('send advancehands', data.players);
 
       setPlayers(data.players);
       setHands(data.hands);
@@ -589,6 +595,24 @@ export default function Index() {
     socket!.emit("advanceHands", { players, hands, playerSockets });
   };
 
+  const handleShowCards = (player: Player) => {
+    let tempPlayers = [...players];
+
+    let tempCards = tempPlayers.filter((p) => p.socket === player.socket).map((p) => p.cards);
+
+    tempCards.forEach((cardArray) => {
+      cardArray.forEach((card) => {
+        card.faceUp = true;
+      });
+    });
+
+    socket!.emit("showCards", { players: tempPlayers });
+  };
+
+  const handleMuckCards = () => {
+
+  };
+
   return (
     <>
       <Snackbar
@@ -712,7 +736,7 @@ export default function Index() {
                     </div>
                     <PlayerDisplay
                       player={players[1]}
-                      active={activePlayer.name === players[1].name}
+                      active={activePlayer.name === players[1].name && !gameOver}
                       onTimeout={() => handlePlayerTimeout(players[1])}
                       prevPlayer={players[0]}
                       gameOver={gameOver}
@@ -779,7 +803,7 @@ export default function Index() {
                     </div>
                     <PlayerDisplay
                       player={players[2]}
-                      active={activePlayer.name === players[2].name}
+                      active={activePlayer.name === players[2].name && !gameOver}
                       onTimeout={() => handlePlayerTimeout(players[2])}
                       prevPlayer={players[1]}
                       gameOver={gameOver}
@@ -844,7 +868,7 @@ export default function Index() {
                 <div className="fixed bottom-[7.5%] flex w-[100vw] flex-col items-center justify-center">
                   <PlayerDisplay
                     player={players[0]}
-                    active={activePlayer.name === players[0].name}
+                    active={activePlayer.name === players[0].name && !gameOver}
                     onTimeout={() => handlePlayerTimeout(players[0])}
                     prevPlayer={players[players.length - 1]}
                     gameOver={gameOver}
@@ -917,6 +941,24 @@ export default function Index() {
                         onClick={() => handleBet(bet)}
                       >
                         Bet
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+                {gameOver && earlyWin && winner && winner.winner.players.map((p) => p.player.socket).includes(player!.socket) ? (
+                  <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8">
+                    <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
+                      <button
+                        className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={() => handleShowCards(player!)}
+                      >
+                        Show Cards
+                      </button>
+                      <button
+                        className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={handleMuckCards}
+                      >
+                        Muck
                       </button>
                     </div>
                   </div>
