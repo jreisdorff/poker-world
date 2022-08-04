@@ -405,9 +405,15 @@ function Index() {
       return;
     let advance = (tn, data, type) => {
       let tempTurnNumber = tn;
-      type === "BET" && (tempTurnNumber = 0, setTurnNumber(0)), type === "FOLD" && setActivePlayerCount((prev) => prev - 1), tempTurnNumber >= data.turnsThisRound - 1 ? (data.activePlayer.socket === (socket == null ? void 0 : socket.id) && advanceGame(data), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
+      if (type === "BET" && (tempTurnNumber = 0, setTurnNumber(0)), type === "FOLD" && setActivePlayerCount((prev) => prev - 1), data.players.filter((p) => !p.folded).length === 1) {
+        console.log("end round"), endRound(data);
+        return;
+      }
+      tempTurnNumber >= data.turnsThisRound - 1 ? (data.activePlayer.socket === (socket == null ? void 0 : socket.id) && advanceGame(data), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
     };
     socket.on("confirmation", (data) => {
+      setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
+    }), socket.on("playerDisconnect", (data) => {
       setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
     }), socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]), setPlayerSockets((prevPS) => [...prevPS, data.socket]), data.socket === socket.id && (setPlayerSocket(data.socket), setPlayer(data), setJoinedGame(!0));
@@ -455,10 +461,12 @@ function Index() {
         turnsThisRound: data.turnsThisRound
       };
       advance(data.turnNumber, advanceDataProps, "FOLD");
+    }), socket.on("sendEndRoundData", (data) => {
+      setActiveBet(0), setGameState(data.gameState), setDealerCards(data.dealerCards), setActivePlayerCount(data.turnsNextRound), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(3), data.winner && (setWinner(data.winner), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver);
     }), socket.on("sendAdvanceData", (data) => {
       setActiveBet(0), setGameState(data.gameState), setDealerCards(data.dealerCards), setActivePlayerCount(data.turnsNextRound), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(3), data.winner && (setWinner(data.winner), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver);
     }), socket.on("sendAdvanceHandsData", (data) => {
-      setGameState(GameState.Preflop), setGameStarted(!0), setGameOver(!1), setDealtCards([]), setDealerCards([]), setWinningCards([]), setWinner(null), setWonAmount(0), setActivePlayerCount(3), setTurnsThisRound(3), setTurnsNextRound(3), setPlayers(data.players), setHands(data.hands);
+      setGameState(GameState.Preflop), setGameStarted(!0), setGameOver(!1), setDealtCards([]), setDealerCards([]), setWinningCards([]), setWinner(null), setWonAmount(0), setTurnNumber(0), setActivePlayerCount(3), setTurnsThisRound(3), setTurnsNextRound(3), console.log("send advancehands", data.players), setPlayers(data.players), setHands(data.hands);
       let nextDealerIndex = data.hands.length % data.players.length, nextLittleBlindIndex = (data.hands.length + 1) % data.players.length, nextBigBlindIndex = (data.hands.length + 2) % data.players.length;
       setDealer(data.players[nextDealerIndex]), setLittleBlind(data.players[nextLittleBlindIndex]), setBigBlind(data.players[nextBigBlindIndex]), setActivePlayerIndex(nextLittleBlindIndex), setActivePlayer(data.players[nextLittleBlindIndex]), setPots([0]);
     });
@@ -536,6 +544,8 @@ function Index() {
       activePlayerIndex: nextActivePlayerIndex,
       activePlayer: players[nextActivePlayerIndex]
     };
+  }, endRound = (data) => {
+    socket.emit("endRound", data);
   }, advanceGame = (data) => {
     socket.emit("advanceHoldEmGame", data);
   }, handleClose = () => {
@@ -581,7 +591,7 @@ function Index() {
   }, /* @__PURE__ */ React.createElement("h1", null, winner ? winner.description : null)), /* @__PURE__ */ React.createElement("div", {
     className: "absolute top-[30%] w-[100vw] items-center justify-center self-center text-center text-xl"
   }, `Blinds: ${blinds[0]}/${blinds[1]} \u2022 Pot: ${pots.join(", ")} \u2022 Hand #${hands.length + 1}`), /* @__PURE__ */ React.createElement("div", {
-    className: "playingCards simpleCards absolute bottom-[48%] flex w-[100vw] flex-row items-center justify-center z-[9999]"
+    className: "playingCards simpleCards absolute bottom-[48%] z-[9999] flex w-[100vw] flex-row items-center justify-center"
   }, dealerCards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
     suit: card.suit,
@@ -592,7 +602,9 @@ function Index() {
   })))), /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col gap-1"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center"
+    className: "fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "playingCards simpleCards flex flex-row items-center justify-center"
   }, players[1].cards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
     suit: card.suit,
@@ -600,9 +612,7 @@ function Index() {
     faceUp: !players[1].folded && players[1].socket === playerSocket || card.faceUp,
     folded: players[1].folded,
     winner: winningCards.length > 0 ? winningCards.filter((w) => w.suit == card.suit.charAt(0) && w.value.toString().replace("T", "10") === card.rank).length > 0 : !1
-  }))), /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center"
-  }, /* @__PURE__ */ React.createElement(PlayerDisplay, {
+  }))), /* @__PURE__ */ React.createElement(PlayerDisplay, {
     player: players[1],
     active: activePlayer.name === players[1].name,
     onTimeout: () => handlePlayerTimeout(players[1]),
@@ -633,7 +643,9 @@ function Index() {
   })) : null), /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col gap-1"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center"
+    className: "fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "playingCards simpleCards flex flex-row items-center justify-center"
   }, players[2].cards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
     suit: card.suit,
@@ -641,9 +653,7 @@ function Index() {
     faceUp: !players[2].folded && players[2].socket === playerSocket || card.faceUp,
     folded: players[2].folded,
     winner: winningCards.length > 0 ? winningCards.filter((w) => w.suit == card.suit.charAt(0) && w.value.toString().replace("T", "10") === card.rank).length > 0 : !1
-  }))), /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center"
-  }, /* @__PURE__ */ React.createElement(PlayerDisplay, {
+  }))), /* @__PURE__ */ React.createElement(PlayerDisplay, {
     player: players[2],
     active: activePlayer.name === players[2].name,
     onTimeout: () => handlePlayerTimeout(players[2]),
@@ -1202,7 +1212,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "ceffe518", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-6BN6IGML.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-VILGU2XY.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-CEFFE518.js" };
+var assets_manifest_default = { version: "8d391784", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-6BN6IGML.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-PW2QXOMT.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-8D391784.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

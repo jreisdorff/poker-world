@@ -34,6 +34,82 @@ const GameState = Object.freeze({
   Showdown: 4,
 });
 
+const endHoldEmRound = (props) => {
+  let nextProps = {
+    gameState: props.gameState,
+    dealerCards: props.dealerCards,
+    hands: props.hands,
+    winner: undefined,
+    winningCards: [],
+    wonAmount: [],
+    players: props.players,
+    activePlayer: props.activePlayer,
+    gameOver: false,
+    turnsNextRound: props.turnsNextRound,
+  };
+
+  nextProps.gameState = GameState.Showdown;
+  let tempDealerCards = [...props.dealerCards];
+  tempDealerCards.forEach((card) => {
+    card.faceUp = true;
+  });
+  let tempPlayers = [...props.players];
+  nextProps.dealerCards = tempDealerCards;
+  let gameWinner = determineWinner(
+    props.players
+      .filter(
+        (player) =>
+          props.players.map((pith) => pith.name).includes(player.name) &&
+          !player.folded
+      )
+      .map((player) => {
+        return { dealerCards: props.dealerCards, player };
+      })
+  );
+
+  const winnerDescription = `${
+    gameWinner.players.length === 1
+      ? gameWinner.players[0].player.name
+      : gameWinner.players
+          .map((winner) => winner.player.name)
+          .join(", ")
+          .replace(/, ((?:.(?!, ))+)$/, ", and $1")
+  } ${gameWinner.players.length === 1 ? "won" : "split the pot"}`;
+  let tempHands = [...props.hands];
+  let winnar = { winner: gameWinner, description: winnerDescription };
+
+  tempHands.push(winnar);
+
+  nextProps.hands = tempHands;
+  const winnerObj = { winner: gameWinner, description: winnerDescription };
+  nextProps.winner = winnerObj;
+  let tempWinningCards = [];
+  gameWinner.wins.forEach((w) => {
+    w.cards.forEach((card) => {
+      if (!tempWinningCards.includes(card)) {
+        tempWinningCards.push(card);
+      }
+    });
+  });
+
+  nextProps.winningCards = tempWinningCards;
+
+  let wonAmount = getWonAmount(winnerObj, props.pots);
+  nextProps.wonAmount = wonAmount;
+
+  tempPlayers
+    .filter((p, index) => gameWinner.winnerIndicies.includes(index))
+    .forEach((player) => {
+      player.chips += wonAmount;
+    });
+
+  nextProps.players = tempPlayers;
+  nextProps.gameOver = true;
+
+  console.log('next props', nextProps);
+  return nextProps;
+};
+
 const advanceHoldEmGame = (props) => {
   let nextProps = {
     gameState: props.gameState,
@@ -99,7 +175,7 @@ const advanceHoldEmGame = (props) => {
 
     tempHands.push(winnar);
 
-    console.log('temp hands pushed winner', tempHands);
+    console.log("temp hands pushed winner", tempHands);
 
     nextProps.hands = tempHands;
     const winnerObj = { winner: gameWinner, description: winnerDescription };
@@ -118,7 +194,7 @@ const advanceHoldEmGame = (props) => {
     let wonAmount = getWonAmount(winnerObj, props.pots);
     nextProps.wonAmount = wonAmount;
 
-    let tempCards = props.players.filter((p) => !p.folded).map(p => p.cards);
+    let tempCards = props.players.filter((p) => !p.folded).map((p) => p.cards);
 
     tempCards.forEach((cardArray) => {
       cardArray.forEach((card) => {
@@ -142,7 +218,7 @@ const advanceHoldEmGame = (props) => {
     nextProps.gameOver = true;
   }
 
-  let turnsNext = nextProps.players.filter(player => !player.folded).length;
+  let turnsNext = nextProps.players.filter((player) => !player.folded).length;
 
   nextProps.turnsNextRound = turnsNext;
 
@@ -301,16 +377,23 @@ io.on("connection", (socket) => {
     let tempPlayerSockets = [...playerSockets];
 
     tempPlayerNames = tempPlayerNames.filter((player) => player !== playerName);
-    tempPlayerSockets = tempPlayerSockets.filter((socket) => socket !== playerSocket);
+    tempPlayerSockets = tempPlayerSockets.filter(
+      (socket) => socket !== playerSocket
+    );
 
     playerNames = tempPlayerNames;
     playerSockets = tempPlayerSockets;
+
+    io.emit("playerDisconnect", { playerNames, playerSockets });
   });
 
   socket.on("playerJoined", (data) => {
     playerNames.push(data.newPlayerName);
     playerSockets.push(socket.id);
-    io.emit("playerJoined", { playerName: data.newPlayerName, socket: socket.id });
+    io.emit("playerJoined", {
+      playerName: data.newPlayerName,
+      socket: socket.id,
+    });
   });
 
   socket.on("playerBet", (data) => {
@@ -330,21 +413,26 @@ io.on("connection", (socket) => {
     io.emit("sendAdvanceData", advanceData);
   });
 
+  socket.on("endRound", (data) => {
+    let endData = endHoldEmRound(data);
+    io.emit("sendEndRoundData", endData);
+  });
+
   socket.on("advanceHands", (data) => {
     cardsCreator.clearPassed();
     let tempPlayers = [...data.players];
 
     let newPlayers = tempPlayers.map((prev, index) => {
-        let newCards = createCards(52, 2, undefined, false);
-        let newPlayer = {
-          name: tempPlayers[index].name,
-          chips: prev.chips,
-          cards: newCards,
-          folded: false,
-          socket: data.playerSockets[index],
-        };
-        return newPlayer;
-      });
+      let newCards = createCards(52, 2, undefined, false);
+      let newPlayer = {
+        name: tempPlayers[index].name,
+        chips: prev.chips,
+        cards: newCards,
+        folded: false,
+        socket: data.playerSockets[index],
+      };
+      return newPlayer;
+    });
 
     let tempHands = [...data.hands];
 

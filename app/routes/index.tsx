@@ -5,13 +5,10 @@ import { useEffect, useState } from "react";
 import Card from "~/components/Card";
 import PlayerDisplay from "~/components/PlayerDisplay";
 import Table from "~/components/Table";
-import { createCards } from "~/utils/cards";
 import { AdvanceGameProps, NextProps } from "~/utils/game";
 import {
-  CardProps,
-  CardsCreator,
-  PokerWinner,
-  StartHoldEmGameProps,
+  CardProps, PokerWinner,
+  StartHoldEmGameProps
 } from "~/utils/poker";
 import cardStyles from "../styles/cards.css";
 import progressStyles from "../styles/progress.css";
@@ -57,7 +54,7 @@ export interface SendCheckOrCallDataProps {
   dealerCards: any[];
   activeBet: number;
   turnsThisRound: number;
-  hands: any[],
+  hands: any[];
 }
 
 export interface SendFoldDataProps {
@@ -206,19 +203,29 @@ export default function Index() {
     if (!socket) return;
 
     const advance = (tn: number, data: AdvanceGameProps, type: string) => {
-
       let tempTurnNumber = tn;
 
       if (type === "BET") {
         tempTurnNumber = 0;
         setTurnNumber(0);
       }
-  
+
       if (type === "FOLD") {
-        setActivePlayerCount((prev) => prev - 1);
+        setActivePlayerCount((prev) => {
+          return prev - 1;
+        });
       }
-    
-      if (tempTurnNumber >= (data.turnsThisRound - 1)) {
+
+      let tempActivePlayerCount = data.players.filter((p) => !p.folded).length;
+
+      if (tempActivePlayerCount === 1) {
+        // need to end the round. last active player wins
+        console.log('end round');
+        endRound(data);
+        return;
+      }
+
+      if (tempTurnNumber >= data.turnsThisRound - 1) {
         if (data.activePlayer.socket === socket?.id) {
           advanceGame(data);
         }
@@ -236,6 +243,12 @@ export default function Index() {
         setPlayerCount(data.playerNames.length);
       }
     );
+
+    socket.on("playerDisconnect", (data: { playerNames: any[]; playerSockets: any[] }) => {
+      setPlayerNames(data.playerNames);
+      setPlayerSockets(data.playerSockets);
+      setPlayerCount(data.playerNames.length);
+    });
 
     socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]);
@@ -351,6 +364,29 @@ export default function Index() {
       advance(data.turnNumber, advanceDataProps, "FOLD");
     });
 
+    socket.on("sendEndRoundData", (data: NextProps) => {
+      setActiveBet(0);
+
+      setGameState(data.gameState);
+      setDealerCards(data.dealerCards);
+
+      setActivePlayerCount(data.turnsNextRound);
+
+      setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
+      setTurnsNextRound(3); // reset turns next round
+
+      if (data.winner) {
+        setWinner(data.winner);
+        setWinningCards(data.winningCards);
+        setWonAmount(data.wonAmount);
+      }
+
+      setHands(data.hands);
+
+      setPlayers(data.players);
+      setGameOver(data.gameOver);
+    });
+
     socket.on("sendAdvanceData", (data: NextProps) => {
       setActiveBet(0);
 
@@ -384,10 +420,14 @@ export default function Index() {
       setWinner(null);
       setWonAmount(0);
 
+      setTurnNumber(0);
+
       setActivePlayerCount(3);
 
       setTurnsThisRound(3);
       setTurnsNextRound(3);
+
+      console.log('send advancehands', data.players);
 
       setPlayers(data.players);
       setHands(data.hands);
@@ -533,6 +573,10 @@ export default function Index() {
     };
   };
 
+  const endRound = (data: AdvanceGameProps) => {
+    socket!.emit("endRound", data);
+  }
+
   const advanceGame = (data: AdvanceGameProps) => {
     socket!.emit("advanceHoldEmGame", data);
   };
@@ -614,7 +658,7 @@ export default function Index() {
                       ", "
                     )} • Hand #${hands.length + 1}`}
                   </div>
-                  <div className="playingCards simpleCards absolute bottom-[48%] flex w-[100vw] flex-row items-center justify-center z-[9999]">
+                  <div className="playingCards simpleCards absolute bottom-[48%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
                       <Card
                         key={`${index}-${card.suit}-${card.rank}`}
@@ -638,33 +682,34 @@ export default function Index() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                <div className="playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center">
-                    {players[1].cards.map((card, index) => (
-                      <Card
-                        key={`${index}-${card.suit}-${card.rank}`}
-                        suit={card.suit}
-                        rank={card.rank}
-                        faceUp={
-                          (!players[1].folded &&
-                            players[1].socket === playerSocket) ||
-                          card.faceUp
-                        }
-                        folded={players[1].folded}
-                        winner={
-                          winningCards.length > 0
-                            ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                    card.rank
-                                );
-                              }).length > 0
-                            : false
-                        }
-                      />
-                    ))}
-                  </div>
+                  {/* <div className="playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
                   <div className="fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center">
+                    <div className="playingCards simpleCards flex flex-row items-center justify-center">
+                      {players[1].cards.map((card, index) => (
+                        <Card
+                          key={`${index}-${card.suit}-${card.rank}`}
+                          suit={card.suit}
+                          rank={card.rank}
+                          faceUp={
+                            (!players[1].folded &&
+                              players[1].socket === playerSocket) ||
+                            card.faceUp
+                          }
+                          folded={players[1].folded}
+                          winner={
+                            winningCards.length > 0
+                              ? winningCards.filter((w) => {
+                                  return (
+                                    w.suit == card.suit.charAt(0) &&
+                                    w.value.toString().replace("T", "10") ===
+                                      card.rank
+                                  );
+                                }).length > 0
+                              : false
+                          }
+                        />
+                      ))}
+                    </div>
                     <PlayerDisplay
                       player={players[1]}
                       active={activePlayer.name === players[1].name}
@@ -704,33 +749,34 @@ export default function Index() {
                   ) : null}
                 </div>
                 <div className="flex flex-col gap-1">
-                <div className="playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center">
-                    {players[2].cards.map((card, index) => (
-                      <Card
-                        key={`${index}-${card.suit}-${card.rank}`}
-                        suit={card.suit}
-                        rank={card.rank}
-                        faceUp={
-                          (!players[2].folded &&
-                            players[2].socket === playerSocket) ||
-                          card.faceUp
-                        }
-                        folded={players[2].folded}
-                        winner={
-                          winningCards.length > 0
-                            ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                    card.rank
-                                );
-                              }).length > 0
-                            : false
-                        }
-                      />
-                    ))}
-                  </div>
+                  {/* <div className="playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
                   <div className="fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center">
+                    <div className="playingCards simpleCards flex flex-row items-center justify-center">
+                      {players[2].cards.map((card, index) => (
+                        <Card
+                          key={`${index}-${card.suit}-${card.rank}`}
+                          suit={card.suit}
+                          rank={card.rank}
+                          faceUp={
+                            (!players[2].folded &&
+                              players[2].socket === playerSocket) ||
+                            card.faceUp
+                          }
+                          folded={players[2].folded}
+                          winner={
+                            winningCards.length > 0
+                              ? winningCards.filter((w) => {
+                                  return (
+                                    w.suit == card.suit.charAt(0) &&
+                                    w.value.toString().replace("T", "10") ===
+                                      card.rank
+                                  );
+                                }).length > 0
+                              : false
+                          }
+                        />
+                      ))}
+                    </div>
                     <PlayerDisplay
                       player={players[2]}
                       active={activePlayer.name === players[2].name}
