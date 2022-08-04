@@ -50,7 +50,7 @@ export default function PlayerDisplay(props: PlayerDisplayProps) {
   });
 
   return (
-    <div className={`flex flex-col`}>
+    <div className={`flex flex-col z-1`}>
       <div
         className={`w-[135px] max-w-[100vw] rounded-t-2xl bg-black p-1 text-center text-white ${
           active && !gameOver

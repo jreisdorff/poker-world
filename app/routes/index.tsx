@@ -629,7 +629,7 @@ export default function Index() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      <main className="relative min-h-screen bg-[rgb(0,90,0)] sm:flex sm:items-center sm:justify-center">
+      <main className="relative min-h-screen bg-[rgb(0,90,0)] flex items-center justify-center">
         <div className="relative sm:pb-16 sm:pt-8">
           <div className="mx-auto flex h-[100vh] w-[100vw] flex-col">
             {!gameStarted && (
@@ -707,7 +707,7 @@ export default function Index() {
                 </div>
                 <div className="flex flex-col gap-1">
                   {/* <div className="playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
-                  <div className="fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center">
+                  <div className="fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center z-[4000]">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
                       {players[1].cards.map((card, index) => (
                         <Card
@@ -743,38 +743,38 @@ export default function Index() {
                     />
                   </div>
                   {dealer.name === players[1].name ? (
-                    <div className="fixed bottom-[50%] flex w-[100vw] flex-row pl-8">
+                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0">
                       <img
                         src="images/black-dealer-button.png"
                         alt="dealer"
-                        className="object-cover"
+                        className="relative object-cover"
                       />
                     </div>
                   ) : littleBlind.name === players[1].name ? (
-                    <div className="fixed bottom-[50%] flex w-[100vw] flex-row pl-8">
+                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0">
                       <img
                         src="images/littleblind.png"
                         alt="little blind"
                         width="50px"
                         height="50px"
-                        className="object-cover"
+                        className="relative object-cover"
                       />
                     </div>
                   ) : bigBlind.name === players[1].name ? (
-                    <div className="fixed bottom-[50%] flex w-[100vw] flex-row pl-8">
+                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0">
                       <img
                         src="images/bigblind.png"
                         alt="big blind"
                         width="50px"
                         height="50px"
-                        className="object-cover"
+                        className="relative object-cover"
                       />
                     </div>
                   ) : null}
                 </div>
                 <div className="flex flex-col gap-1">
                   {/* <div className="playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
-                  <div className="fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center">
+                  <div className="fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center z-[4000]">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
                       {players[2].cards.map((card, index) => (
                         <Card
@@ -810,31 +810,31 @@ export default function Index() {
                     />
                   </div>
                   {dealer.name === players[2].name ? (
-                    <div className="fixed bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8">
+                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0">
                       <img
                         src="images/black-dealer-button.png"
                         alt="dealer"
-                        className="object-cover"
+                        className="relative object-cover"
                       />
                     </div>
                   ) : littleBlind.name === players[2].name ? (
-                    <div className="fixed bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8">
+                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0">
                       <img
                         src="images/littleblind.png"
                         alt="little blind"
                         width="50px"
                         height="50px"
-                        className="object-cover"
+                        className="relative object-cover"
                       />
                     </div>
                   ) : bigBlind.name === players[2].name ? (
-                    <div className="fixed bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8">
+                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0">
                       <img
                         src="images/bigblind.png"
                         alt="big blind"
                         width="50px"
                         height="50px"
-                        className="object-cover"
+                        className="relative object-cover"
                       />
                     </div>
                   ) : null}
@@ -865,7 +865,7 @@ export default function Index() {
                     />
                   ))}
                 </div>
-                <div className="fixed bottom-[7.5%] flex w-[100vw] flex-col items-center justify-center">
+                <div className="fixed bottom-[7.5%] flex w-[100vw] flex-col items-center justify-center z-[4000]">
                   <PlayerDisplay
                     player={players[0]}
                     active={activePlayer.name === players[0].name && !gameOver}
@@ -875,31 +875,31 @@ export default function Index() {
                   />
                 </div>
                 {dealer.name === players[0].name ? (
-                  <div className="fixed bottom-[1%] flex w-[100vw] flex-row items-center justify-center">
+                  <div className="absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0">
                     <img
                       src="images/black-dealer-button.png"
                       alt="dealer"
-                      className="object-cover"
+                      className="relative object-cover"
                     />
                   </div>
                 ) : littleBlind.name === players[0].name ? (
-                  <div className="fixed bottom-[1%] flex w-[100vw] flex-row items-center justify-center">
+                  <div className="absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0">
                     <img
                       src="images/littleblind.png"
                       alt="little blind"
                       width="50px"
                       height="50px"
-                      className="object-cover"
+                      className="relative object-cover"
                     />
                   </div>
                 ) : bigBlind.name === players[0].name ? (
-                  <div className="fixed bottom-[1%] flex w-[100vw] flex-row items-center justify-center">
+                  <div className="absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0">
                     <img
                       src="images/bigblind.png"
                       alt="big blind"
                       width="50px"
                       height="50px"
-                      className="object-cover"
+                      className="relative object-cover"
                     />
                   </div>
                 ) : null}
