@@ -10,6 +10,8 @@ export interface AdvanceGameProps {
     hands: any[];
     pots: any[];
     activeBet?: number;
+    turnsNextRound: number;
+    turnsThisRound: number;
 };
 
 export interface NextProps {
@@ -22,4 +24,5 @@ export interface NextProps {
   players: any[];
   gameOver: boolean;
   activePlayer: any;
+  turnsNextRound: number;
 };

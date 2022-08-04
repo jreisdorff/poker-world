@@ -56,6 +56,8 @@ export interface SendCheckOrCallDataProps {
   gameState: number;
   dealerCards: any[];
   activeBet: number;
+  turnsThisRound: number;
+  hands: any[],
 }
 
 export interface SendFoldDataProps {
@@ -66,6 +68,9 @@ export interface SendFoldDataProps {
   turnNumber: number;
   playerSocket: string;
   gameState: number;
+  turnsNextRound: number;
+  turnsThisRound: number;
+  hands: any[];
 }
 
 export interface SendBetDataProps {
@@ -79,6 +84,9 @@ export interface SendBetDataProps {
   gameState: number;
   dealerCards: any[];
   activeBet: number;
+  turnsNextRound: number;
+  turnsThisRound: number;
+  hands: any[];
 }
 
 const GameState = Object.freeze({
@@ -162,7 +170,8 @@ export default function Index() {
 
   const [joinedGame, setJoinedGame] = useState(false);
 
-  let cardsCreator = CardsCreator.getInstance();
+  const [turnsThisRound, setTurnsThisRound] = useState(3);
+  const [turnsNextRound, setTurnsNextRound] = useState(3);
 
   const handleCheckOrCall = () => {
     let tempPlayers = [...players];
@@ -186,6 +195,8 @@ export default function Index() {
       gameState,
       dealerCards,
       activeBet,
+      turnsThisRound,
+      hands,
     };
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
@@ -194,11 +205,37 @@ export default function Index() {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("confirmation", (data: { playerNames: any[]; playerSockets: any[] }) => {
-      setPlayerNames(data.playerNames);
-      setPlayerSockets(data.playerSockets);
-      setPlayerCount(data.playerNames.length);
-    });
+    const advance = (tn: number, data: AdvanceGameProps, type: string) => {
+
+      let tempTurnNumber = tn;
+
+      if (type === "BET") {
+        tempTurnNumber = 0;
+        setTurnNumber(0);
+      }
+  
+      if (type === "FOLD") {
+        setActivePlayerCount((prev) => prev - 1);
+      }
+    
+      if (tempTurnNumber >= (data.turnsThisRound - 1)) {
+        if (data.activePlayer.socket === socket?.id) {
+          advanceGame(data);
+        }
+        setTurnNumber(0);
+      } else {
+        setTurnNumber((prev) => prev + 1);
+      }
+    };
+
+    socket.on(
+      "confirmation",
+      (data: { playerNames: any[]; playerSockets: any[] }) => {
+        setPlayerNames(data.playerNames);
+        setPlayerSockets(data.playerSockets);
+        setPlayerCount(data.playerNames.length);
+      }
+    );
 
     socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]);
@@ -217,7 +254,6 @@ export default function Index() {
     });
 
     socket.on("sendHoldEmData", (data: StartHoldEmGameProps) => {
-
       setGameState(data.gameState);
       setGameStarted(data.gameStarted);
       setGameOver(data.gameOver);
@@ -238,7 +274,9 @@ export default function Index() {
       setActiveBet(data.activeBet);
       setActivePlayerIndex(data.activePlayerIndex);
       setActivePlayer(data.activePlayer);
-      setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`);
+      setSnackbarMessage(
+        `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`
+      );
       setIsSnackbarOpen(true);
 
       const advanceDataProps: AdvanceGameProps = {
@@ -246,9 +284,11 @@ export default function Index() {
         gameState: data.gameState,
         dealerCards: data.dealerCards,
         players: data.players,
-        hands,
+        hands: data.hands,
         pots: data.pots,
         activeBet: data.activeBet,
+        turnsNextRound: data.turnsNextRound,
+        turnsThisRound: data.turnsThisRound,
       };
 
       advance(data.turnNumber, advanceDataProps, "BET");
@@ -263,9 +303,9 @@ export default function Index() {
 
       setSnackbarMessage(
         data.activeBet
-          ? `${
-              data.players[data.prevActivePlayerIndex].name
-            } called $${data.activeBet}`
+          ? `${data.players[data.prevActivePlayerIndex].name} called $${
+              data.activeBet
+            }`
           : `${data.players[data.prevActivePlayerIndex].name} checked`
       );
       setIsSnackbarOpen(true);
@@ -275,8 +315,10 @@ export default function Index() {
         gameState: data.gameState,
         dealerCards: data.dealerCards,
         players: data.players,
-        hands,
+        hands: data.hands,
         pots: data.pots,
+        turnsNextRound,
+        turnsThisRound: data.turnsThisRound,
       };
 
       advance(data.turnNumber, advanceDataProps, "CHECK");
@@ -288,6 +330,8 @@ export default function Index() {
       setActivePlayerIndex(data.activePlayerIndex);
       setActivePlayer(data.activePlayer);
 
+      setTurnsNextRound(data.turnsNextRound);
+
       setSnackbarMessage(
         `${data.players[data.prevActivePlayerIndex].name} folded`
       );
@@ -298,20 +342,25 @@ export default function Index() {
         gameState: data.gameState,
         dealerCards,
         players: data.players,
-        hands,
+        hands: data.hands,
         pots,
+        turnsNextRound: data.turnsNextRound - 1,
+        turnsThisRound: data.turnsThisRound,
       };
 
       advance(data.turnNumber, advanceDataProps, "FOLD");
     });
 
     socket.on("sendAdvanceData", (data: NextProps) => {
-
       setActiveBet(0);
 
       setGameState(data.gameState);
       setDealerCards(data.dealerCards);
-      setHands(data.hands);
+
+      setActivePlayerCount(data.turnsNextRound);
+
+      setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
+      setTurnsNextRound(3); // reset turns next round
 
       if (data.winner) {
         setWinner(data.winner);
@@ -319,8 +368,43 @@ export default function Index() {
         setWonAmount(data.wonAmount);
       }
 
+      setHands(data.hands);
+
       setPlayers(data.players);
       setGameOver(data.gameOver);
+    });
+
+    socket.on("sendAdvanceHandsData", (data) => {
+      setGameState(GameState.Preflop);
+      setGameStarted(true);
+      setGameOver(false);
+      setDealtCards([]);
+      setDealerCards([]);
+      setWinningCards([]);
+      setWinner(null);
+      setWonAmount(0);
+
+      setActivePlayerCount(3);
+
+      setTurnsThisRound(3);
+      setTurnsNextRound(3);
+
+      setPlayers(data.players);
+      setHands(data.hands);
+
+      let nextDealerIndex = data.hands.length % data.players.length;
+      let nextLittleBlindIndex = (data.hands.length + 1) % data.players.length;
+      let nextBigBlindIndex = (data.hands.length + 2) % data.players.length;
+
+      setDealer(data.players[nextDealerIndex]);
+      setLittleBlind(data.players[nextLittleBlindIndex]);
+      setBigBlind(data.players[nextBigBlindIndex]);
+
+      setActivePlayerIndex(nextLittleBlindIndex);
+
+      setActivePlayer(data.players[nextLittleBlindIndex]);
+
+      setPots([0]);
     });
   }, [socket]);
 
@@ -352,46 +436,6 @@ export default function Index() {
     setButtonClicked(true);
   };
 
-  const handleNewGame = () => {
-    setGameState(GameState.Preflop);
-    setGameStarted(true);
-    setGameOver(false);
-    setDealtCards([]);
-    setDealerCards([]);
-    setWinningCards([]);
-    setWinner(null);
-    setWonAmount(0);
-    setActivePlayerCount(3);
-    cardsCreator.clearPassed();
-    setPlayers((prevPlayers: Player[]) =>
-      prevPlayers.map((prev: Player, index) => {
-        let newCards = createCards(52, 2, undefined, index === 0);
-        let newPlayer = {
-          ...initialPlayers[index],
-          name: playerNames[index],
-          chips: prev.chips,
-          cards: newCards,
-          folded: false,
-        };
-        return newPlayer;
-      })
-    );
-    setDealerCards(createCards(52, 3, undefined, false));
-
-    let nextDealerIndex = hands.length % players.length;
-    let nextLittleBlindIndex = (hands.length + 1) % players.length;
-    let nextBigBlindIndex = (hands.length + 2) % players.length;
-
-    setDealer(initialPlayers[nextDealerIndex]);
-    setLittleBlind(initialPlayers[nextLittleBlindIndex]);
-    setBigBlind(initialPlayers[nextBigBlindIndex]);
-
-    setActivePlayerIndex(nextLittleBlindIndex);
-    setActivePlayer(initialPlayers[nextLittleBlindIndex]);
-
-    setPots([0]);
-  };
-
   const handleFold = () => {
     let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
@@ -413,23 +457,12 @@ export default function Index() {
       turnNumber,
       playerSocket,
       gameState,
+      turnsNextRound: turnsNextRound - 1,
+      turnsThisRound: turnsNextRound,
+      hands,
     };
 
     socket!.emit("playerFolded", foldProps);
-  };
-
-  const advance = (tn: number, data: AdvanceGameProps, type: string) => {
-    if (tn >= activePlayerCount - 1) {
-      console.log('got here');
-      if (data.activePlayer.socket === socket?.id) {
-        advanceGame(data);
-      }
-      setActivePlayerCount(players.filter((p) => !p.folded).length);
-      setTurnNumber(0);
-    } else {
-      console.log('else here');
-      setTurnNumber((prev) => prev + 1);
-    }
   };
 
   const handleBet = (amount: number) => {
@@ -454,6 +487,9 @@ export default function Index() {
       gameState,
       dealerCards,
       activeBet: amount,
+      turnsNextRound,
+      turnsThisRound,
+      hands,
     };
 
     socket!.emit("playerBet", betProps);
@@ -506,7 +542,7 @@ export default function Index() {
   };
 
   const advanceHands = () => {
-    handleNewGame();
+    socket!.emit("advanceHands", { players, hands, playerSockets });
   };
 
   return (
@@ -546,10 +582,7 @@ export default function Index() {
                 >
                   {!joinedGame ? "Join Game" : "Joined, awaiting players"}
                 </button>
-                <div className="absolute mt-48 self-center text-6xl text-black">
-                  {playerCount}
-                </div>
-                <div className="absolute mt-[50%] self-center text-6xl text-black">
+                <div className="absolute mt-[30%] self-center text-6xl text-black">
                   {playerNames.join(", ")}
                 </div>
               </>
@@ -621,9 +654,9 @@ export default function Index() {
                         suit={card.suit}
                         rank={card.rank}
                         faceUp={
-                          !players[1].folded &&
-                          players[1].socket === playerSocket &&
-                          activePlayer.socket === playerSocket
+                          (!players[1].folded &&
+                            players[1].socket === playerSocket) ||
+                          card.faceUp
                         }
                         folded={players[1].folded}
                         winner={
@@ -687,9 +720,9 @@ export default function Index() {
                         suit={card.suit}
                         rank={card.rank}
                         faceUp={
-                          !players[2].folded &&
-                          players[2].socket === playerSocket &&
-                          activePlayer.socket === playerSocket
+                          (!players[2].folded &&
+                            players[2].socket === playerSocket) ||
+                          card.faceUp
                         }
                         folded={players[2].folded}
                         winner={
@@ -743,9 +776,9 @@ export default function Index() {
                       suit={card.suit}
                       rank={card.rank}
                       faceUp={
-                        !players[0].folded &&
-                        players[0].socket === playerSocket &&
-                        activePlayer.socket === playerSocket
+                        (!players[0].folded &&
+                          players[0].socket === playerSocket) ||
+                        card.faceUp
                       }
                       folded={players[0].folded}
                       winner={

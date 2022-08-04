@@ -45,10 +45,10 @@ const advanceHoldEmGame = (props) => {
     players: props.players,
     activePlayer: props.activePlayer,
     gameOver: false,
+    turnsNextRound: props.turnsNextRound,
   };
 
   if (props.gameState === GameState.Preflop) {
-    console.log(props.gameState);
     nextProps.gameState = GameState.Flop;
     let newCards = createCards(52, 3, undefined, true);
     let tempDealerCards = [...props.dealerCards];
@@ -84,8 +84,6 @@ const advanceHoldEmGame = (props) => {
         })
     );
 
-    console.log(gameWinner);
-
     const winnerDescription = `${
       gameWinner.players.length === 1
         ? gameWinner.players[0].player.name
@@ -98,7 +96,11 @@ const advanceHoldEmGame = (props) => {
     }`;
     let tempHands = [...props.hands];
     let winnar = { winner: gameWinner, description: winnerDescription };
+
     tempHands.push(winnar);
+
+    console.log('temp hands pushed winner', tempHands);
+
     nextProps.hands = tempHands;
     const winnerObj = { winner: gameWinner, description: winnerDescription };
     nextProps.winner = winnerObj;
@@ -116,12 +118,18 @@ const advanceHoldEmGame = (props) => {
     let wonAmount = getWonAmount(winnerObj, props.pots);
     nextProps.wonAmount = wonAmount;
 
+    let tempCards = props.players.filter((p) => !p.folded).map(p => p.cards);
+
+    tempCards.forEach((cardArray) => {
+      cardArray.forEach((card) => {
+        card.faceUp = true;
+      });
+    });
+
     tempPlayers
       .filter((p) => !p.folded)
-      .forEach((player) => {
-        player.cards.forEach((card) => {
-          card.faceUp = true;
-        });
+      .forEach((player, index) => {
+        player.cards = tempCards[index];
       });
 
     tempPlayers
@@ -133,6 +141,10 @@ const advanceHoldEmGame = (props) => {
     nextProps.players = tempPlayers;
     nextProps.gameOver = true;
   }
+
+  let turnsNext = nextProps.players.filter(player => !player.folded).length;
+
+  nextProps.turnsNextRound = turnsNext;
 
   return nextProps;
 };
@@ -318,6 +330,27 @@ io.on("connection", (socket) => {
     io.emit("sendAdvanceData", advanceData);
   });
 
+  socket.on("advanceHands", (data) => {
+    cardsCreator.clearPassed();
+    let tempPlayers = [...data.players];
+
+    let newPlayers = tempPlayers.map((prev, index) => {
+        let newCards = createCards(52, 2, undefined, false);
+        let newPlayer = {
+          name: tempPlayers[index].name,
+          chips: prev.chips,
+          cards: newCards,
+          folded: false,
+          socket: data.playerSockets[index],
+        };
+        return newPlayer;
+      });
+
+    let tempHands = [...data.hands];
+
+    io.emit("sendAdvanceHandsData", { players: newPlayers, hands: tempHands });
+  });
+
   socket.on("startHoldEmGame", (data) => {
     cardsCreator.clearPassed();
 
@@ -337,6 +370,7 @@ io.on("connection", (socket) => {
         name: player,
         socket: data.playerSockets[index],
         chips: playerChips[index],
+        folded: false,
       };
 
       fullPlayers.push(newGuy);
