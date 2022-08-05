@@ -130,7 +130,7 @@ export default function Index() {
   const [logs, setLogs] = useState<string[]>([]);
 
   const [gameStarted, setGameStarted] = useState(false);
-  const [bet, setBet] = useState(0);
+
   const [dealerCards, setDealerCards] = useState<any[]>([]);
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -148,6 +148,7 @@ export default function Index() {
   const [bigBlind, setBigBlind] = useState(initialPlayers[2]);
   const [littleBlindAmount, setLittleBlindAmount] = useState(10);
   const [bigBlindAmount, setBigBlindAmount] = useState(20);
+  const [bet, setBet] = useState(bigBlindAmount);
   const [pots, setPots] = useState<any[]>([littleBlindAmount, bigBlindAmount]);
   const [activeBet, setActiveBet] = useState(0);
   const [turnNumber, setTurnNumber] = useState(0);
@@ -320,6 +321,7 @@ export default function Index() {
       setPots(data.pots);
       setPlayers(data.players);
       setActiveBet(data.activeBet);
+      setBet(data.activeBet);
       setActivePlayerIndex(data.activePlayerIndex);
       setActivePlayer(data.activePlayer);
       setLogs((prev) => [
@@ -365,24 +367,22 @@ export default function Index() {
       setLittleBlindIndex(data.littleBlindIndex);
       setBigBlindIndex(data.bigBlindIndex);
 
-      console.log("data", data);
-
-      console.log(activePlayer);
-
-      if (
-        data.gameState === GameState.Preflop &&
-        data.littleBlindIndex == data.activePlayerIndex
-      ) {
-        setActiveBet(littleBlindAmount);
-      } else if (
-        data.gameState === GameState.Preflop &&
-        data.bigBlindIndex == data.activePlayerIndex
-      ) {
-        setActiveBet(0);
+      if (data.activeBet <= bigBlindAmount) {
+        if (
+          data.gameState === GameState.Preflop &&
+          data.littleBlindIndex == data.activePlayerIndex
+        ) {
+          setActiveBet(littleBlindAmount);
+        } else if (
+          data.gameState === GameState.Preflop &&
+          data.bigBlindIndex == data.activePlayerIndex
+        ) {
+          setActiveBet(0);
+        }
       }
 
       let checkOrCallDescription = data.activeBet
-        ? `${data.players[data.prevActivePlayerIndex].name} called $${
+        ? `${data.players[data.prevActivePlayerIndex].name} called ${
             data.activeBet
           }`
         : `${data.players[data.prevActivePlayerIndex].name} checked`;
@@ -459,6 +459,8 @@ export default function Index() {
     socket.on("sendEndRoundData", (data: NextProps) => {
       setActiveBet(0);
 
+      setBet(bigBlindAmount);
+
       setGameState(data.gameState);
 
       setActivePlayerCount(data.turnsNextRound);
@@ -483,6 +485,8 @@ export default function Index() {
 
     socket.on("sendAdvanceData", (data: NextProps) => {
       setActiveBet(0);
+
+      setBet(bigBlindAmount);
 
       setGameState(data.gameState);
       setDealerCards(data.dealerCards);
@@ -643,14 +647,12 @@ export default function Index() {
   };
 
   const handlePlayerTimeout = (player: Player) => {
+    setLogs((prev) => [...prev, `${player.name} timed out and auto-folded`]);
+    setSnackbarMessage(`${player.name} timed out and auto-folded`);
+    setIsSnackbarOpen(true);
     if (playerSocket === player.socket) {
       handleFold();
     }
-
-    setLogs((prev) => [...prev, `${player.name} timed out and auto-folded`]);
-
-    setSnackbarMessage(`${player.name} timed out and auto-folded`);
-    setIsSnackbarOpen(true);
   };
 
   const getNextPlayerProps = (tempPlayers: Player[]) => {
@@ -723,8 +725,11 @@ export default function Index() {
           {gameStarted ? <Table /> : null}
           <div className="mx-auto flex h-[80vh] w-[95vw] flex-col">
             {logs.length > 0 && (
-              <div className="fixed bottom-0 left-0 h-[75px] w-[250px] overflow-auto rounded-tr-xl bg-black/80 text-white z-[55555]">
-                <div className="flex flex-col" style={{ boxSizing: 'content-box', paddingRight: '17px' }}>
+              <div className="fixed bottom-0 left-0 z-[55555] h-[75px] w-[250px] overflow-auto rounded-tr-xl bg-black/80 text-white">
+                <div
+                  className="flex flex-col"
+                  style={{ boxSizing: "content-box", paddingRight: "17px" }}
+                >
                   {logs.map((l, index) => (
                     <span key={index}>{l}</span>
                   ))}
@@ -788,7 +793,11 @@ export default function Index() {
                   <div className="absolute top-[20%] flex w-[100vw] flex-col items-center justify-center self-center text-center text-xl">
                     <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
                     <div>{`Pot: ${pots.join(", ")}`}</div>
-                    <div>{winner ? `Hand #${hands.length}` : `Hand #${hands.length + 1}`}</div>
+                    <div>
+                      {winner
+                        ? `Hand #${hands.length}`
+                        : `Hand #${hands.length + 1}`}
+                    </div>
                   </div>
                   <div className="playingCards simpleCards absolute bottom-[45%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
@@ -1022,8 +1031,8 @@ export default function Index() {
                         <input
                           type="range"
                           className="form-range w-full p-0 focus:shadow-none focus:outline-none focus:ring-0"
-                          min="0"
-                          max="100"
+                          min={activeBet > 0 ? activeBet : bigBlindAmount}
+                          max={activePlayer.chips}
                           value={bet}
                           onChange={(event) => {
                             setBet(+event.target.value);
@@ -1032,7 +1041,7 @@ export default function Index() {
                       </div>
                       <div className="flex-1" />
                       <button className="rounded bg-transparent px-4 py-2 text-white">
-                        ${bet}
+                        {bet}
                       </button>
                     </div>
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
@@ -1046,13 +1055,13 @@ export default function Index() {
                         className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
                         onClick={handleCheckOrCall}
                       >
-                        {activeBet > 0 ? `Call $${activeBet}` : "Check"}
+                        {activeBet > 0 ? `Call ${activePlayer.chips >= activeBet ? activeBet : activePlayer.chips}` : "Check"}
                       </button>
                       <button
                         className="rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
                         onClick={() => handleBet(bet)}
                       >
-                        Bet
+                        {activeBet > 0 ? `Raise` : `Bet`}
                       </button>
                     </div>
                   </div>

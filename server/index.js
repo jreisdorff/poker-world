@@ -69,7 +69,7 @@ const endHoldEmRound = (props) => {
 
   let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
 
-  let winnerDescription = getWinnerDescription(gameWinner, wonAmount);
+  let winnerDescription = getWinnerDescription(gameWinner, wonAmount, false);
 
   let tempHands = [...props.hands];
   let winnar = { winner: gameWinner, description: winnerDescription };
@@ -153,7 +153,7 @@ const advanceHoldEmGame = (props) => {
         })
     );
     let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
-    const winnerDescription = getWinnerDescription(gameWinner, wonAmount);
+    const winnerDescription = getWinnerDescription(gameWinner, wonAmount, true);
 
     let tempHands = [...props.hands];
     let winnar = { winner: gameWinner, description: winnerDescription };
@@ -248,27 +248,28 @@ const determineWinner = (playerWithDealerCards) => {
   return pokerWinner;
 };
 
-const getWinnerDescription = (winner, amount) => {
+const getWinnerDescription = (winner, amount, fullDescription = false) => {
 
   let winnerDescription = '';
 
   if (winner.players.length === 1) {
-    winnerDescription = `${winner.players[0].player.name} won ${amount}`;
-    return winnerDescription;
+    winnerDescription = `${winner.players[0].player.name} won`;
   } else if (winner.players.length === 2) {
-    winnerDescription = winner.players.map((winner) => winner.player.name).join(", ").replace(/, ((?:.(?!, ))+)$/, " and $1");
+    winnerDescription = `${winner.players.map((winner) => winner.player.name).join(", ").replace(/, ((?:.(?!, ))+)$/, " and $1")} split the pot`;
   } else if (winner.players.length > 2) {
-    winnerDescription = winner.players.map((winner) => winner.player.name).join(", ").replace(/, ((?:.(?!, ))+)$/, ", and $1");
+    winnerDescription = `${winner.players.map((winner) => winner.player.name).join(", ").replace(/, ((?:.(?!, ))+)$/, ", and $1")} split the pot`;
   }
 
-  return `${winnerDescription} split the pot`;
+  if (fullDescription) {
+    winnerDescription = `${winnerDescription} with ${winner.hand}`;
+  }
+
+  return winnerDescription;
 }
 
 const getWonAmount = (winner, pots) => {
   let daMoney = 0;
   let numberOfWinners = winner.winner.players.length;
-
-  console.log('numWin', numberOfWinners);
 
   pots.forEach((pot) => {
     daMoney += pot;
