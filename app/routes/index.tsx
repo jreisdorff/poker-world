@@ -53,6 +53,8 @@ export interface SendCheckOrCallDataProps {
   turnsThisRound: number;
   hands: any[];
   needResponsesFrom: number;
+  littleBlindIndex: number;
+  bigBlindIndex: number;
 }
 
 export interface SendFoldDataProps {
@@ -177,6 +179,12 @@ export default function Index() {
 
   const [needResponsesFrom, setNeedResponsesFrom] = useState(3);
 
+  const [littleBlindAmount, setLittleBlindAmount] = useState(10);
+  const [bigBlindAmount, setBigBlindAmount] = useState(20);
+
+  const [littleBlindIndex, setLittleBlindIndex] = useState(1);
+  const [bigBlindIndex, setBigBlindIndex] = useState(2);
+
   const handleCheckOrCall = () => {
     let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
@@ -202,6 +210,8 @@ export default function Index() {
       turnsThisRound,
       hands,
       needResponsesFrom,
+      littleBlindIndex,
+      bigBlindIndex,
     };
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
@@ -293,7 +303,7 @@ export default function Index() {
 
       setPots(data.pots);
 
-      setActiveBet(20);
+      setActiveBet(bigBlindAmount);
 
       setDealer(data.dealer);
       setLittleBlind(data.littleBlind);
@@ -344,9 +354,14 @@ export default function Index() {
       setActivePlayerIndex(data.activePlayerIndex);
       setActivePlayer(data.activePlayer);
 
-      if (data.gameState === GameState.Preflop && data.activePlayerIndex == players.indexOf(littleBlind)) {
-        setActiveBet(10);
-      } else if (data.gameState === GameState.Preflop && data.activePlayerIndex == players.indexOf(bigBlind)) {
+      setLittleBlindIndex(data.littleBlindIndex);
+      setBigBlindIndex(data.bigBlindIndex);
+
+      console.log('data', data);
+
+      if (data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex) {
+        setActiveBet(littleBlindAmount);
+      } else if (data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex) {
         setActiveBet(0);
       }
 
@@ -485,9 +500,14 @@ export default function Index() {
       let nextLittleBlindIndex = (data.hands.length + 1) % data.players.length;
       let nextBigBlindIndex = (data.hands.length + 2) % data.players.length;
 
+      setActiveBet(bigBlindAmount);
+
       setDealer(data.players[nextDealerIndex]);
       setLittleBlind(data.players[nextLittleBlindIndex]);
       setBigBlind(data.players[nextBigBlindIndex]);
+
+      setLittleBlindIndex(nextLittleBlindIndex);
+      setBigBlindIndex(nextBigBlindIndex);
 
       setActivePlayerIndex(nextDealerIndex);
 

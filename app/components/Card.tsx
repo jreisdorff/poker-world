@@ -27,14 +27,26 @@ export default function Card(props: CardProps) {
   };
 
   return (
-    <div className={`relative p-0 ${winner ? '-mt-8 transition-all duration-1000' : ''}`}>
-      <div className={`card rank-${rank} ${suit} ${winner ? 'winner border-4 border-lime-500' : ''} w-[1.65em] h-[2.3em]`}>
-        <span className="rank">{rank}</span>
-        <span className="suit">{getUnicodeSuit(suit)}</span>
+    <div
+      className={`relative p-0 ${
+        winner ? "-mt-8 transition-all duration-1000" : ""
+      }`}
+    >
+      <div
+        className={`card rank-${rank} ${suit} ${
+          winner ? "winner border-4 border-lime-500" : ""
+        }`}
+      >
+        {faceUp && (
+          <>
+            <span className="rank">{rank}</span>
+            <span className="suit">{getUnicodeSuit(suit)}</span>
+          </>
+        )}
       </div>
       {!faceUp && (
         <div className="absolute top-0">
-          <div className={`card back ${folded ? 'folded' : ''}`} />
+          <div className={`card back ${folded ? "folded" : ""}`} />
         </div>
       )}
     </div>
