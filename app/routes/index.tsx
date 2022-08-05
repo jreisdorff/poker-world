@@ -706,8 +706,8 @@ export default function Index() {
           {gameStarted ? <Table /> : null}
           <div className="mx-auto flex h-[80vh] w-[95vw] flex-col">
             {logs.length > 0 && (
-              <div className="fixed bottom-0 left-0 h-[75px] w-[250px] overflow-scroll rounded-tr-xl bg-black/80 text-white z-[55555]">
-                <div className="flex flex-col">
+              <div className="fixed bottom-0 left-0 h-[75px] w-[250px] overflow-auto rounded-tr-xl bg-black/80 text-white z-[55555]">
+                <div className="flex flex-col" style={{ boxSizing: 'content-box', paddingRight: '17px' }}>
                   {logs.map((l) => (
                     <span>{l}</span>
                   ))}
@@ -771,7 +771,7 @@ export default function Index() {
                   <div className="absolute top-[20%] flex w-[100vw] flex-col items-center justify-center self-center text-center text-xl">
                     <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
                     <div>{`Pot: ${pots.join(", ")}`}</div>
-                    <div>{`Hand #${hands.length + 1}`}</div>
+                    <div>{winner ? `Hand #${hands.length}` : `Hand #${hands.length + 1}`}</div>
                   </div>
                   <div className="playingCards simpleCards absolute bottom-[45%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
