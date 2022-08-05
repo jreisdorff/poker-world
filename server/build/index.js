@@ -77,7 +77,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-Q3R3YIBY.css";
+var tailwind_default = "/build/_assets/tailwind-GI74S646.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -329,15 +329,11 @@ function PlayerDisplay(props) {
 
 // app/components/Table.tsx
 function Table() {
-  return /* @__PURE__ */ React.createElement("div", {
-    className: "-z-1 flex min-h-full min-w-full flex-col items-center justify-center self-center"
-  }, /* @__PURE__ */ React.createElement("div", {
-    className: "fixed flex flex-col items-center justify-center self-center"
-  }, /* @__PURE__ */ React.createElement("img", {
+  return /* @__PURE__ */ React.createElement("img", {
     src: "images/table.png",
     alt: "table",
-    className: "relative object-cover"
-  })));
+    className: "absolute flex h-[80vh] w-[95vw] object-cover items-center justify-center self-center overflow-visible"
+  });
 }
 
 // app/styles/cards.css
@@ -613,10 +609,10 @@ function Index() {
   }, handleMuckCards = () => {
   };
   return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("main", {
-    className: "relative flex h-screen items-center justify-center bg-[rgb(0,90,0)]"
+    className: "relative flex h-screen w-screen items-center justify-center bg-[rgb(0,90,0)] overflow-visible"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "relative sm:pb-16 sm:pt-8"
-  }, /* @__PURE__ */ React.createElement("div", {
+  }, gameStarted ? /* @__PURE__ */ React.createElement(Table, null) : null, /* @__PURE__ */ React.createElement("div", {
     className: "mx-auto flex h-[80vh] w-[95vw] flex-col"
   }, logs.length > 0 && /* @__PURE__ */ React.createElement("div", {
     className: "fixed bottom-0 left-0 h-[200px] w-[250px] overflow-scroll rounded-tr-xl bg-black/80 text-white"
@@ -633,19 +629,21 @@ function Index() {
     onClick: handleJoinGame,
     disabled: joinedGame
   }, joinedGame ? "Joined, awaiting players" : "Join Game"), playerNames.length > 0 ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute mt-[30%] self-center text-6xl text-black"
-  }, `${playerNames.length} ${pluralize(playerNames.length, "player", "players")} joined`) : null), gameOver && /* @__PURE__ */ React.createElement("button", {
+    className: "absolute mt-[30%] self-center text-3xl text-black"
+  }, `${playerNames.length} ${pluralize(playerNames.length, "player", "players")} joined`) : null), gameOver && /* @__PURE__ */ React.createElement("div", {
+    className: "flex flex-col"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: `w-full items-center justify-center self-center text-center text-3xl text-white transition-all mb-8 duration-[1000ms] ${winner ? "opacity-100" : "opacity-0"}`
+  }, /* @__PURE__ */ React.createElement("h1", null, winner ? winner.description : null)), /* @__PURE__ */ React.createElement("button", {
     id: "next-btn",
-    className: "absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
+    className: "self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
     onClick: () => advanceHands()
-  }, "Next Hand"), gameStarted ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Table, null), /* @__PURE__ */ React.createElement("div", {
+  }, "Next Hand")), gameStarted ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col items-center justify-center"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: `absolute top-[2%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${winner ? "opacity-100" : "opacity-0"}`
-  }, /* @__PURE__ */ React.createElement("h1", null, winner ? winner.description : null)), /* @__PURE__ */ React.createElement("div", {
     className: "absolute top-[20%] flex w-[100vw] flex-col items-center justify-center self-center text-center text-xl"
   }, /* @__PURE__ */ React.createElement("div", null, `Blinds: ${blinds[0]}/${blinds[1]}`), /* @__PURE__ */ React.createElement("div", null, `Pot: ${pots.join(", ")}`), /* @__PURE__ */ React.createElement("div", null, `Hand #${hands.length + 1}`)), /* @__PURE__ */ React.createElement("div", {
-    className: "playingCards simpleCards absolute bottom-[48%] z-[9999] flex w-[100vw] flex-row items-center justify-center"
+    className: "playingCards simpleCards absolute bottom-[45%] z-[9999] flex w-[100vw] flex-row items-center justify-center"
   }, dealerCards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
     suit: card.suit,
@@ -1247,7 +1245,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "f08a3b3c", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-ANMSPUJP.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-XOGO3WLM.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-F08A3B3C.js" };
+var assets_manifest_default = { version: "6ecd2015", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-T7N732MM.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-OJV73LKS.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-6ECD2015.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

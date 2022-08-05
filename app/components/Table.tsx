@@ -1,13 +1,9 @@
 export default function Table() {
   return (
-    <div className="-z-1 flex min-h-full min-w-full flex-col items-center justify-center self-center">
-      <div className="fixed flex flex-col items-center justify-center self-center">
         <img
           src="images/table.png"
           alt="table"
-          className="relative object-cover"
+          className="absolute flex h-[80vh] w-[95vw] object-cover items-center justify-center self-center overflow-visible"
         />
-      </div>
-    </div>
   );
 }

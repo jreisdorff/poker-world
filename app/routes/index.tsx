@@ -699,8 +699,9 @@ export default function Index() {
 
   return (
     <>
-      <main className="relative flex h-screen items-center justify-center bg-[rgb(0,90,0)]">
+      <main className="relative flex h-screen w-screen items-center justify-center bg-[rgb(0,90,0)] overflow-visible">
         <div className="relative sm:pb-16 sm:pt-8">
+          {gameStarted ? <Table /> : null}
           <div className="mx-auto flex h-[80vh] w-[95vw] flex-col">
             {logs.length > 0 && (
               <div className="fixed bottom-0 left-0 h-[200px] w-[250px] overflow-scroll rounded-tr-xl bg-black/80 text-white">
@@ -711,20 +712,6 @@ export default function Index() {
                 </div>
               </div>
             )}
-            {/* <Snackbar
-              open={isSnackbarOpen}
-              autoHideDuration={3000}
-              onClose={handleClose}
-              key={snackbarMessage}
-            >
-              <Alert
-                className="rounded-full"
-                onClose={handleClose}
-                sx={{ width: "100%" }}
-              >
-                {snackbarMessage}
-              </Alert>
-            </Snackbar> */}
             {!gameStarted && (
               <>
                 {!joinedGame ? (
@@ -746,7 +733,7 @@ export default function Index() {
                   {!joinedGame ? "Join Game" : "Joined, awaiting players"}
                 </button>
                 {playerNames.length > 0 ? (
-                  <div className="absolute mt-[30%] self-center text-6xl text-black">
+                  <div className="absolute mt-[30%] self-center text-3xl text-black">
                     {`${playerNames.length} ${pluralize(
                       playerNames.length,
                       "player",
@@ -758,32 +745,33 @@ export default function Index() {
             )}
 
             {gameOver && (
-              <button
-                id="next-btn"
-                className="absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                onClick={() => advanceHands()}
-              >
-                Next Hand
-              </button>
+              <div className="flex flex-col">
+                <div
+                  className={`w-full items-center justify-center self-center text-center text-3xl text-white transition-all mb-8 duration-[1000ms] ${
+                    !winner ? "opacity-0" : "opacity-100"
+                  }`}
+                >
+                  <h1>{winner ? winner.description : null}</h1>
+                </div>
+                <button
+                  id="next-btn"
+                  className="self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                  onClick={() => advanceHands()}
+                >
+                  Next Hand
+                </button>
+              </div>
             )}
 
             {gameStarted ? (
               <>
-                <Table />
                 <div className="flex flex-col items-center justify-center">
-                  <div
-                    className={`absolute top-[2%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
-                      !winner ? "opacity-0" : "opacity-100"
-                    }`}
-                  >
-                    <h1>{winner ? winner.description : null}</h1>
-                  </div>
                   <div className="absolute top-[20%] flex w-[100vw] flex-col items-center justify-center self-center text-center text-xl">
                     <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
                     <div>{`Pot: ${pots.join(", ")}`}</div>
                     <div>{`Hand #${hands.length + 1}`}</div>
                   </div>
-                  <div className="playingCards simpleCards absolute bottom-[48%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
+                  <div className="playingCards simpleCards absolute bottom-[45%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
                       <Card
                         key={`${index}-${card.suit}-${card.rank}`}
