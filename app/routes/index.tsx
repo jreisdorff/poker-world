@@ -772,7 +772,7 @@ export default function Index() {
                 <Table />
                 <div className="flex flex-col items-center justify-center">
                   <div
-                    className={`absolute top-[10%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
+                    className={`absolute top-[2%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
                       !winner ? "opacity-0" : "opacity-100"
                     }`}
                   >
