@@ -755,7 +755,7 @@ export default function Index() {
                 </div>
                 <button
                   id="next-btn"
-                  className="self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                  className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
                   onClick={() => advanceHands()}
                 >
                   Next Hand
