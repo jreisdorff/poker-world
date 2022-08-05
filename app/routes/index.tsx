@@ -706,7 +706,7 @@ export default function Index() {
           {gameStarted ? <Table /> : null}
           <div className="mx-auto flex h-[80vh] w-[95vw] flex-col">
             {logs.length > 0 && (
-              <div className="fixed bottom-0 left-0 h-[75px] w-[225px] overflow-scroll rounded-tr-xl bg-black/80 text-white">
+              <div className="fixed bottom-0 left-0 h-[75px] w-[250px] overflow-scroll rounded-tr-xl bg-black/80 text-white z-[55555]">
                 <div className="flex flex-col">
                   {logs.map((l) => (
                     <span>{l}</span>
