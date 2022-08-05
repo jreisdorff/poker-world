@@ -450,6 +450,11 @@ io.on("connection", (socket) => {
     let tempPlayers = [...players];
     let dealtCards = [];
     let fullPlayers = [];
+    let tempPot = 0;
+
+    let nextDealerIndex = pastHands.length % players.length;
+    let nextLittleBlindIndex = (pastHands.length + 1) % players.length;
+    let nextBigBlindIndex = (pastHands.length + 2) % players.length;
 
     tempPlayers.forEach((player, index) => {
       let newCards = createCards(52, 2, undefined, false);
@@ -462,14 +467,19 @@ io.on("connection", (socket) => {
         folded: false,
       };
 
+      if (index == nextLittleBlindIndex) {
+        newGuy.chips = newGuy.chips - 10;
+        tempPot = tempPot + 10;
+        
+      } else if (index == nextBigBlindIndex) {
+        newGuy.chips = newGuy.chips - 20;
+        tempPot = tempPot + 20;
+      }
+
       fullPlayers.push(newGuy);
 
       dealtCards = [...dealtCards, ...newCards];
     });
-
-    let nextDealerIndex = pastHands.length % players.length;
-    let nextLittleBlindIndex = (pastHands.length + 1) % players.length;
-    let nextBigBlindIndex = (pastHands.length + 2) % players.length;
 
     let startHoldEmGameProps = {
       gameState: GameState.Preflop,
@@ -481,6 +491,7 @@ io.on("connection", (socket) => {
       dealer: fullPlayers[nextDealerIndex],
       littleBlind: fullPlayers[nextLittleBlindIndex],
       bigBlind: fullPlayers[nextBigBlindIndex],
+      pots: [tempPot],
     };
 
     io.emit("sendHoldEmData", startHoldEmGameProps);

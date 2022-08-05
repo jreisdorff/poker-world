@@ -211,8 +211,6 @@ export default function Index() {
     if (!socket) return;
 
     const advance = (tn: number, data: AdvanceGameProps, type: string) => {
-      let tempTurnNumber = tn;
-
       let tempNeedResponsesFrom = data.needResponsesFrom;
 
       if (type === "BET") {
@@ -292,6 +290,11 @@ export default function Index() {
       setDealtCards(data.dealtCards);
       setDealerCards(data.dealerCards);
       setPlayers(data.players);
+
+      setPots(data.pots);
+
+      setActiveBet(20);
+
       setDealer(data.dealer);
       setLittleBlind(data.littleBlind);
       setBigBlind(data.bigBlind);
@@ -340,6 +343,12 @@ export default function Index() {
       setGameState(data.gameState);
       setActivePlayerIndex(data.activePlayerIndex);
       setActivePlayer(data.activePlayer);
+
+      if (data.gameState === GameState.Preflop && data.activePlayerIndex == players.indexOf(littleBlind)) {
+        setActiveBet(10);
+      } else if (data.gameState === GameState.Preflop && data.activePlayerIndex == players.indexOf(bigBlind)) {
+        setActiveBet(0);
+      }
 
       setSnackbarMessage(
         data.activeBet

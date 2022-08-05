@@ -40,6 +40,7 @@ export interface StartHoldEmGameProps {
   dealer: Player,
   littleBlind: Player,
   bigBlind: Player,
+  pots: any[];
 };
 
 //
