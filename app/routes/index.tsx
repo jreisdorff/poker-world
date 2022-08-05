@@ -6,10 +6,7 @@ import Card from "~/components/Card";
 import PlayerDisplay from "~/components/PlayerDisplay";
 import Table from "~/components/Table";
 import { AdvanceGameProps, NextProps } from "~/utils/game";
-import {
-  CardProps, PokerWinner,
-  StartHoldEmGameProps
-} from "~/utils/poker";
+import { CardProps, PokerWinner, StartHoldEmGameProps } from "~/utils/poker";
 import cardStyles from "../styles/cards.css";
 import progressStyles from "../styles/progress.css";
 
@@ -55,6 +52,7 @@ export interface SendCheckOrCallDataProps {
   activeBet: number;
   turnsThisRound: number;
   hands: any[];
+  needResponsesFrom: number;
 }
 
 export interface SendFoldDataProps {
@@ -68,6 +66,8 @@ export interface SendFoldDataProps {
   turnsNextRound: number;
   turnsThisRound: number;
   hands: any[];
+  dealerCards: any[];
+  needResponsesFrom: number;
 }
 
 export interface SendBetDataProps {
@@ -84,6 +84,7 @@ export interface SendBetDataProps {
   turnsNextRound: number;
   turnsThisRound: number;
   hands: any[];
+  needResponsesFrom: number;
 }
 
 const GameState = Object.freeze({
@@ -121,6 +122,8 @@ export default function Index() {
 
   const socket = useSocket();
 
+  const [logs, setLogs] = useState<string[]>([]);
+
   const [gameStarted, setGameStarted] = useState(false);
   const [bet, setBet] = useState(0);
   const [dealerCards, setDealerCards] = useState<any[]>([]);
@@ -130,7 +133,7 @@ export default function Index() {
   const [dealtCards, setDealtCards] = useState<any[]>([]);
 
   const [players, setPlayers] = useState<Player[]>(initialPlayers);
-  const [activePlayerIndex, setActivePlayerIndex] = useState(1); //set to one as that is the player after the dealer
+  const [activePlayerIndex, setActivePlayerIndex] = useState(0);
   const [activePlayer, setActivePlayer] = useState(
     initialPlayers[activePlayerIndex]
   );
@@ -167,10 +170,12 @@ export default function Index() {
 
   const [joinedGame, setJoinedGame] = useState(false);
 
-  const [turnsThisRound, setTurnsThisRound] = useState(3);
-  const [turnsNextRound, setTurnsNextRound] = useState(3);
+  const [turnsThisRound, setTurnsThisRound] = useState(2);
+  const [turnsNextRound, setTurnsNextRound] = useState(2);
 
   const [earlyWin, setEarlyWin] = useState(false);
+
+  const [needResponsesFrom, setNeedResponsesFrom] = useState(3);
 
   const handleCheckOrCall = () => {
     let tempPlayers = [...players];
@@ -196,6 +201,7 @@ export default function Index() {
       activeBet,
       turnsThisRound,
       hands,
+      needResponsesFrom,
     };
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
@@ -207,9 +213,14 @@ export default function Index() {
     const advance = (tn: number, data: AdvanceGameProps, type: string) => {
       let tempTurnNumber = tn;
 
+      let tempNeedResponsesFrom = data.needResponsesFrom;
+
       if (type === "BET") {
-        tempTurnNumber = 0;
-        setTurnNumber(0);
+        tempNeedResponsesFrom = data.players.filter((p) => !p.folded).length - 1;
+        setNeedResponsesFrom(data.players.filter((p) => !p.folded).length - 1);
+      } else {
+        tempNeedResponsesFrom = tempNeedResponsesFrom - 1;
+        setNeedResponsesFrom(tempNeedResponsesFrom);
       }
 
       if (type === "FOLD") {
@@ -222,11 +233,15 @@ export default function Index() {
 
       if (tempActivePlayerCount === 1) {
         // need to end the round. last active player wins
-        endRound(data);
-        return;
+        if (data.activePlayer.socket === socket?.id) {
+          endRound(data);
+          return;
+        } else {
+          return;
+        }
       }
 
-      if (tempTurnNumber >= data.turnsThisRound - 1) {
+      if (tempNeedResponsesFrom === 0) {
         if (data.activePlayer.socket === socket?.id) {
           advanceGame(data);
         }
@@ -245,11 +260,14 @@ export default function Index() {
       }
     );
 
-    socket.on("playerDisconnect", (data: { playerNames: any[]; playerSockets: any[] }) => {
-      setPlayerNames(data.playerNames);
-      setPlayerSockets(data.playerSockets);
-      setPlayerCount(data.playerNames.length);
-    });
+    socket.on(
+      "playerDisconnect",
+      (data: { playerNames: any[]; playerSockets: any[] }) => {
+        setPlayerNames(data.playerNames);
+        setPlayerSockets(data.playerSockets);
+        setPlayerCount(data.playerNames.length);
+      }
+    );
 
     socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]);
@@ -278,8 +296,8 @@ export default function Index() {
       setLittleBlind(data.littleBlind);
       setBigBlind(data.bigBlind);
 
-      setActivePlayerIndex(1);
-      setActivePlayer(data.players[1]);
+      setActivePlayerIndex(0);
+      setActivePlayer(data.players[0]);
     });
 
     socket.on("sendBetData", (data: SendBetDataProps) => {
@@ -288,10 +306,13 @@ export default function Index() {
       setActiveBet(data.activeBet);
       setActivePlayerIndex(data.activePlayerIndex);
       setActivePlayer(data.activePlayer);
+      setLogs((prev) => [...prev, `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`]);
       setSnackbarMessage(
         `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`
       );
       setIsSnackbarOpen(true);
+
+      setNeedResponsesFrom(data.needResponsesFrom);
 
       const advanceDataProps: AdvanceGameProps = {
         activePlayer: data.activePlayer,
@@ -303,6 +324,7 @@ export default function Index() {
         activeBet: data.activeBet,
         turnsNextRound: data.turnsNextRound,
         turnsThisRound: data.turnsThisRound,
+        needResponsesFrom: data.needResponsesFrom,
       };
 
       advance(data.turnNumber, advanceDataProps, "BET");
@@ -328,6 +350,8 @@ export default function Index() {
       );
       setIsSnackbarOpen(true);
 
+      setNeedResponsesFrom(data.needResponsesFrom);
+
       const advanceDataProps: AdvanceGameProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -337,6 +361,7 @@ export default function Index() {
         pots: data.pots,
         turnsNextRound,
         turnsThisRound: data.turnsThisRound,
+        needResponsesFrom: data.needResponsesFrom,
       };
 
       advance(data.turnNumber, advanceDataProps, "CHECK");
@@ -350,20 +375,25 @@ export default function Index() {
 
       setTurnsNextRound(data.turnsNextRound);
 
+      setLogs((prev) => [...prev, `${data.players[data.prevActivePlayerIndex].name} folded`]);
+
       setSnackbarMessage(
         `${data.players[data.prevActivePlayerIndex].name} folded`
       );
       setIsSnackbarOpen(true);
 
+      setNeedResponsesFrom(data.needResponsesFrom);
+
       const advanceDataProps: AdvanceGameProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
-        dealerCards,
+        dealerCards: data.dealerCards,
         players: data.players,
         hands: data.hands,
         pots,
         turnsNextRound: data.turnsNextRound - 1,
         turnsThisRound: data.turnsThisRound,
+        needResponsesFrom: data.needResponsesFrom,
       };
 
       advance(data.turnNumber, advanceDataProps, "FOLD");
@@ -377,12 +407,13 @@ export default function Index() {
       setActivePlayerCount(data.turnsNextRound);
 
       setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
-      setTurnsNextRound(3); // reset turns next round
+      setTurnsNextRound(2); // reset turns next round
 
       setEarlyWin(true);
 
       if (data.winner) {
         setWinner(data.winner);
+        setLogs((prev) => [...prev, data.winner.description]);
         setWinningCards(data.winningCards);
         setWonAmount(data.wonAmount);
       }
@@ -402,10 +433,13 @@ export default function Index() {
       setActivePlayerCount(data.turnsNextRound);
 
       setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
-      setTurnsNextRound(3); // reset turns next round
+      setTurnsNextRound(2); // reset turns next round
+
+      setNeedResponsesFrom(data.players.filter((p) => !p.folded).length);
 
       if (data.winner) {
         setWinner(data.winner);
+        setLogs((prev) => [...prev, data.winner.description]);
         setWinningCards(data.winningCards);
         setWonAmount(data.wonAmount);
       }
@@ -425,15 +459,15 @@ export default function Index() {
       setWinningCards([]);
       setWinner(null);
       setWonAmount(0);
-
+      setNeedResponsesFrom(3);
       setTurnNumber(0);
 
       setEarlyWin(false);
 
       setActivePlayerCount(3);
 
-      setTurnsThisRound(3);
-      setTurnsNextRound(3);
+      setTurnsThisRound(2);
+      setTurnsNextRound(2);
 
       setPlayers(data.players);
       setHands(data.hands);
@@ -446,9 +480,9 @@ export default function Index() {
       setLittleBlind(data.players[nextLittleBlindIndex]);
       setBigBlind(data.players[nextBigBlindIndex]);
 
-      setActivePlayerIndex(nextLittleBlindIndex);
+      setActivePlayerIndex(nextDealerIndex);
 
-      setActivePlayer(data.players[nextLittleBlindIndex]);
+      setActivePlayer(data.players[nextDealerIndex]);
 
       setPots([0]);
     });
@@ -506,6 +540,8 @@ export default function Index() {
       turnsNextRound: turnsNextRound - 1,
       turnsThisRound: turnsNextRound,
       hands,
+      dealerCards,
+      needResponsesFrom,
     };
 
     socket!.emit("playerFolded", foldProps);
@@ -536,6 +572,7 @@ export default function Index() {
       turnsNextRound,
       turnsThisRound,
       hands,
+      needResponsesFrom,
     };
 
     socket!.emit("playerBet", betProps);
@@ -545,6 +582,8 @@ export default function Index() {
     if (playerSocket === player.socket) {
       handleFold();
     }
+
+    setLogs((prev) => [...prev, `${player.name} timed out and auto-folded`]);
 
     setSnackbarMessage(`${player.name} timed out and auto-folded`);
     setIsSnackbarOpen(true);
@@ -581,7 +620,7 @@ export default function Index() {
 
   const endRound = (data: AdvanceGameProps) => {
     socket!.emit("endRound", data);
-  }
+  };
 
   const advanceGame = (data: AdvanceGameProps) => {
     socket!.emit("advanceHoldEmGame", data);
@@ -598,7 +637,9 @@ export default function Index() {
   const handleShowCards = (player: Player) => {
     let tempPlayers = [...players];
 
-    let tempCards = tempPlayers.filter((p) => p.socket === player.socket).map((p) => p.cards);
+    let tempCards = tempPlayers
+      .filter((p) => p.socket === player.socket)
+      .map((p) => p.cards);
 
     tempCards.forEach((cardArray) => {
       cardArray.forEach((card) => {
@@ -609,29 +650,30 @@ export default function Index() {
     socket!.emit("showCards", { players: tempPlayers });
   };
 
-  const handleMuckCards = () => {
-
-  };
+  const handleMuckCards = () => {};
 
   return (
     <>
-      <Snackbar
-        open={isSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleClose}
-        key={snackbarMessage}
-      >
-        <Alert
-          className="rounded-full"
-          onClose={handleClose}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-      <main className="relative min-h-screen bg-[rgb(0,90,0)] flex items-center justify-center">
+      <main className="relative flex h-screen items-center justify-center bg-[rgb(0,90,0)]">
         <div className="relative sm:pb-16 sm:pt-8">
-          <div className="mx-auto flex h-[100vh] w-[100vw] flex-col">
+          <div className="mx-auto flex h-[80vh] w-[95vw] flex-col">
+            {logs.length > 0 && <div className="fixed bottom-0 left-0 w-[250px] h-[200px] overflow-scroll bg-black/80 text-white rounded-tr-xl">
+              <div className="flex flex-col">{logs.map((l) => <span>{l}</span>)}</div>
+            </div>}
+            {/* <Snackbar
+              open={isSnackbarOpen}
+              autoHideDuration={3000}
+              onClose={handleClose}
+              key={snackbarMessage}
+            >
+              <Alert
+                className="rounded-full"
+                onClose={handleClose}
+                sx={{ width: "100%" }}
+              >
+                {snackbarMessage}
+              </Alert>
+            </Snackbar> */}
             {!gameStarted && (
               <>
                 <input
@@ -707,7 +749,7 @@ export default function Index() {
                 </div>
                 <div className="flex flex-col gap-1">
                   {/* <div className="playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
-                  <div className="fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center z-[4000]">
+                  <div className="fixed bottom-[47vh] right-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
                       {players[1].cards.map((card, index) => (
                         <Card
@@ -736,14 +778,16 @@ export default function Index() {
                     </div>
                     <PlayerDisplay
                       player={players[1]}
-                      active={activePlayer.name === players[1].name && !gameOver}
+                      active={
+                        activePlayer.name === players[1].name && !gameOver
+                      }
                       onTimeout={() => handlePlayerTimeout(players[1])}
                       prevPlayer={players[0]}
                       gameOver={gameOver}
                     />
                   </div>
                   {dealer.name === players[1].name ? (
-                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0">
+                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/black-dealer-button.png"
                         alt="dealer"
@@ -751,7 +795,7 @@ export default function Index() {
                       />
                     </div>
                   ) : littleBlind.name === players[1].name ? (
-                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0">
+                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/littleblind.png"
                         alt="little blind"
@@ -761,7 +805,7 @@ export default function Index() {
                       />
                     </div>
                   ) : bigBlind.name === players[1].name ? (
-                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0">
+                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/bigblind.png"
                         alt="big blind"
@@ -774,7 +818,7 @@ export default function Index() {
                 </div>
                 <div className="flex flex-col gap-1">
                   {/* <div className="playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
-                  <div className="fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center z-[4000]">
+                  <div className="fixed bottom-[47vh] left-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
                       {players[2].cards.map((card, index) => (
                         <Card
@@ -803,14 +847,16 @@ export default function Index() {
                     </div>
                     <PlayerDisplay
                       player={players[2]}
-                      active={activePlayer.name === players[2].name && !gameOver}
+                      active={
+                        activePlayer.name === players[2].name && !gameOver
+                      }
                       onTimeout={() => handlePlayerTimeout(players[2])}
                       prevPlayer={players[1]}
                       gameOver={gameOver}
                     />
                   </div>
                   {dealer.name === players[2].name ? (
-                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0">
+                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/black-dealer-button.png"
                         alt="dealer"
@@ -818,7 +864,7 @@ export default function Index() {
                       />
                     </div>
                   ) : littleBlind.name === players[2].name ? (
-                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0">
+                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/littleblind.png"
                         alt="little blind"
@@ -828,7 +874,7 @@ export default function Index() {
                       />
                     </div>
                   ) : bigBlind.name === players[2].name ? (
-                    <div className="absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0">
+                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/bigblind.png"
                         alt="big blind"
@@ -865,7 +911,7 @@ export default function Index() {
                     />
                   ))}
                 </div>
-                <div className="fixed bottom-[7.5%] flex w-[100vw] flex-col items-center justify-center z-[4000]">
+                <div className="fixed bottom-[7.5%] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                   <PlayerDisplay
                     player={players[0]}
                     active={activePlayer.name === players[0].name && !gameOver}
@@ -875,7 +921,7 @@ export default function Index() {
                   />
                 </div>
                 {dealer.name === players[0].name ? (
-                  <div className="absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0">
+                  <div className="absolute bottom-[1%] z-0 flex w-[100vw] flex-row items-center justify-center">
                     <img
                       src="images/black-dealer-button.png"
                       alt="dealer"
@@ -883,7 +929,7 @@ export default function Index() {
                     />
                   </div>
                 ) : littleBlind.name === players[0].name ? (
-                  <div className="absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0">
+                  <div className="absolute bottom-[1%] z-0 flex w-[100vw] flex-row items-center justify-center">
                     <img
                       src="images/littleblind.png"
                       alt="little blind"
@@ -893,7 +939,7 @@ export default function Index() {
                     />
                   </div>
                 ) : bigBlind.name === players[0].name ? (
-                  <div className="absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0">
+                  <div className="absolute bottom-[1%] z-0 flex w-[100vw] flex-row items-center justify-center">
                     <img
                       src="images/bigblind.png"
                       alt="big blind"
@@ -904,7 +950,7 @@ export default function Index() {
                   </div>
                 ) : null}
                 {!gameOver && activePlayer.socket === playerSocket ? (
-                  <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8 z-[10999]">
+                  <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">
                         <input
@@ -945,8 +991,13 @@ export default function Index() {
                     </div>
                   </div>
                 ) : null}
-                {gameOver && earlyWin && winner && winner.winner.players.map((p) => p.player.socket).includes(player!.socket) ? (
-                  <div className="fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8 z-[10999]">
+                {gameOver &&
+                earlyWin &&
+                winner &&
+                winner.winner.players
+                  .map((p) => p.player.socket)
+                  .includes(player!.socket) ? (
+                  <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
                       <button
                         className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"

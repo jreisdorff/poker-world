@@ -77,7 +77,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-6QK26W7A.css";
+var tailwind_default = "/build/_assets/tailwind-5T3MDDMO.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -87,7 +87,7 @@ var import_bcryptjs = __toESM(require("bcryptjs"));
 
 // app/db.server.ts
 var import_client = require("@prisma/client"), prisma;
-prisma = new import_client.PrismaClient();
+global.__db__ || (global.__db__ = new import_client.PrismaClient()), prisma = global.__db__, prisma.$connect();
 
 // app/models/user.server.ts
 async function getUserById(id) {
@@ -131,7 +131,7 @@ var sessionStorage = (0, import_node2.createCookieSessionStorage)({
     path: "/",
     sameSite: "lax",
     secrets: [process.env.SESSION_SECRET],
-    secure: !0
+    secure: !1
   }
 }), USER_SESSION_KEY = "userId";
 async function getSession(request) {
@@ -266,7 +266,7 @@ __export(routes_exports, {
   links: () => links2,
   meta: () => meta2
 });
-var import_Alert = __toESM(require("@mui/material/Alert")), import_Snackbar = __toESM(require("@mui/material/Snackbar")), import_react6 = require("react");
+var import_react6 = require("react");
 
 // app/components/Card.tsx
 function Card(props) {
@@ -287,7 +287,7 @@ function Card(props) {
   return /* @__PURE__ */ React.createElement("div", {
     className: `relative p-0 ${winner ? "-mt-8 transition-all duration-1000" : ""}`
   }, /* @__PURE__ */ React.createElement("div", {
-    className: `card rank-${rank} ${suit} ${winner ? "winner border-4 border-lime-500" : ""}`
+    className: `card rank-${rank} ${suit} ${winner ? "winner border-4 border-lime-500" : ""} w-[1.65em] h-[2.3em]`
   }, /* @__PURE__ */ React.createElement("span", {
     className: "rank"
   }, rank), /* @__PURE__ */ React.createElement("span", {
@@ -317,9 +317,9 @@ function PlayerDisplay(props) {
   }), /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col z-1"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: `w-[135px] max-w-[100vw] rounded-t-2xl bg-black p-1 text-center text-white ${active && !gameOver ? "border-x-4 border-t-4 border-x-lime-500 border-t-lime-500" : null}`
+    className: `w-[135px] max-w-[100vw] rounded-t-2xl bg-black/80 p-1 text-center text-white ${active && !gameOver ? "border-x-4 border-t-4 border-x-lime-500 border-t-lime-500" : null}`
   }, `${player.name}`), /* @__PURE__ */ React.createElement("div", {
-    className: `mb-1 w-[135px] max-w-[100vw] rounded-b-2xl bg-white p-1 text-center text-black ${active && !gameOver ? "border-x-4 border-b-4 border-x-lime-500 border-b-lime-500" : null}`
+    className: `mb-1 w-[135px] max-w-[100vw] rounded-b-2xl bg-white/80 p-1 text-center text-black ${active && !gameOver ? "border-x-4 border-b-4 border-x-lime-500 border-b-lime-500" : null}`
   }, wonAmount > 0 ? `${player.chips} + ${wonAmount}` : `${player.chips}`), active ? /* @__PURE__ */ React.createElement("div", {
     id: "progressbar"
   }) : /* @__PURE__ */ React.createElement("div", {
@@ -330,12 +330,14 @@ function PlayerDisplay(props) {
 // app/components/Table.tsx
 function Table() {
   return /* @__PURE__ */ React.createElement("div", {
-    className: "self-center min-w-full min-h-full flex flex-col items-center justify-center -z-1"
+    className: "-z-1 flex min-h-full min-w-full flex-col items-center justify-center self-center"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "fixed flex flex-col items-center justify-center self-center"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/table.png",
     alt: "table",
     className: "relative object-cover"
-  }));
+  })));
 }
 
 // app/styles/cards.css
@@ -379,7 +381,7 @@ var links2 = () => [
   }
 ];
 function Index() {
-  let [gameState, setGameState] = (0, import_react6.useState)(GameState.Preflop), socket = useSocket(), [gameStarted, setGameStarted] = (0, import_react6.useState)(!1), [bet, setBet] = (0, import_react6.useState)(0), [dealerCards, setDealerCards] = (0, import_react6.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react6.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react6.useState)(""), [dealtCards, setDealtCards] = (0, import_react6.useState)([]), [players, setPlayers] = (0, import_react6.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react6.useState)(1), [activePlayer, setActivePlayer] = (0, import_react6.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react6.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react6.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react6.useState)(initialPlayers[2]), [pots, setPots] = (0, import_react6.useState)([0]), [activeBet, setActiveBet] = (0, import_react6.useState)(0), [turnNumber, setTurnNumber] = (0, import_react6.useState)(0), [blinds, setBlinds] = (0, import_react6.useState)([10, 20]), [winner, setWinner] = (0, import_react6.useState)(null), [gameOver, setGameOver] = (0, import_react6.useState)(!1), [hands, setHands] = (0, import_react6.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react6.useState)(3), [winningCards, setWinningCards] = (0, import_react6.useState)([]), [wonAmount, setWonAmount] = (0, import_react6.useState)(0), [playerName, setPlayerName] = (0, import_react6.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react6.useState)(!1), [playerCount, setPlayerCount] = (0, import_react6.useState)(0), [messageSent, setMessageSent] = (0, import_react6.useState)(!1), [socketConnected, setSocketConnected] = (0, import_react6.useState)(!1), [playerNames, setPlayerNames] = (0, import_react6.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react6.useState)(), [playerSockets, setPlayerSockets] = (0, import_react6.useState)([]), [player, setPlayer] = (0, import_react6.useState)(), [joinedGame, setJoinedGame] = (0, import_react6.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react6.useState)(3), [turnsNextRound, setTurnsNextRound] = (0, import_react6.useState)(3), [earlyWin, setEarlyWin] = (0, import_react6.useState)(!1), handleCheckOrCall = () => {
+  let [gameState, setGameState] = (0, import_react6.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react6.useState)([]), [gameStarted, setGameStarted] = (0, import_react6.useState)(!1), [bet, setBet] = (0, import_react6.useState)(0), [dealerCards, setDealerCards] = (0, import_react6.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react6.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react6.useState)(""), [dealtCards, setDealtCards] = (0, import_react6.useState)([]), [players, setPlayers] = (0, import_react6.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react6.useState)(0), [activePlayer, setActivePlayer] = (0, import_react6.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react6.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react6.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react6.useState)(initialPlayers[2]), [pots, setPots] = (0, import_react6.useState)([0]), [activeBet, setActiveBet] = (0, import_react6.useState)(0), [turnNumber, setTurnNumber] = (0, import_react6.useState)(0), [blinds, setBlinds] = (0, import_react6.useState)([10, 20]), [winner, setWinner] = (0, import_react6.useState)(null), [gameOver, setGameOver] = (0, import_react6.useState)(!1), [hands, setHands] = (0, import_react6.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react6.useState)(3), [winningCards, setWinningCards] = (0, import_react6.useState)([]), [wonAmount, setWonAmount] = (0, import_react6.useState)(0), [playerName, setPlayerName] = (0, import_react6.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react6.useState)(!1), [playerCount, setPlayerCount] = (0, import_react6.useState)(0), [messageSent, setMessageSent] = (0, import_react6.useState)(!1), [socketConnected, setSocketConnected] = (0, import_react6.useState)(!1), [playerNames, setPlayerNames] = (0, import_react6.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react6.useState)(), [playerSockets, setPlayerSockets] = (0, import_react6.useState)([]), [player, setPlayer] = (0, import_react6.useState)(), [joinedGame, setJoinedGame] = (0, import_react6.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react6.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react6.useState)(2), [earlyWin, setEarlyWin] = (0, import_react6.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react6.useState)(3), handleCheckOrCall = () => {
     let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((tempP) => tempP.name === activePlayer.name);
     tempActivePlayer.chips -= activeBet;
     let tempPots = [...pots];
@@ -396,7 +398,8 @@ function Index() {
       dealerCards,
       activeBet,
       turnsThisRound,
-      hands
+      hands,
+      needResponsesFrom
     };
     socket.emit("playerCheckedOrCalled", checkOrCallProps);
   };
@@ -404,12 +407,14 @@ function Index() {
     if (!socket)
       return;
     let advance = (tn, data, type) => {
-      let tempTurnNumber = tn;
-      if (type === "BET" && (tempTurnNumber = 0, setTurnNumber(0)), type === "FOLD" && setActivePlayerCount((prev) => prev - 1), data.players.filter((p) => !p.folded).length === 1) {
-        endRound(data);
-        return;
-      }
-      tempTurnNumber >= data.turnsThisRound - 1 ? (data.activePlayer.socket === (socket == null ? void 0 : socket.id) && advanceGame(data), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
+      let tempTurnNumber = tn, tempNeedResponsesFrom = data.needResponsesFrom;
+      if (type === "BET" ? (tempNeedResponsesFrom = data.players.filter((p) => !p.folded).length - 1, setNeedResponsesFrom(data.players.filter((p) => !p.folded).length - 1)) : (tempNeedResponsesFrom = tempNeedResponsesFrom - 1, setNeedResponsesFrom(tempNeedResponsesFrom)), type === "FOLD" && setActivePlayerCount((prev) => prev - 1), data.players.filter((p) => !p.folded).length === 1)
+        if (data.activePlayer.socket === (socket == null ? void 0 : socket.id)) {
+          endRound(data);
+          return;
+        } else
+          return;
+      tempNeedResponsesFrom === 0 ? (data.activePlayer.socket === (socket == null ? void 0 : socket.id) && advanceGame(data), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
     };
     socket.on("confirmation", (data) => {
       setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
@@ -420,9 +425,9 @@ function Index() {
       let newPlayerCount = 0;
       setPlayerCount((prevPC) => (newPlayerCount = prevPC + 1, newPlayerCount)), setButtonClicked(!1);
     }), socket.on("sendHoldEmData", (data) => {
-      setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(1), setActivePlayer(data.players[1]);
+      setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(0), setActivePlayer(data.players[0]);
     }), socket.on("sendBetData", (data) => {
-      setPots(data.pots), setPlayers(data.players), setActiveBet(data.activeBet), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`), setIsSnackbarOpen(!0);
+      setPots(data.pots), setPlayers(data.players), setActiveBet(data.activeBet), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLogs((prev) => [...prev, `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -432,13 +437,14 @@ function Index() {
         pots: data.pots,
         activeBet: data.activeBet,
         turnsNextRound: data.turnsNextRound,
-        turnsThisRound: data.turnsThisRound
+        turnsThisRound: data.turnsThisRound,
+        needResponsesFrom: data.needResponsesFrom
       };
       advance(data.turnNumber, advanceDataProps, "BET");
     }), socket.on("sendShowCardsData", (data) => {
       setPlayers(data.players);
     }), socket.on("sendCheckOrCallData", (data) => {
-      setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setSnackbarMessage(data.activeBet ? `${data.players[data.prevActivePlayerIndex].name} called $${data.activeBet}` : `${data.players[data.prevActivePlayerIndex].name} checked`), setIsSnackbarOpen(!0);
+      setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setSnackbarMessage(data.activeBet ? `${data.players[data.prevActivePlayerIndex].name} called $${data.activeBet}` : `${data.players[data.prevActivePlayerIndex].name} checked`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -447,30 +453,32 @@ function Index() {
         hands: data.hands,
         pots: data.pots,
         turnsNextRound,
-        turnsThisRound: data.turnsThisRound
+        turnsThisRound: data.turnsThisRound,
+        needResponsesFrom: data.needResponsesFrom
       };
       advance(data.turnNumber, advanceDataProps, "CHECK");
     }), socket.on("sendFoldData", (data) => {
-      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0);
+      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), setLogs((prev) => [...prev, `${data.players[data.prevActivePlayerIndex].name} folded`]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
-        dealerCards,
+        dealerCards: data.dealerCards,
         players: data.players,
         hands: data.hands,
         pots,
         turnsNextRound: data.turnsNextRound - 1,
-        turnsThisRound: data.turnsThisRound
+        turnsThisRound: data.turnsThisRound,
+        needResponsesFrom: data.needResponsesFrom
       };
       advance(data.turnNumber, advanceDataProps, "FOLD");
     }), socket.on("sendEndRoundData", (data) => {
-      setActiveBet(0), setGameState(data.gameState), setActivePlayerCount(data.turnsNextRound), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(3), setEarlyWin(!0), data.winner && (setWinner(data.winner), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver);
+      setActiveBet(0), setGameState(data.gameState), setActivePlayerCount(data.turnsNextRound), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(2), setEarlyWin(!0), data.winner && (setWinner(data.winner), setLogs((prev) => [...prev, data.winner.description]), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver);
     }), socket.on("sendAdvanceData", (data) => {
-      setActiveBet(0), setGameState(data.gameState), setDealerCards(data.dealerCards), setActivePlayerCount(data.turnsNextRound), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(3), data.winner && (setWinner(data.winner), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver);
+      setActiveBet(0), setGameState(data.gameState), setDealerCards(data.dealerCards), setActivePlayerCount(data.turnsNextRound), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(2), setNeedResponsesFrom(data.players.filter((p) => !p.folded).length), data.winner && (setWinner(data.winner), setLogs((prev) => [...prev, data.winner.description]), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver);
     }), socket.on("sendAdvanceHandsData", (data) => {
-      setGameState(GameState.Preflop), setGameStarted(!0), setGameOver(!1), setDealtCards([]), setDealerCards([]), setWinningCards([]), setWinner(null), setWonAmount(0), setTurnNumber(0), setEarlyWin(!1), setActivePlayerCount(3), setTurnsThisRound(3), setTurnsNextRound(3), setPlayers(data.players), setHands(data.hands);
+      setGameState(GameState.Preflop), setGameStarted(!0), setGameOver(!1), setDealtCards([]), setDealerCards([]), setWinningCards([]), setWinner(null), setWonAmount(0), setNeedResponsesFrom(3), setTurnNumber(0), setEarlyWin(!1), setActivePlayerCount(3), setTurnsThisRound(2), setTurnsNextRound(2), setPlayers(data.players), setHands(data.hands);
       let nextDealerIndex = data.hands.length % data.players.length, nextLittleBlindIndex = (data.hands.length + 1) % data.players.length, nextBigBlindIndex = (data.hands.length + 2) % data.players.length;
-      setDealer(data.players[nextDealerIndex]), setLittleBlind(data.players[nextLittleBlindIndex]), setBigBlind(data.players[nextBigBlindIndex]), setActivePlayerIndex(nextLittleBlindIndex), setActivePlayer(data.players[nextLittleBlindIndex]), setPots([0]);
+      setDealer(data.players[nextDealerIndex]), setLittleBlind(data.players[nextLittleBlindIndex]), setBigBlind(data.players[nextBigBlindIndex]), setActivePlayerIndex(nextDealerIndex), setActivePlayer(data.players[nextDealerIndex]), setPots([0]);
     });
   }, [socket]), (0, import_react6.useEffect)(() => {
     if (playerCount === 3 && playerSocket === playerSockets[2]) {
@@ -504,7 +512,9 @@ function Index() {
       gameState,
       turnsNextRound: turnsNextRound - 1,
       turnsThisRound: turnsNextRound,
-      hands
+      hands,
+      dealerCards,
+      needResponsesFrom
     };
     socket.emit("playerFolded", foldProps);
   }, handleBet = (amount) => {
@@ -525,11 +535,12 @@ function Index() {
       activeBet: amount,
       turnsNextRound,
       turnsThisRound,
-      hands
+      hands,
+      needResponsesFrom
     };
     socket.emit("playerBet", betProps);
   }, handlePlayerTimeout = (player2) => {
-    playerSocket === player2.socket && handleFold(), setSnackbarMessage(`${player2.name} timed out and auto-folded`), setIsSnackbarOpen(!0);
+    playerSocket === player2.socket && handleFold(), setLogs((prev) => [...prev, `${player2.name} timed out and auto-folded`]), setSnackbarMessage(`${player2.name} timed out and auto-folded`), setIsSnackbarOpen(!0);
   }, getNextPlayerProps = () => {
     let tempActivePlayerIndex = activePlayerIndex, activePlayerIndicies = [];
     players.map((p, index) => {
@@ -563,22 +574,17 @@ function Index() {
     }), socket.emit("showCards", { players: tempPlayers });
   }, handleMuckCards = () => {
   };
-  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(import_Snackbar.default, {
-    open: isSnackbarOpen,
-    autoHideDuration: 3e3,
-    onClose: handleClose,
-    key: snackbarMessage
-  }, /* @__PURE__ */ React.createElement(import_Alert.default, {
-    className: "rounded-full",
-    onClose: handleClose,
-    sx: { width: "100%" }
-  }, snackbarMessage)), /* @__PURE__ */ React.createElement("main", {
-    className: "relative min-h-screen bg-[rgb(0,90,0)] flex items-center justify-center"
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("main", {
+    className: "relative flex h-screen items-center justify-center bg-[rgb(0,90,0)]"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "relative sm:pb-16 sm:pt-8"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "mx-auto flex h-[100vh] w-[100vw] flex-col"
-  }, !gameStarted && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("input", {
+    className: "mx-auto flex h-[80vh] w-[95vw] flex-col"
+  }, logs.length > 0 && /* @__PURE__ */ React.createElement("div", {
+    className: "fixed bottom-0 left-0 w-[250px] h-[200px] overflow-scroll bg-black/80 text-white rounded-tr-xl"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "flex flex-col"
+  }, logs.map((l) => /* @__PURE__ */ React.createElement("span", null, l)))), !gameStarted && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("input", {
     placeholder: "Enter player name",
     type: "text",
     value: playerName,
@@ -612,7 +618,7 @@ function Index() {
   })))), /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col gap-1"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[47vh] right-[35vw] flex w-[100vw] flex-col items-center justify-center z-[4000]"
+    className: "fixed bottom-[47vh] right-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "playingCards simpleCards flex flex-row items-center justify-center"
   }, players[1].cards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
@@ -629,13 +635,13 @@ function Index() {
     prevPlayer: players[0],
     gameOver
   })), dealer.name === players[1].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0"
+    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/black-dealer-button.png",
     alt: "dealer",
     className: "relative object-cover"
   })) : littleBlind.name === players[1].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0"
+    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/littleblind.png",
     alt: "little blind",
@@ -643,7 +649,7 @@ function Index() {
     height: "50px",
     className: "relative object-cover"
   })) : bigBlind.name === players[1].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] flex w-[100vw] flex-row pl-8 z-0"
+    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/bigblind.png",
     alt: "big blind",
@@ -653,7 +659,7 @@ function Index() {
   })) : null), /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col gap-1"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[47vh] left-[35vw] flex w-[100vw] flex-col items-center justify-center z-[4000]"
+    className: "fixed bottom-[47vh] left-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "playingCards simpleCards flex flex-row items-center justify-center"
   }, players[2].cards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
@@ -670,13 +676,13 @@ function Index() {
     prevPlayer: players[1],
     gameOver
   })), dealer.name === players[2].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0"
+    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/black-dealer-button.png",
     alt: "dealer",
     className: "relative object-cover"
   })) : littleBlind.name === players[2].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0"
+    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/littleblind.png",
     alt: "little blind",
@@ -684,7 +690,7 @@ function Index() {
     height: "50px",
     className: "relative object-cover"
   })) : bigBlind.name === players[2].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] flex w-[100vw] flex-row items-end justify-end pr-8 z-0"
+    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/bigblind.png",
     alt: "big blind",
@@ -701,7 +707,7 @@ function Index() {
     folded: players[0].folded,
     winner: winningCards.length > 0 ? winningCards.filter((w) => w.suit == card.suit.charAt(0) && w.value.toString().replace("T", "10") === card.rank).length > 0 : !1
   }))), /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[7.5%] flex w-[100vw] flex-col items-center justify-center z-[4000]"
+    className: "fixed bottom-[7.5%] z-[4000] flex w-[100vw] flex-col items-center justify-center"
   }, /* @__PURE__ */ React.createElement(PlayerDisplay, {
     player: players[0],
     active: activePlayer.name === players[0].name && !gameOver,
@@ -709,13 +715,13 @@ function Index() {
     prevPlayer: players[players.length - 1],
     gameOver
   })), dealer.name === players[0].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0"
+    className: "absolute bottom-[1%] z-0 flex w-[100vw] flex-row items-center justify-center"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/black-dealer-button.png",
     alt: "dealer",
     className: "relative object-cover"
   })) : littleBlind.name === players[0].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0"
+    className: "absolute bottom-[1%] z-0 flex w-[100vw] flex-row items-center justify-center"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/littleblind.png",
     alt: "little blind",
@@ -723,7 +729,7 @@ function Index() {
     height: "50px",
     className: "relative object-cover"
   })) : bigBlind.name === players[0].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[1%] flex w-[100vw] flex-row items-center justify-center z-0"
+    className: "absolute bottom-[1%] z-0 flex w-[100vw] flex-row items-center justify-center"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/bigblind.png",
     alt: "big blind",
@@ -731,7 +737,7 @@ function Index() {
     height: "50px",
     className: "relative object-cover"
   })) : null, !gameOver && activePlayer.socket === playerSocket ? /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8 z-[10999]"
+    className: "fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "flex w-[100%] flex-row items-end"
   }, /* @__PURE__ */ React.createElement("div", {
@@ -761,7 +767,7 @@ function Index() {
     className: "rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
     onClick: () => handleBet(bet)
   }, "Bet"))) : null, gameOver && earlyWin && winner && winner.winner.players.map((p) => p.player.socket).includes(player.socket) ? /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[10%] right-0 flex w-[220px] flex-row items-end justify-end pr-8 z-[10999]"
+    className: "fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end"
   }, /* @__PURE__ */ React.createElement("button", {
@@ -1232,7 +1238,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "3e243ca8", entry: { module: "/build/entry.client-MQASNF5I.js", imports: ["/build/_shared/chunk-ITJF5MQW.js", "/build/_shared/chunk-KQ4UEIY5.js", "/build/_shared/chunk-ZI4FXXR7.js", "/build/_shared/chunk-Z6I63RXN.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-M2IDL62A.js", imports: ["/build/_shared/chunk-WYXNEOQY.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-A2VKZMUZ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-7RM3SOZL.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-ZOGVMCL2.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-6DRHFCUS.js", imports: ["/build/_shared/chunk-UQFGA6YH.js", "/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-IKXGI3QT.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KYH5O3PB.js", imports: ["/build/_shared/chunk-QVZVKMCD.js", "/build/_shared/chunk-J4EG7P3T.js", "/build/_shared/chunk-7A34JLFB.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-Y7RVFTKU.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-VUI6DN3B.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-XSI6HG3D.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-3E243CA8.js" };
+var assets_manifest_default = { version: "8ef9babe", entry: { module: "/build/entry.client-R3MZUUHS.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-IE3L4TEA.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-BOIPQSKF.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-56AB3VL2.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-QRQRANUV.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-X3I7IBON.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-QRQRANUV.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-SWVWU5B7.js", imports: ["/build/_shared/chunk-QRQRANUV.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-8EF9BABE.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
@@ -1326,3 +1332,4 @@ module.exports = __toCommonJS(stdin_exports);
   publicPath,
   routes
 });
+//# sourceMappingURL=index.js.map

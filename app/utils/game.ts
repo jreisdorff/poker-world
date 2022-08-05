@@ -12,6 +12,7 @@ export interface AdvanceGameProps {
     activeBet?: number;
     turnsNextRound: number;
     turnsThisRound: number;
+    needResponsesFrom: number;
 };
 
 export interface NextProps {

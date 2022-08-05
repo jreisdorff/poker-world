@@ -52,7 +52,7 @@ export default function PlayerDisplay(props: PlayerDisplayProps) {
   return (
     <div className={`flex flex-col z-1`}>
       <div
-        className={`w-[135px] max-w-[100vw] rounded-t-2xl bg-black p-1 text-center text-white ${
+        className={`w-[135px] max-w-[100vw] rounded-t-2xl bg-black/80 p-1 text-center text-white ${
           active && !gameOver
             ? "border-x-4 border-t-4 border-x-lime-500 border-t-lime-500"
             : null
@@ -61,7 +61,7 @@ export default function PlayerDisplay(props: PlayerDisplayProps) {
         {`${player.name}`}
       </div>
       <div
-        className={`mb-1 w-[135px] max-w-[100vw] rounded-b-2xl bg-white p-1 text-center text-black ${
+        className={`mb-1 w-[135px] max-w-[100vw] rounded-b-2xl bg-white/80 p-1 text-center text-black ${
           active && !gameOver
             ? "border-x-4 border-b-4 border-x-lime-500 border-b-lime-500"
             : null
