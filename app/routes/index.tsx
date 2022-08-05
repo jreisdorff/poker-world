@@ -11,6 +11,7 @@ import cardStyles from "../styles/cards.css";
 import progressStyles from "../styles/progress.css";
 
 import { useSocket } from "~/context";
+import { pluralize } from "~/utils";
 
 export const links: LinksFunction = () => {
   return [
@@ -224,7 +225,8 @@ export default function Index() {
       let tempNeedResponsesFrom = data.needResponsesFrom;
 
       if (type === "BET") {
-        tempNeedResponsesFrom = data.players.filter((p) => !p.folded).length - 1;
+        tempNeedResponsesFrom =
+          data.players.filter((p) => !p.folded).length - 1;
         setNeedResponsesFrom(data.players.filter((p) => !p.folded).length - 1);
       } else {
         tempNeedResponsesFrom = tempNeedResponsesFrom - 1;
@@ -319,7 +321,12 @@ export default function Index() {
       setActiveBet(data.activeBet);
       setActivePlayerIndex(data.activePlayerIndex);
       setActivePlayer(data.activePlayer);
-      setLogs((prev) => [...prev, `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`]);
+      setLogs((prev) => [
+        ...prev,
+        `${data.players[data.prevActivePlayerIndex].name} bet ${
+          data.activeBet
+        }`,
+      ]);
       setSnackbarMessage(
         `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`
       );
@@ -357,11 +364,17 @@ export default function Index() {
       setLittleBlindIndex(data.littleBlindIndex);
       setBigBlindIndex(data.bigBlindIndex);
 
-      console.log('data', data);
+      console.log("data", data);
 
-      if (data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex) {
+      if (
+        data.gameState === GameState.Preflop &&
+        data.littleBlindIndex == data.activePlayerIndex
+      ) {
         setActiveBet(littleBlindAmount);
-      } else if (data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex) {
+      } else if (
+        data.gameState === GameState.Preflop &&
+        data.bigBlindIndex == data.activePlayerIndex
+      ) {
         setActiveBet(0);
       }
 
@@ -399,7 +412,10 @@ export default function Index() {
 
       setTurnsNextRound(data.turnsNextRound);
 
-      setLogs((prev) => [...prev, `${data.players[data.prevActivePlayerIndex].name} folded`]);
+      setLogs((prev) => [
+        ...prev,
+        `${data.players[data.prevActivePlayerIndex].name} folded`,
+      ]);
 
       setSnackbarMessage(
         `${data.players[data.prevActivePlayerIndex].name} folded`
@@ -686,9 +702,15 @@ export default function Index() {
       <main className="relative flex h-screen items-center justify-center bg-[rgb(0,90,0)]">
         <div className="relative sm:pb-16 sm:pt-8">
           <div className="mx-auto flex h-[80vh] w-[95vw] flex-col">
-            {logs.length > 0 && <div className="fixed bottom-0 left-0 w-[250px] h-[200px] overflow-scroll bg-black/80 text-white rounded-tr-xl">
-              <div className="flex flex-col">{logs.map((l) => <span>{l}</span>)}</div>
-            </div>}
+            {logs.length > 0 && (
+              <div className="fixed bottom-0 left-0 h-[200px] w-[250px] overflow-scroll rounded-tr-xl bg-black/80 text-white">
+                <div className="flex flex-col">
+                  {logs.map((l) => (
+                    <span>{l}</span>
+                  ))}
+                </div>
+              </div>
+            )}
             {/* <Snackbar
               open={isSnackbarOpen}
               autoHideDuration={3000}
@@ -705,13 +727,15 @@ export default function Index() {
             </Snackbar> */}
             {!gameStarted && (
               <>
-                <input
-                  placeholder="Enter player name"
-                  type="text"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  className="absolute mt-24 self-center rounded bg-black px-4 py-2 text-white"
-                />
+                {!joinedGame ? (
+                  <input
+                    placeholder="Enter player name"
+                    type="text"
+                    value={playerName}
+                    onChange={(e) => setPlayerName(e.target.value)}
+                    className="absolute mt-24 self-center rounded bg-black px-4 py-2 text-white"
+                  />
+                ) : null}
                 <button
                   className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${
                     joinedGame ? "disabled" : ""
@@ -721,9 +745,15 @@ export default function Index() {
                 >
                   {!joinedGame ? "Join Game" : "Joined, awaiting players"}
                 </button>
-                <div className="absolute mt-[30%] self-center text-6xl text-black">
-                  {playerNames.join(", ")}
-                </div>
+                {playerNames.length > 0 ? (
+                  <div className="absolute mt-[30%] self-center text-6xl text-black">
+                    {`${playerNames.length} ${pluralize(
+                      playerNames.length,
+                      "player",
+                      "players"
+                    )} joined`}
+                  </div>
+                ) : null}
               </>
             )}
 
@@ -742,16 +772,16 @@ export default function Index() {
                 <Table />
                 <div className="flex flex-col items-center justify-center">
                   <div
-                    className={`absolute top-[20%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
+                    className={`absolute top-[10%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
                       !winner ? "opacity-0" : "opacity-100"
                     }`}
                   >
                     <h1>{winner ? winner.description : null}</h1>
                   </div>
-                  <div className="absolute top-[30%] w-[100vw] items-center justify-center self-center text-center text-xl">
-                    {`Blinds: ${blinds[0]}/${blinds[1]} • Pot: ${pots.join(
-                      ", "
-                    )} • Hand #${hands.length + 1}`}
+                  <div className="absolute top-[20%] flex w-[100vw] flex-col items-center justify-center self-center text-center text-xl">
+                    <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
+                    <div>{`Pot: ${pots.join(", ")}`}</div>
+                    <div>{`Hand #${hands.length + 1}`}</div>
                   </div>
                   <div className="playingCards simpleCards absolute bottom-[48%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
@@ -816,7 +846,7 @@ export default function Index() {
                     />
                   </div>
                   {dealer.name === players[1].name ? (
-                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8">
+                    <div className="absolute bottom-[30%] z-0 flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/black-dealer-button.png"
                         alt="dealer"
@@ -824,7 +854,7 @@ export default function Index() {
                       />
                     </div>
                   ) : littleBlind.name === players[1].name ? (
-                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8">
+                    <div className="absolute bottom-[30%] z-0 flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/littleblind.png"
                         alt="little blind"
@@ -834,7 +864,7 @@ export default function Index() {
                       />
                     </div>
                   ) : bigBlind.name === players[1].name ? (
-                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8">
+                    <div className="absolute bottom-[30%] z-0 flex w-[100vw] flex-row pl-8">
                       <img
                         src="images/bigblind.png"
                         alt="big blind"
@@ -885,7 +915,7 @@ export default function Index() {
                     />
                   </div>
                   {dealer.name === players[2].name ? (
-                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
+                    <div className="absolute bottom-[30%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/black-dealer-button.png"
                         alt="dealer"
@@ -893,7 +923,7 @@ export default function Index() {
                       />
                     </div>
                   ) : littleBlind.name === players[2].name ? (
-                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
+                    <div className="absolute bottom-[30%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/littleblind.png"
                         alt="little blind"
@@ -903,7 +933,7 @@ export default function Index() {
                       />
                     </div>
                   ) : bigBlind.name === players[2].name ? (
-                    <div className="absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
+                    <div className="absolute bottom-[30%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8">
                       <img
                         src="images/bigblind.png"
                         alt="big blind"

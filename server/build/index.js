@@ -77,7 +77,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-5T3MDDMO.css";
+var tailwind_default = "/build/_assets/tailwind-UOUQVBGG.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -266,7 +266,7 @@ __export(routes_exports, {
   links: () => links2,
   meta: () => meta2
 });
-var import_react6 = require("react");
+var import_react8 = require("react");
 
 // app/components/Card.tsx
 function Card(props) {
@@ -346,6 +346,36 @@ var cards_default = "/build/_assets/cards-COWKL53X.css";
 // app/styles/progress.css
 var progress_default = "/build/_assets/progress-4XQ5EFCP.css";
 
+// app/utils.ts
+var import_react6 = require("@remix-run/react"), import_react7 = require("react"), DEFAULT_REDIRECT = "/";
+function safeRedirect(to, defaultRedirect = DEFAULT_REDIRECT) {
+  return !to || typeof to != "string" || !to.startsWith("/") || to.startsWith("//") ? defaultRedirect : to;
+}
+function useMatchesData(id) {
+  let matchingRoutes = (0, import_react6.useMatches)(), route = (0, import_react7.useMemo)(() => matchingRoutes.find((route2) => route2.id === id), [matchingRoutes, id]);
+  return route == null ? void 0 : route.data;
+}
+function isUser(user) {
+  return user && typeof user == "object" && typeof user.email == "string";
+}
+function useOptionalUser() {
+  let data = useMatchesData("root");
+  if (!(!data || !isUser(data.user)))
+    return data.user;
+}
+function useUser() {
+  let maybeUser = useOptionalUser();
+  if (!maybeUser)
+    throw new Error("No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead.");
+  return maybeUser;
+}
+function validateEmail(email) {
+  return typeof email == "string" && email.length > 3 && email.includes("@");
+}
+function pluralize(count, singular, plural) {
+  return count === 1 ? singular : plural;
+}
+
 // route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var links2 = () => [
   { rel: "stylesheet", href: cards_default },
@@ -381,7 +411,7 @@ var links2 = () => [
   }
 ];
 function Index() {
-  let [gameState, setGameState] = (0, import_react6.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react6.useState)([]), [gameStarted, setGameStarted] = (0, import_react6.useState)(!1), [bet, setBet] = (0, import_react6.useState)(0), [dealerCards, setDealerCards] = (0, import_react6.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react6.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react6.useState)(""), [dealtCards, setDealtCards] = (0, import_react6.useState)([]), [players, setPlayers] = (0, import_react6.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react6.useState)(0), [activePlayer, setActivePlayer] = (0, import_react6.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react6.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react6.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react6.useState)(initialPlayers[2]), [pots, setPots] = (0, import_react6.useState)([0]), [activeBet, setActiveBet] = (0, import_react6.useState)(0), [turnNumber, setTurnNumber] = (0, import_react6.useState)(0), [blinds, setBlinds] = (0, import_react6.useState)([10, 20]), [winner, setWinner] = (0, import_react6.useState)(null), [gameOver, setGameOver] = (0, import_react6.useState)(!1), [hands, setHands] = (0, import_react6.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react6.useState)(3), [winningCards, setWinningCards] = (0, import_react6.useState)([]), [wonAmount, setWonAmount] = (0, import_react6.useState)(0), [playerName, setPlayerName] = (0, import_react6.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react6.useState)(!1), [playerCount, setPlayerCount] = (0, import_react6.useState)(0), [messageSent, setMessageSent] = (0, import_react6.useState)(!1), [socketConnected, setSocketConnected] = (0, import_react6.useState)(!1), [playerNames, setPlayerNames] = (0, import_react6.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react6.useState)(), [playerSockets, setPlayerSockets] = (0, import_react6.useState)([]), [player, setPlayer] = (0, import_react6.useState)(), [joinedGame, setJoinedGame] = (0, import_react6.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react6.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react6.useState)(2), [earlyWin, setEarlyWin] = (0, import_react6.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react6.useState)(3), [littleBlindAmount, setLittleBlindAmount] = (0, import_react6.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react6.useState)(20), [littleBlindIndex, setLittleBlindIndex] = (0, import_react6.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react6.useState)(2), handleCheckOrCall = () => {
+  let [gameState, setGameState] = (0, import_react8.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react8.useState)([]), [gameStarted, setGameStarted] = (0, import_react8.useState)(!1), [bet, setBet] = (0, import_react8.useState)(0), [dealerCards, setDealerCards] = (0, import_react8.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react8.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react8.useState)(""), [dealtCards, setDealtCards] = (0, import_react8.useState)([]), [players, setPlayers] = (0, import_react8.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react8.useState)(0), [activePlayer, setActivePlayer] = (0, import_react8.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react8.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react8.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react8.useState)(initialPlayers[2]), [pots, setPots] = (0, import_react8.useState)([0]), [activeBet, setActiveBet] = (0, import_react8.useState)(0), [turnNumber, setTurnNumber] = (0, import_react8.useState)(0), [blinds, setBlinds] = (0, import_react8.useState)([10, 20]), [winner, setWinner] = (0, import_react8.useState)(null), [gameOver, setGameOver] = (0, import_react8.useState)(!1), [hands, setHands] = (0, import_react8.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react8.useState)(3), [winningCards, setWinningCards] = (0, import_react8.useState)([]), [wonAmount, setWonAmount] = (0, import_react8.useState)(0), [playerName, setPlayerName] = (0, import_react8.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react8.useState)(!1), [playerCount, setPlayerCount] = (0, import_react8.useState)(0), [messageSent, setMessageSent] = (0, import_react8.useState)(!1), [socketConnected, setSocketConnected] = (0, import_react8.useState)(!1), [playerNames, setPlayerNames] = (0, import_react8.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react8.useState)(), [playerSockets, setPlayerSockets] = (0, import_react8.useState)([]), [player, setPlayer] = (0, import_react8.useState)(), [joinedGame, setJoinedGame] = (0, import_react8.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react8.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react8.useState)(2), [earlyWin, setEarlyWin] = (0, import_react8.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react8.useState)(3), [littleBlindAmount, setLittleBlindAmount] = (0, import_react8.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react8.useState)(20), [littleBlindIndex, setLittleBlindIndex] = (0, import_react8.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react8.useState)(2), handleCheckOrCall = () => {
     let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((tempP) => tempP.name === activePlayer.name);
     tempActivePlayer.chips -= activeBet;
     let tempPots = [...pots];
@@ -405,7 +435,7 @@ function Index() {
     };
     socket.emit("playerCheckedOrCalled", checkOrCallProps);
   };
-  (0, import_react6.useEffect)(() => {
+  (0, import_react8.useEffect)(() => {
     if (!socket)
       return;
     let advance = (tn, data, type) => {
@@ -429,7 +459,10 @@ function Index() {
     }), socket.on("sendHoldEmData", (data) => {
       setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setPots(data.pots), setActiveBet(bigBlindAmount), setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(0), setActivePlayer(data.players[0]);
     }), socket.on("sendBetData", (data) => {
-      setPots(data.pots), setPlayers(data.players), setActiveBet(data.activeBet), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLogs((prev) => [...prev, `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
+      setPots(data.pots), setPlayers(data.players), setActiveBet(data.activeBet), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLogs((prev) => [
+        ...prev,
+        `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`
+      ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -460,7 +493,10 @@ function Index() {
       };
       advance(data.turnNumber, advanceDataProps, "CHECK");
     }), socket.on("sendFoldData", (data) => {
-      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), setLogs((prev) => [...prev, `${data.players[data.prevActivePlayerIndex].name} folded`]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
+      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), setLogs((prev) => [
+        ...prev,
+        `${data.players[data.prevActivePlayerIndex].name} folded`
+      ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -482,7 +518,7 @@ function Index() {
       let nextDealerIndex = data.hands.length % data.players.length, nextLittleBlindIndex = (data.hands.length + 1) % data.players.length, nextBigBlindIndex = (data.hands.length + 2) % data.players.length;
       setActiveBet(bigBlindAmount), setDealer(data.players[nextDealerIndex]), setLittleBlind(data.players[nextLittleBlindIndex]), setBigBlind(data.players[nextBigBlindIndex]), setLittleBlindIndex(nextLittleBlindIndex), setBigBlindIndex(nextBigBlindIndex), setActivePlayerIndex(nextDealerIndex), setActivePlayer(data.players[nextDealerIndex]), setPots([0]);
     });
-  }, [socket]), (0, import_react6.useEffect)(() => {
+  }, [socket]), (0, import_react8.useEffect)(() => {
     if (playerCount === 3 && playerSocket === playerSockets[2]) {
       let startProps = {
         playerNames,
@@ -492,7 +528,7 @@ function Index() {
       };
       socket.emit("startHoldEmGame", startProps);
     }
-  }, [playerCount]), (0, import_react6.useEffect)(() => {
+  }, [playerCount]), (0, import_react8.useEffect)(() => {
     if (buttonClicked) {
       if (!socket)
         return;
@@ -583,10 +619,10 @@ function Index() {
   }, /* @__PURE__ */ React.createElement("div", {
     className: "mx-auto flex h-[80vh] w-[95vw] flex-col"
   }, logs.length > 0 && /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-0 left-0 w-[250px] h-[200px] overflow-scroll bg-black/80 text-white rounded-tr-xl"
+    className: "fixed bottom-0 left-0 h-[200px] w-[250px] overflow-scroll rounded-tr-xl bg-black/80 text-white"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col"
-  }, logs.map((l) => /* @__PURE__ */ React.createElement("span", null, l)))), !gameStarted && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("input", {
+  }, logs.map((l) => /* @__PURE__ */ React.createElement("span", null, l)))), !gameStarted && /* @__PURE__ */ React.createElement(React.Fragment, null, joinedGame ? null : /* @__PURE__ */ React.createElement("input", {
     placeholder: "Enter player name",
     type: "text",
     value: playerName,
@@ -596,19 +632,19 @@ function Index() {
     className: `absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${joinedGame ? "disabled" : ""}`,
     onClick: handleJoinGame,
     disabled: joinedGame
-  }, joinedGame ? "Joined, awaiting players" : "Join Game"), /* @__PURE__ */ React.createElement("div", {
+  }, joinedGame ? "Joined, awaiting players" : "Join Game"), playerNames.length > 0 ? /* @__PURE__ */ React.createElement("div", {
     className: "absolute mt-[30%] self-center text-6xl text-black"
-  }, playerNames.join(", "))), gameOver && /* @__PURE__ */ React.createElement("button", {
+  }, `${playerNames.length} ${pluralize(playerNames.length, "player", "players")} joined`) : null), gameOver && /* @__PURE__ */ React.createElement("button", {
     id: "next-btn",
     className: "absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
     onClick: () => advanceHands()
   }, "Next Hand"), gameStarted ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Table, null), /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col items-center justify-center"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: `absolute top-[20%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${winner ? "opacity-100" : "opacity-0"}`
+    className: `absolute top-[10%] w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${winner ? "opacity-100" : "opacity-0"}`
   }, /* @__PURE__ */ React.createElement("h1", null, winner ? winner.description : null)), /* @__PURE__ */ React.createElement("div", {
-    className: "absolute top-[30%] w-[100vw] items-center justify-center self-center text-center text-xl"
-  }, `Blinds: ${blinds[0]}/${blinds[1]} \u2022 Pot: ${pots.join(", ")} \u2022 Hand #${hands.length + 1}`), /* @__PURE__ */ React.createElement("div", {
+    className: "absolute top-[20%] flex w-[100vw] flex-col items-center justify-center self-center text-center text-xl"
+  }, /* @__PURE__ */ React.createElement("div", null, `Blinds: ${blinds[0]}/${blinds[1]}`), /* @__PURE__ */ React.createElement("div", null, `Pot: ${pots.join(", ")}`), /* @__PURE__ */ React.createElement("div", null, `Hand #${hands.length + 1}`)), /* @__PURE__ */ React.createElement("div", {
     className: "playingCards simpleCards absolute bottom-[48%] z-[9999] flex w-[100vw] flex-row items-center justify-center"
   }, dealerCards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
@@ -637,13 +673,13 @@ function Index() {
     prevPlayer: players[0],
     gameOver
   })), dealer.name === players[1].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8"
+    className: "absolute bottom-[30%] z-0 flex w-[100vw] flex-row pl-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/black-dealer-button.png",
     alt: "dealer",
     className: "relative object-cover"
   })) : littleBlind.name === players[1].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8"
+    className: "absolute bottom-[30%] z-0 flex w-[100vw] flex-row pl-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/littleblind.png",
     alt: "little blind",
@@ -651,7 +687,7 @@ function Index() {
     height: "50px",
     className: "relative object-cover"
   })) : bigBlind.name === players[1].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row pl-8"
+    className: "absolute bottom-[30%] z-0 flex w-[100vw] flex-row pl-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/bigblind.png",
     alt: "big blind",
@@ -678,13 +714,13 @@ function Index() {
     prevPlayer: players[1],
     gameOver
   })), dealer.name === players[2].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
+    className: "absolute bottom-[30%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/black-dealer-button.png",
     alt: "dealer",
     className: "relative object-cover"
   })) : littleBlind.name === players[2].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
+    className: "absolute bottom-[30%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/littleblind.png",
     alt: "little blind",
@@ -692,7 +728,7 @@ function Index() {
     height: "50px",
     className: "relative object-cover"
   })) : bigBlind.name === players[2].name ? /* @__PURE__ */ React.createElement("div", {
-    className: "absolute bottom-[50%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
+    className: "absolute bottom-[30%] z-0 flex w-[100vw] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("img", {
     src: "images/bigblind.png",
     alt: "big blind",
@@ -790,35 +826,6 @@ __export(login_exports, {
   meta: () => meta3
 });
 var import_node5 = require("@remix-run/node"), import_react9 = require("@remix-run/react"), React2 = __toESM(require("react"));
-
-// app/utils.ts
-var import_react7 = require("@remix-run/react"), import_react8 = require("react"), DEFAULT_REDIRECT = "/";
-function safeRedirect(to, defaultRedirect = DEFAULT_REDIRECT) {
-  return !to || typeof to != "string" || !to.startsWith("/") || to.startsWith("//") ? defaultRedirect : to;
-}
-function useMatchesData(id) {
-  let matchingRoutes = (0, import_react7.useMatches)(), route = (0, import_react8.useMemo)(() => matchingRoutes.find((route2) => route2.id === id), [matchingRoutes, id]);
-  return route == null ? void 0 : route.data;
-}
-function isUser(user) {
-  return user && typeof user == "object" && typeof user.email == "string";
-}
-function useOptionalUser() {
-  let data = useMatchesData("root");
-  if (!(!data || !isUser(data.user)))
-    return data.user;
-}
-function useUser() {
-  let maybeUser = useOptionalUser();
-  if (!maybeUser)
-    throw new Error("No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead.");
-  return maybeUser;
-}
-function validateEmail(email) {
-  return typeof email == "string" && email.length > 3 && email.includes("@");
-}
-
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\login.tsx
 async function loader4({ request }) {
   return await getUserId(request) ? (0, import_node5.redirect)("/") : (0, import_node5.json)({});
 }
@@ -1240,7 +1247,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "9fc11a49", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-IE3L4TEA.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-OSLXYGJJ.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-56AB3VL2.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-QRQRANUV.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-X3I7IBON.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-QRQRANUV.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-SWVWU5B7.js", imports: ["/build/_shared/chunk-QRQRANUV.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-9FC11A49.js" };
+var assets_manifest_default = { version: "ba3bc81a", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-AXY5UXSI.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-NJO5DUR7.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-BA3BC81A.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
