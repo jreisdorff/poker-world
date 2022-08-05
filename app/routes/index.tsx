@@ -71,6 +71,8 @@ export interface SendFoldDataProps {
   hands: any[];
   dealerCards: any[];
   needResponsesFrom: number;
+  littleBlindIndex: number;
+  bigBlindIndex: number;
 }
 
 export interface SendBetDataProps {
@@ -144,7 +146,9 @@ export default function Index() {
   const [dealer, setDealer] = useState(initialPlayers[0]);
   const [littleBlind, setLittleBlind] = useState(initialPlayers[1]);
   const [bigBlind, setBigBlind] = useState(initialPlayers[2]);
-  const [pots, setPots] = useState<any[]>([0]);
+  const [littleBlindAmount, setLittleBlindAmount] = useState(10);
+  const [bigBlindAmount, setBigBlindAmount] = useState(20);
+  const [pots, setPots] = useState<any[]>([littleBlindAmount, bigBlindAmount]);
   const [activeBet, setActiveBet] = useState(0);
   const [turnNumber, setTurnNumber] = useState(0);
   const [blinds, setBlinds] = useState([10, 20]);
@@ -180,9 +184,6 @@ export default function Index() {
 
   const [needResponsesFrom, setNeedResponsesFrom] = useState(3);
 
-  const [littleBlindAmount, setLittleBlindAmount] = useState(10);
-  const [bigBlindAmount, setBigBlindAmount] = useState(20);
-
   const [littleBlindIndex, setLittleBlindIndex] = useState(1);
   const [bigBlindIndex, setBigBlindIndex] = useState(2);
 
@@ -195,7 +196,7 @@ export default function Index() {
     let tempPots = [...pots];
     tempPots[0] += activeBet;
 
-    const advanceProps = getNextPlayerProps();
+    const advanceProps = getNextPlayerProps(tempPlayers);
 
     const checkOrCallProps: SendCheckOrCallDataProps = {
       players: tempPlayers,
@@ -366,6 +367,8 @@ export default function Index() {
 
       console.log("data", data);
 
+      console.log(activePlayer);
+
       if (
         data.gameState === GameState.Preflop &&
         data.littleBlindIndex == data.activePlayerIndex
@@ -413,6 +416,18 @@ export default function Index() {
       setActivePlayer(data.activePlayer);
 
       setTurnsNextRound(data.turnsNextRound);
+
+      if (
+        data.gameState === GameState.Preflop &&
+        data.littleBlindIndex == data.activePlayerIndex
+      ) {
+        setActiveBet(littleBlindAmount);
+      } else if (
+        data.gameState === GameState.Preflop &&
+        data.bigBlindIndex == data.activePlayerIndex
+      ) {
+        setActiveBet(0);
+      }
 
       setLogs((prev) => [
         ...prev,
@@ -531,7 +546,7 @@ export default function Index() {
 
       setActivePlayer(data.players[nextDealerIndex]);
 
-      setPots([0]);
+      setPots([littleBlindAmount + bigBlindAmount]);
     });
   }, [socket]);
 
@@ -574,7 +589,7 @@ export default function Index() {
     });
     tempActivePlayer!.folded = true;
 
-    const advanceProps = getNextPlayerProps();
+    const advanceProps = getNextPlayerProps(tempPlayers);
 
     const foldProps: SendFoldDataProps = {
       players: tempPlayers,
@@ -589,6 +604,8 @@ export default function Index() {
       hands,
       dealerCards,
       needResponsesFrom,
+      littleBlindIndex,
+      bigBlindIndex,
     };
 
     socket!.emit("playerFolded", foldProps);
@@ -603,7 +620,7 @@ export default function Index() {
     let tempPots = [...pots];
     tempPots[0] += amount;
 
-    const advanceProps = getNextPlayerProps();
+    const advanceProps = getNextPlayerProps(tempPlayers);
 
     const betProps: SendBetDataProps = {
       players: tempPlayers,
@@ -636,10 +653,10 @@ export default function Index() {
     setIsSnackbarOpen(true);
   };
 
-  const getNextPlayerProps = () => {
+  const getNextPlayerProps = (tempPlayers: Player[]) => {
     let tempActivePlayerIndex = activePlayerIndex;
     let activePlayerIndicies: number[] = [];
-    players.map((p, index) => {
+    tempPlayers.map((p, index) => {
       if (!p.folded) {
         activePlayerIndicies.push(index);
       }
@@ -661,7 +678,7 @@ export default function Index() {
     return {
       prevActivePlayerIndex: activePlayerIndex,
       activePlayerIndex: nextActivePlayerIndex,
-      activePlayer: players[nextActivePlayerIndex],
+      activePlayer: tempPlayers[nextActivePlayerIndex],
     };
   };
 
@@ -708,8 +725,8 @@ export default function Index() {
             {logs.length > 0 && (
               <div className="fixed bottom-0 left-0 h-[75px] w-[250px] overflow-auto rounded-tr-xl bg-black/80 text-white z-[55555]">
                 <div className="flex flex-col" style={{ boxSizing: 'content-box', paddingRight: '17px' }}>
-                  {logs.map((l) => (
-                    <span>{l}</span>
+                  {logs.map((l, index) => (
+                    <span key={index}>{l}</span>
                   ))}
                 </div>
               </div>

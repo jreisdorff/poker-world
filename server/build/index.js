@@ -407,12 +407,12 @@ var links2 = () => [
   }
 ];
 function Index() {
-  let [gameState, setGameState] = (0, import_react8.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react8.useState)([]), [gameStarted, setGameStarted] = (0, import_react8.useState)(!1), [bet, setBet] = (0, import_react8.useState)(0), [dealerCards, setDealerCards] = (0, import_react8.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react8.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react8.useState)(""), [dealtCards, setDealtCards] = (0, import_react8.useState)([]), [players, setPlayers] = (0, import_react8.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react8.useState)(0), [activePlayer, setActivePlayer] = (0, import_react8.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react8.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react8.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react8.useState)(initialPlayers[2]), [pots, setPots] = (0, import_react8.useState)([0]), [activeBet, setActiveBet] = (0, import_react8.useState)(0), [turnNumber, setTurnNumber] = (0, import_react8.useState)(0), [blinds, setBlinds] = (0, import_react8.useState)([10, 20]), [winner, setWinner] = (0, import_react8.useState)(null), [gameOver, setGameOver] = (0, import_react8.useState)(!1), [hands, setHands] = (0, import_react8.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react8.useState)(3), [winningCards, setWinningCards] = (0, import_react8.useState)([]), [wonAmount, setWonAmount] = (0, import_react8.useState)(0), [playerName, setPlayerName] = (0, import_react8.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react8.useState)(!1), [playerCount, setPlayerCount] = (0, import_react8.useState)(0), [messageSent, setMessageSent] = (0, import_react8.useState)(!1), [socketConnected, setSocketConnected] = (0, import_react8.useState)(!1), [playerNames, setPlayerNames] = (0, import_react8.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react8.useState)(), [playerSockets, setPlayerSockets] = (0, import_react8.useState)([]), [player, setPlayer] = (0, import_react8.useState)(), [joinedGame, setJoinedGame] = (0, import_react8.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react8.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react8.useState)(2), [earlyWin, setEarlyWin] = (0, import_react8.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react8.useState)(3), [littleBlindAmount, setLittleBlindAmount] = (0, import_react8.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react8.useState)(20), [littleBlindIndex, setLittleBlindIndex] = (0, import_react8.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react8.useState)(2), handleCheckOrCall = () => {
+  let [gameState, setGameState] = (0, import_react8.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react8.useState)([]), [gameStarted, setGameStarted] = (0, import_react8.useState)(!1), [bet, setBet] = (0, import_react8.useState)(0), [dealerCards, setDealerCards] = (0, import_react8.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react8.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react8.useState)(""), [dealtCards, setDealtCards] = (0, import_react8.useState)([]), [players, setPlayers] = (0, import_react8.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react8.useState)(0), [activePlayer, setActivePlayer] = (0, import_react8.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react8.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react8.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react8.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react8.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react8.useState)(20), [pots, setPots] = (0, import_react8.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react8.useState)(0), [turnNumber, setTurnNumber] = (0, import_react8.useState)(0), [blinds, setBlinds] = (0, import_react8.useState)([10, 20]), [winner, setWinner] = (0, import_react8.useState)(null), [gameOver, setGameOver] = (0, import_react8.useState)(!1), [hands, setHands] = (0, import_react8.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react8.useState)(3), [winningCards, setWinningCards] = (0, import_react8.useState)([]), [wonAmount, setWonAmount] = (0, import_react8.useState)(0), [playerName, setPlayerName] = (0, import_react8.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react8.useState)(!1), [playerCount, setPlayerCount] = (0, import_react8.useState)(0), [messageSent, setMessageSent] = (0, import_react8.useState)(!1), [socketConnected, setSocketConnected] = (0, import_react8.useState)(!1), [playerNames, setPlayerNames] = (0, import_react8.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react8.useState)(), [playerSockets, setPlayerSockets] = (0, import_react8.useState)([]), [player, setPlayer] = (0, import_react8.useState)(), [joinedGame, setJoinedGame] = (0, import_react8.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react8.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react8.useState)(2), [earlyWin, setEarlyWin] = (0, import_react8.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react8.useState)(3), [littleBlindIndex, setLittleBlindIndex] = (0, import_react8.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react8.useState)(2), handleCheckOrCall = () => {
     let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((tempP) => tempP.name === activePlayer.name);
     tempActivePlayer.chips -= activeBet;
     let tempPots = [...pots];
     tempPots[0] += activeBet;
-    let advanceProps = getNextPlayerProps(), checkOrCallProps = {
+    let advanceProps = getNextPlayerProps(tempPlayers), checkOrCallProps = {
       players: tempPlayers,
       pots: tempPots,
       prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
@@ -475,7 +475,7 @@ function Index() {
     }), socket.on("sendShowCardsData", (data) => {
       setPlayers(data.players);
     }), socket.on("sendCheckOrCallData", (data) => {
-      setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLittleBlindIndex(data.littleBlindIndex), setBigBlindIndex(data.bigBlindIndex), console.log("data", data), data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex && setActiveBet(0);
+      setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLittleBlindIndex(data.littleBlindIndex), setBigBlindIndex(data.bigBlindIndex), console.log("data", data), console.log(activePlayer), data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex && setActiveBet(0);
       let checkOrCallDescription = data.activeBet ? `${data.players[data.prevActivePlayerIndex].name} called $${data.activeBet}` : `${data.players[data.prevActivePlayerIndex].name} checked`;
       setLogs((prev) => [...prev, checkOrCallDescription]), setSnackbarMessage(checkOrCallDescription), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
@@ -491,7 +491,7 @@ function Index() {
       };
       advance(data.turnNumber, advanceDataProps, "CHECK");
     }), socket.on("sendFoldData", (data) => {
-      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), setLogs((prev) => [
+      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex && setActiveBet(0), setLogs((prev) => [
         ...prev,
         `${data.players[data.prevActivePlayerIndex].name} folded`
       ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
@@ -514,7 +514,7 @@ function Index() {
     }), socket.on("sendAdvanceHandsData", (data) => {
       setGameState(GameState.Preflop), setGameStarted(!0), setGameOver(!1), setDealtCards([]), setDealerCards([]), setWinningCards([]), setWinner(null), setWonAmount(0), setNeedResponsesFrom(3), setTurnNumber(0), setEarlyWin(!1), setActivePlayerCount(3), setTurnsThisRound(2), setTurnsNextRound(2), setPlayers(data.players), setHands(data.hands);
       let nextDealerIndex = data.hands.length % data.players.length, nextLittleBlindIndex = (data.hands.length + 1) % data.players.length, nextBigBlindIndex = (data.hands.length + 2) % data.players.length;
-      setActiveBet(bigBlindAmount), setDealer(data.players[nextDealerIndex]), setLittleBlind(data.players[nextLittleBlindIndex]), setBigBlind(data.players[nextBigBlindIndex]), setLittleBlindIndex(nextLittleBlindIndex), setBigBlindIndex(nextBigBlindIndex), setActivePlayerIndex(nextDealerIndex), setActivePlayer(data.players[nextDealerIndex]), setPots([0]);
+      setActiveBet(bigBlindAmount), setDealer(data.players[nextDealerIndex]), setLittleBlind(data.players[nextLittleBlindIndex]), setBigBlind(data.players[nextBigBlindIndex]), setLittleBlindIndex(nextLittleBlindIndex), setBigBlindIndex(nextBigBlindIndex), setActivePlayerIndex(nextDealerIndex), setActivePlayer(data.players[nextDealerIndex]), setPots([littleBlindAmount + bigBlindAmount]);
     });
   }, [socket]), (0, import_react8.useEffect)(() => {
     if (playerCount === 3 && playerSocket === playerSockets[2]) {
@@ -538,7 +538,7 @@ function Index() {
   }, handleFold = () => {
     let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name);
     tempActivePlayer.cards = tempActivePlayer.cards.map((card) => (card.faceUp = !1, card)), tempActivePlayer.folded = !0;
-    let advanceProps = getNextPlayerProps(), foldProps = {
+    let advanceProps = getNextPlayerProps(tempPlayers), foldProps = {
       players: tempPlayers,
       activePlayerIndex: advanceProps.activePlayerIndex,
       activePlayer: advanceProps.activePlayer,
@@ -550,7 +550,9 @@ function Index() {
       turnsThisRound: turnsNextRound,
       hands,
       dealerCards,
-      needResponsesFrom
+      needResponsesFrom,
+      littleBlindIndex,
+      bigBlindIndex
     };
     socket.emit("playerFolded", foldProps);
   }, handleBet = (amount) => {
@@ -558,7 +560,7 @@ function Index() {
     tempActivePlayer.chips -= amount;
     let tempPots = [...pots];
     tempPots[0] += amount;
-    let advanceProps = getNextPlayerProps(), betProps = {
+    let advanceProps = getNextPlayerProps(tempPlayers), betProps = {
       players: tempPlayers,
       pots: tempPots,
       prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
@@ -577,9 +579,9 @@ function Index() {
     socket.emit("playerBet", betProps);
   }, handlePlayerTimeout = (player2) => {
     playerSocket === player2.socket && handleFold(), setLogs((prev) => [...prev, `${player2.name} timed out and auto-folded`]), setSnackbarMessage(`${player2.name} timed out and auto-folded`), setIsSnackbarOpen(!0);
-  }, getNextPlayerProps = () => {
+  }, getNextPlayerProps = (tempPlayers) => {
     let tempActivePlayerIndex = activePlayerIndex, activePlayerIndicies = [];
-    players.map((p, index) => {
+    tempPlayers.map((p, index) => {
       p.folded || activePlayerIndicies.push(index);
     });
     let nextActivePlayerIndex = tempActivePlayerIndex;
@@ -591,7 +593,7 @@ function Index() {
     return nextActivePlayerIndex === tempActivePlayerIndex && (nextActivePlayerIndex = activePlayerIndicies[0]), {
       prevActivePlayerIndex: activePlayerIndex,
       activePlayerIndex: nextActivePlayerIndex,
-      activePlayer: players[nextActivePlayerIndex]
+      activePlayer: tempPlayers[nextActivePlayerIndex]
     };
   }, endRound = (data) => {
     socket.emit("endRound", data);
@@ -621,7 +623,9 @@ function Index() {
   }, /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col",
     style: { boxSizing: "content-box", paddingRight: "17px" }
-  }, logs.map((l) => /* @__PURE__ */ React.createElement("span", null, l)))), !gameStarted && /* @__PURE__ */ React.createElement(React.Fragment, null, joinedGame ? null : /* @__PURE__ */ React.createElement("input", {
+  }, logs.map((l, index) => /* @__PURE__ */ React.createElement("span", {
+    key: index
+  }, l)))), !gameStarted && /* @__PURE__ */ React.createElement(React.Fragment, null, joinedGame ? null : /* @__PURE__ */ React.createElement("input", {
     placeholder: "Enter player name",
     type: "text",
     value: playerName,
@@ -1248,7 +1252,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "4174a837", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-SGQYDWAM.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-BY52P3GP.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-4174A837.js" };
+var assets_manifest_default = { version: "fe80f379", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-SGQYDWAM.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-3A3SYZLK.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-FE80F379.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

@@ -67,14 +67,10 @@ const endHoldEmRound = (props) => {
       })
   );
 
-  const winnerDescription = `${
-    gameWinner.players.length === 1
-      ? gameWinner.players[0].player.name
-      : gameWinner.players
-          .map((winner) => winner.player.name)
-          .join(", ")
-          .replace(/, ((?:.(?!, ))+)$/, ", and $1")
-  } ${gameWinner.players.length === 1 ? "won" : "split the pot"}`;
+  let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
+
+  let winnerDescription = getWinnerDescription(gameWinner, wonAmount);
+
   let tempHands = [...props.hands];
   let winnar = { winner: gameWinner, description: winnerDescription };
 
@@ -93,8 +89,6 @@ const endHoldEmRound = (props) => {
   });
 
   nextProps.winningCards = tempWinningCards;
-
-  let wonAmount = getWonAmount(winnerObj, props.pots);
   nextProps.wonAmount = wonAmount;
 
   tempPlayers
@@ -158,17 +152,9 @@ const advanceHoldEmGame = (props) => {
           return { dealerCards: props.dealerCards, player };
         })
     );
+    let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
+    const winnerDescription = getWinnerDescription(gameWinner, wonAmount);
 
-    const winnerDescription = `${
-      gameWinner.players.length === 1
-        ? gameWinner.players[0].player.name
-        : gameWinner.players
-            .map((winner) => winner.player.name)
-            .join(", ")
-            .replace(/, ((?:.(?!, ))+)$/, ", and $1")
-    } ${gameWinner.players.length === 1 ? "won" : "split the pot"} with ${
-      gameWinner.hand
-    }`;
     let tempHands = [...props.hands];
     let winnar = { winner: gameWinner, description: winnerDescription };
 
@@ -187,8 +173,6 @@ const advanceHoldEmGame = (props) => {
     });
 
     nextProps.winningCards = tempWinningCards;
-
-    let wonAmount = getWonAmount(winnerObj, props.pots);
     nextProps.wonAmount = wonAmount;
 
     let tempCards = props.players.filter((p) => !p.folded).map((p) => p.cards);
@@ -264,9 +248,27 @@ const determineWinner = (playerWithDealerCards) => {
   return pokerWinner;
 };
 
+const getWinnerDescription = (winner, amount) => {
+
+  let winnerDescription = '';
+
+  if (winner.players.length === 1) {
+    winnerDescription = `${winner.players[0].player.name} won ${amount}`;
+    return winnerDescription;
+  } else if (winner.players.length === 2) {
+    winnerDescription = winner.players.map((winner) => winner.player.name).join(", ").replace(/, ((?:.(?!, ))+)$/, " and $1");
+  } else if (winner.players.length > 2) {
+    winnerDescription = winner.players.map((winner) => winner.player.name).join(", ").replace(/, ((?:.(?!, ))+)$/, ", and $1");
+  }
+
+  return `${winnerDescription} split the pot`;
+}
+
 const getWonAmount = (winner, pots) => {
   let daMoney = 0;
   let numberOfWinners = winner.winner.players.length;
+
+  console.log('numWin', numberOfWinners);
 
   pots.forEach((pot) => {
     daMoney += pot;
