@@ -378,13 +378,15 @@ export default function Index() {
         setActiveBet(0);
       }
 
-      setSnackbarMessage(
-        data.activeBet
-          ? `${data.players[data.prevActivePlayerIndex].name} called $${
-              data.activeBet
-            }`
-          : `${data.players[data.prevActivePlayerIndex].name} checked`
-      );
+      let checkOrCallDescription = data.activeBet
+        ? `${data.players[data.prevActivePlayerIndex].name} called $${
+            data.activeBet
+          }`
+        : `${data.players[data.prevActivePlayerIndex].name} checked`;
+
+      setLogs((prev) => [...prev, checkOrCallDescription]);
+
+      setSnackbarMessage(checkOrCallDescription);
       setIsSnackbarOpen(true);
 
       setNeedResponsesFrom(data.needResponsesFrom);
@@ -699,12 +701,12 @@ export default function Index() {
 
   return (
     <>
-      <main className="relative flex h-screen w-screen items-center justify-center bg-[rgb(0,90,0)] overflow-visible">
+      <main className="relative flex h-screen w-screen items-center justify-center overflow-visible bg-[rgb(0,90,0)]">
         <div className="relative sm:pb-16 sm:pt-8">
           {gameStarted ? <Table /> : null}
           <div className="mx-auto flex h-[80vh] w-[95vw] flex-col">
             {logs.length > 0 && (
-              <div className="fixed bottom-0 left-0 h-[200px] w-[250px] overflow-scroll rounded-tr-xl bg-black/80 text-white">
+              <div className="fixed bottom-0 left-0 h-[75px] w-[225px] overflow-scroll rounded-tr-xl bg-black/80 text-white">
                 <div className="flex flex-col">
                   {logs.map((l) => (
                     <span>{l}</span>
@@ -747,7 +749,7 @@ export default function Index() {
             {gameOver && (
               <div className="flex flex-col">
                 <div
-                  className={`w-full items-center justify-center self-center text-center text-3xl text-white transition-all mb-8 duration-[1000ms] ${
+                  className={`mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
                     !winner ? "opacity-0" : "opacity-100"
                   }`}
                 >
