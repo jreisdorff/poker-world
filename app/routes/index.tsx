@@ -10,6 +10,7 @@ import progressStyles from "../styles/progress.css";
 
 import { useSocket } from "~/context";
 import { pluralize } from "~/utils";
+import { isEmpty } from "lodash";
 
 export const links: LinksFunction = () => {
   return [
@@ -268,6 +269,7 @@ export default function Index() {
 
       if (tempNeedResponsesFrom === 0) {
         if (data.activePlayer.socket === socket?.id) {
+          console.log('calling advance game');
           advanceGame(data);
         }
         setTurnNumber(0);
@@ -293,6 +295,10 @@ export default function Index() {
         setPlayerCount(data.playerNames.length);
       }
     );
+
+    socket.on("dealerCards", (data) => {
+      setDealerCards(data);
+    });
 
     socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]);
@@ -497,60 +503,66 @@ export default function Index() {
     });
 
     socket.on("sendAdvanceData", (data: NextProps) => {
-      setActiveBet(0);
+      console.log('in send advance with data', data);
+      if (!isEmpty(data)) {
+        console.log('got here');
 
-      setPots(data.pots);
 
-      let activePlayers = data.players.length - data.players.filter((p) => p.allIn || p.folded).length
+        setActiveBet(0);
 
-      if ((activePlayers === 0 || activePlayers === 1) && !data.manualAdvance) {
+        setPots(data.pots);
 
-        setManualAdvance(true);
+        let activePlayers = data.players.length - data.players.filter((p) => p.allIn || p.folded).length
 
-        let advanceGameProps: AdvanceGameProps = {
-          activePlayer: data.activePlayer,
-          gameState: data.gameState,
-          dealerCards: data.dealerCards,
-          players: data.players,
-          hands: data.hands,
-          pots: data.pots,
-          turnsNextRound: data.turnsNextRound,
-          turnsThisRound: data.turnsThisRound,
-          needResponsesFrom: data.players.filter((p) => !p.folded).length,
-          manualAdvance: true,
-        };
-        if (data.activePlayer.socket === socket?.id) {
-          socket!.emit("advanceToEnd", advanceGameProps);
+        if ((activePlayers === 0 || activePlayers === 1) && !data.manualAdvance) {
+
+          setManualAdvance(true);
+
+          let advanceGameProps: AdvanceGameProps = {
+            activePlayer: data.activePlayer,
+            gameState: data.gameState,
+            dealerCards: data.dealerCards,
+            players: data.players,
+            hands: data.hands,
+            pots: data.pots,
+            turnsNextRound: data.turnsNextRound,
+            turnsThisRound: data.turnsThisRound,
+            needResponsesFrom: data.players.filter((p) => !p.folded).length,
+            manualAdvance: true,
+          };
+          if (data.activePlayer.socket === socket?.id) {
+            socket!.emit("advanceToEnd", advanceGameProps);
+          }
         }
+
+        setBet(bigBlindAmount);
+
+        setGameState(data.gameState);
+        setDealerCards(data.dealerCards);
+
+        setActivePlayerCount(data.turnsNextRound);
+
+        setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
+        setTurnsNextRound(2); // reset turns next round
+
+        setNeedResponsesFrom(data.players.filter((p) => !p.folded).length);
+
+        if (data.winner) {
+          setWinner(data.winner);
+          setLogs((prev) => [...prev, data.winner.description]);
+          setWinningCards(data.winningCards);
+          setWonAmount(data.wonAmount);
+        }
+
+        if (data.players.filter((p) => p.chips > 0).length === 1) {
+          //Only one player left. Game is over
+          setUltimateWinner(data.winner.winner.player);
+        }
+
+        setHands(data.hands);
+        setPlayers(data.players);
+        setGameOver(data.gameOver);
       }
-
-      setBet(bigBlindAmount);
-
-      setGameState(data.gameState);
-      setDealerCards(data.dealerCards);
-
-      setActivePlayerCount(data.turnsNextRound);
-
-      setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
-      setTurnsNextRound(2); // reset turns next round
-
-      setNeedResponsesFrom(data.players.filter((p) => !p.folded).length);
-
-      if (data.winner) {
-        setWinner(data.winner);
-        setLogs((prev) => [...prev, data.winner.description]);
-        setWinningCards(data.winningCards);
-        setWonAmount(data.wonAmount);
-      }
-
-      if (data.players.filter((p) => p.chips === 0).length === (data.players.length - 1)) {
-        //Only one player left. Game is over
-        setUltimateWinner(data.players.filter((p) => p.chips !== 0)[0]);
-      }
-
-      setHands(data.hands);
-      setPlayers(data.players);
-      setGameOver(data.gameOver);
     });
 
     socket.on("sendAdvanceHandsData", (data) => {

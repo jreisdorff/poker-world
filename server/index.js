@@ -103,7 +103,7 @@ const endHoldEmRound = (props) => {
   return nextProps;
 };
 
-const advanceToEnd = (props) => {
+const advanceToEnd = async (props) => {
   let nextProps = {
     gameState: props.gameState,
     dealerCards: props.dealerCards,
@@ -116,9 +116,17 @@ const advanceToEnd = (props) => {
     gameOver: false,
     turnsNextRound: props.turnsNextRound,
     manualAdvance: props.manualAdvance,
+    pots: props.pots,
   };
 
   let tempDealerCards = [...props.dealerCards];
+
+
+    let tempPlayers = [...props.players];
+    tempPlayers.forEach((player) => 
+      player.cards = player.cards.map((card) => ({ ...card, faceUp: true })));
+
+      io.emit("sendShowCardsData", { players: tempPlayers });
 
   if (nextProps.gameState === GameState.Preflop) {
     //we need to deal flop, turn and river
@@ -127,97 +135,109 @@ const advanceToEnd = (props) => {
     let tempDealerCards = [...props.dealerCards];
     newCards.forEach((card) => tempDealerCards.push(card));
     nextProps.dealerCards = tempDealerCards;
+    io.emit("dealerCards", nextProps.dealerCards);
   }
 
-  if (nextProps.gameState === GameState.Flop) {
-    nextProps.gameState = GameState.Turn;
-    newCards = createCards(52, 1, undefined, true);
-    tempDealerCards = [...tempDealerCards, ...newCards];
-    nextProps.dealerCards = tempDealerCards;
-  }
+  setTimeout(() => {
+    if (nextProps.gameState === GameState.Flop) {
+      nextProps.gameState = GameState.Turn;
+      newCards = createCards(52, 1, undefined, true);
+      tempDealerCards = [...tempDealerCards, ...newCards];
+      nextProps.dealerCards = tempDealerCards;
+      io.emit("dealerCards", nextProps.dealerCards);
+    }
+  }, 3000);
 
-  if (nextProps.gameState === GameState.Turn) {
-    nextProps.gameState = GameState.River;
-    newCards = createCards(52, 1, undefined, true);
-    tempDealerCards = [...tempDealerCards, ...newCards];
-    nextProps.dealerCards = tempDealerCards;
-  }
-  if (nextProps.gameState === GameState.River) {
-    nextProps.gameState = GameState.Showdown;
-    tempDealerCards.forEach((card) => {
-      card.faceUp = true;
-    });
-    let tempPlayers = [...props.players];
-    nextProps.dealerCards = tempDealerCards;
+  setTimeout(() => {
+    if (nextProps.gameState === GameState.Turn) {
+      nextProps.gameState = GameState.River;
+      newCards = createCards(52, 1, undefined, true);
+      tempDealerCards = [...tempDealerCards, ...newCards];
+      nextProps.dealerCards = tempDealerCards;
+      io.emit("dealerCards", nextProps.dealerCards);
+    }
+  }, 6000);
 
-    let gameWinner = determineWinner(
-      props.players
-        .filter(
-          (player) =>
-            props.players.map((pith) => pith.name).includes(player.name) &&
-            !player.folded
-        )
-        .map((player) => {
-          return { dealerCards: nextProps.dealerCards, player };
-        })
-    );
-
-    console.log(props.pots);
-    let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
-    const winnerDescription = getWinnerDescription(gameWinner, wonAmount, true);
-
-    let tempHands = [...props.hands];
-    let winnar = { winner: gameWinner, description: winnerDescription };
-
-    tempHands.push(winnar);
-
-    nextProps.hands = tempHands;
-    const winnerObj = { winner: gameWinner, description: winnerDescription };
-    nextProps.winner = winnerObj;
-    let tempWinningCards = [];
-    gameWinner.wins.forEach((w) => {
-      w.cards.forEach((card) => {
-        if (!tempWinningCards.includes(card)) {
-          tempWinningCards.push(card);
-        }
-      });
-    });
-
-    nextProps.winningCards = tempWinningCards;
-    nextProps.wonAmount = wonAmount;
-
-    let tempCards = props.players.filter((p) => !p.folded).map((p) => p.cards);
-
-    tempCards.forEach((cardArray) => {
-      cardArray.forEach((card) => {
+  setTimeout(() => {
+    if (nextProps.gameState === GameState.River) {
+      nextProps.gameState = GameState.Showdown;
+      tempDealerCards.forEach((card) => {
         card.faceUp = true;
       });
-    });
+      let tempPlayers = [...props.players];
+      nextProps.dealerCards = tempDealerCards;
 
-    tempPlayers
-      .filter((p) => !p.folded)
-      .forEach((player, index) => {
-        player.cards = tempCards[index];
+      let gameWinner = determineWinner(
+        props.players
+          .filter(
+            (player) =>
+              props.players.map((pith) => pith.name).includes(player.name) &&
+              !player.folded
+          )
+          .map((player) => {
+            return { dealerCards: nextProps.dealerCards, player };
+          })
+      );
+
+      let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
+      const winnerDescription = getWinnerDescription(gameWinner, wonAmount, true);
+
+      let tempHands = [...props.hands];
+      let winnar = { winner: gameWinner, description: winnerDescription };
+
+      tempHands.push(winnar);
+
+      nextProps.hands = tempHands;
+      const winnerObj = { winner: gameWinner, description: winnerDescription };
+      nextProps.winner = winnerObj;
+      let tempWinningCards = [];
+      gameWinner.wins.forEach((w) => {
+        w.cards.forEach((card) => {
+          if (!tempWinningCards.includes(card)) {
+            tempWinningCards.push(card);
+          }
+        });
       });
+
+      nextProps.winningCards = tempWinningCards;
+      nextProps.wonAmount = wonAmount;
+
+      let tempCards = props.players.filter((p) => !p.folded).map((p) => p.cards);
+
+      tempCards.forEach((cardArray) => {
+        cardArray.forEach((card) => {
+          card.faceUp = true;
+        });
+      });
+
+      tempPlayers
+        .filter((p) => !p.folded)
+        .forEach((player, index) => {
+          player.cards = tempCards[index];
+        });
 
       tempPlayers.forEach((player) => {
         player.allIn = false;
       });
 
-    tempPlayers
-      .filter((p, index) => gameWinner.winnerIndicies.includes(index))
-      .forEach((player) => {
-        console.log('player', player.name, player.chips, wonAmount);
-        player.chips += wonAmount;
-      });
+      tempPlayers
+        .filter((p, index) => gameWinner.winnerIndicies.includes(index))
+        .forEach((player) => {
+          console.log('player', player.name, player.chips, wonAmount);
+          player.chips += wonAmount;
+        });
 
-    nextProps.players = tempPlayers;
-    nextProps.gameOver = true;
-  }
-  let turnsNext = nextProps.players.filter((player) => !player.folded).length;
-  nextProps.turnsNextRound = turnsNext;
+      nextProps.players = tempPlayers;
+      nextProps.gameOver = true;
+    }
 
-  return nextProps;
+    let turnsNext = nextProps.players.filter((player) => !player.folded).length;
+
+    nextProps.turnsNextRound = turnsNext;
+
+    io.emit("sendAdvanceData", nextProps);
+  }, 9000);
+
 }
 
 const advanceHoldEmGame = (props) => {
@@ -537,12 +557,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("advanceToEnd", (data) => {
-    let advanceData = advanceToEnd(data);
-    io.emit("sendAdvanceData", advanceData);
+    advanceToEnd(data);
   });
 
   socket.on("endRound", (data) => {
     let endData = endHoldEmRound(data);
+    console.log('emitting', endData);
     io.emit("sendEndRoundData", endData);
   });
 
