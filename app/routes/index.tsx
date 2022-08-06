@@ -1,5 +1,3 @@
-import Alert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
 import Card from "~/components/Card";
@@ -37,6 +35,7 @@ export interface Player {
   folded: boolean;
   finalCards?: any | any[];
   socket?: string;
+  allIn?: boolean;
   [key: string]: string | number | boolean | CardProps[] | (string | undefined);
 }
 
@@ -56,6 +55,7 @@ export interface SendCheckOrCallDataProps {
   needResponsesFrom: number;
   littleBlindIndex: number;
   bigBlindIndex: number;
+  callAmount: number;
 }
 
 export interface SendFoldDataProps {
@@ -69,6 +69,7 @@ export interface SendFoldDataProps {
   turnsNextRound: number;
   turnsThisRound: number;
   hands: any[];
+  pots: any[];
   dealerCards: any[];
   needResponsesFrom: number;
   littleBlindIndex: number;
@@ -106,18 +107,21 @@ const initialPlayers: Player[] = [
     chips: 1000,
     cards: [],
     folded: false,
+    allIn: false,
   },
   {
     name: "misterbrother",
     chips: 1000,
     cards: [],
     folded: false,
+    allIn: false,
   },
   {
     name: "copsucker",
     chips: 1000,
     cards: [],
     folded: false,
+    allIn: false,
   },
 ];
 
@@ -188,16 +192,25 @@ export default function Index() {
   const [littleBlindIndex, setLittleBlindIndex] = useState(1);
   const [bigBlindIndex, setBigBlindIndex] = useState(2);
 
-  const handleCheckOrCall = () => {
+  const [manualAdvance, setManualAdvance] = useState(false);
+
+  const handleCheckOrCall = (callAmount: number) => {
     let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
       (tempP) => tempP.name === activePlayer.name
     );
-    tempActivePlayer!.chips -= activeBet;
+    tempActivePlayer!.chips -= callAmount;
+
+    if (tempActivePlayer!.chips <= 0) {
+      tempActivePlayer!.allIn = true;
+    }
+
     let tempPots = [...pots];
-    tempPots[0] += activeBet;
+    tempPots[0] += callAmount;
 
     const advanceProps = getNextPlayerProps(tempPlayers);
+
+    console.log('tempPots', tempPots);
 
     const checkOrCallProps: SendCheckOrCallDataProps = {
       players: tempPlayers,
@@ -215,6 +228,7 @@ export default function Index() {
       needResponsesFrom,
       littleBlindIndex,
       bigBlindIndex,
+      callAmount,
     };
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
@@ -223,12 +237,11 @@ export default function Index() {
   useEffect(() => {
     if (!socket) return;
 
-    const advance = (tn: number, data: AdvanceGameProps, type: string) => {
+    const advance = (data: AdvanceGameProps, type: string) => {
       let tempNeedResponsesFrom = data.needResponsesFrom;
 
       if (type === "BET") {
-        tempNeedResponsesFrom =
-          data.players.filter((p) => !p.folded).length - 1;
+        tempNeedResponsesFrom = data.players.filter((p) => !p.folded).length - 1;
         setNeedResponsesFrom(data.players.filter((p) => !p.folded).length - 1);
       } else {
         tempNeedResponsesFrom = tempNeedResponsesFrom - 1;
@@ -326,8 +339,7 @@ export default function Index() {
       setActivePlayer(data.activePlayer);
       setLogs((prev) => [
         ...prev,
-        `${data.players[data.prevActivePlayerIndex].name} bet ${
-          data.activeBet
+        `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet
         }`,
       ]);
       setSnackbarMessage(
@@ -350,7 +362,7 @@ export default function Index() {
         needResponsesFrom: data.needResponsesFrom,
       };
 
-      advance(data.turnNumber, advanceDataProps, "BET");
+      advance(advanceDataProps, "BET");
     });
 
     socket.on("sendShowCardsData", (data: { players: any[] }) => {
@@ -382,9 +394,8 @@ export default function Index() {
       }
 
       let checkOrCallDescription = data.activeBet
-        ? `${data.players[data.prevActivePlayerIndex].name} called ${
-            data.activeBet
-          }`
+        ? `${data.players[data.prevActivePlayerIndex].name} called ${data.callAmount
+        }`
         : `${data.players[data.prevActivePlayerIndex].name} checked`;
 
       setLogs((prev) => [...prev, checkOrCallDescription]);
@@ -406,7 +417,7 @@ export default function Index() {
         needResponsesFrom: data.needResponsesFrom,
       };
 
-      advance(data.turnNumber, advanceDataProps, "CHECK");
+      advance(advanceDataProps, "CHECK");
     });
 
     socket.on("sendFoldData", (data: SendFoldDataProps) => {
@@ -447,13 +458,13 @@ export default function Index() {
         dealerCards: data.dealerCards,
         players: data.players,
         hands: data.hands,
-        pots,
+        pots: data.pots,
         turnsNextRound: data.turnsNextRound - 1,
         turnsThisRound: data.turnsThisRound,
         needResponsesFrom: data.needResponsesFrom,
       };
 
-      advance(data.turnNumber, advanceDataProps, "FOLD");
+      advance(advanceDataProps, "FOLD");
     });
 
     socket.on("sendEndRoundData", (data: NextProps) => {
@@ -486,6 +497,31 @@ export default function Index() {
     socket.on("sendAdvanceData", (data: NextProps) => {
       setActiveBet(0);
 
+      setPots(data.pots);
+
+      if ((data.players.filter((p) => p.allIn).length === data.players.length) && !data.manualAdvance) {
+
+        setManualAdvance(true);
+
+        let advanceGameProps: AdvanceGameProps = {
+          activePlayer: data.activePlayer,
+          gameState: data.gameState,
+          dealerCards: data.dealerCards,
+          players: data.players,
+          hands: data.hands,
+          pots: data.pots,
+          turnsNextRound: data.turnsNextRound,
+          turnsThisRound: data.turnsThisRound,
+          needResponsesFrom: data.players.filter((p) => !p.folded).length,
+          manualAdvance: true,
+        };
+        if (data.activePlayer.socket === socket?.id) {
+          console.log('emitting advance to end');
+          console.log(advanceGameProps);
+          socket!.emit("advanceToEnd", advanceGameProps);
+        }
+      }
+
       setBet(bigBlindAmount);
 
       setGameState(data.gameState);
@@ -506,7 +542,6 @@ export default function Index() {
       }
 
       setHands(data.hands);
-
       setPlayers(data.players);
       setGameOver(data.gameOver);
     });
@@ -520,7 +555,7 @@ export default function Index() {
       setWinningCards([]);
       setWinner(null);
       setWonAmount(0);
-      setNeedResponsesFrom(3);
+      setNeedResponsesFrom(players.filter((p) => p.chips <= 0).length);
       setTurnNumber(0);
 
       setEarlyWin(false);
@@ -610,6 +645,7 @@ export default function Index() {
       needResponsesFrom,
       littleBlindIndex,
       bigBlindIndex,
+      pots,
     };
 
     socket!.emit("playerFolded", foldProps);
@@ -621,6 +657,11 @@ export default function Index() {
       (player) => player.name === activePlayer.name
     );
     tempActivePlayer!.chips -= amount;
+
+    if (tempActivePlayer!.chips <= 0) {
+      tempActivePlayer!.allIn = true;
+    }
+
     let tempPots = [...pots];
     tempPots[0] += amount;
 
@@ -716,7 +757,7 @@ export default function Index() {
     socket!.emit("showCards", { players: tempPlayers });
   };
 
-  const handleMuckCards = () => {};
+  const handleMuckCards = () => { };
 
   return (
     <>
@@ -748,9 +789,8 @@ export default function Index() {
                   />
                 ) : null}
                 <button
-                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${
-                    joinedGame ? "disabled" : ""
-                  }`}
+                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${joinedGame ? "disabled" : ""
+                    }`}
                   onClick={handleJoinGame}
                   disabled={joinedGame}
                 >
@@ -771,9 +811,8 @@ export default function Index() {
             {gameOver && (
               <div className="flex flex-col">
                 <div
-                  className={`mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
-                    !winner ? "opacity-0" : "opacity-100"
-                  }`}
+                  className={`z-[410443] mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${!winner ? "opacity-0" : "opacity-100"
+                    }`}
                 >
                   <h1>{winner ? winner.description : null}</h1>
                 </div>
@@ -787,18 +826,19 @@ export default function Index() {
               </div>
             )}
 
+            {gameStarted && <div className="flex flex-col w-full justify-center items-center">
+              <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
+              <div>{`Pot: ${!pots ? 0 : pots.join(", ")}`}</div>
+              <div>
+                {winner
+                  ? `Hand #${hands.length}`
+                  : `Hand #${hands.length + 1}`}
+              </div>
+            </div>}
+
             {gameStarted ? (
               <>
                 <div className="flex flex-col items-center justify-center">
-                  <div className="absolute top-[20%] flex w-[100vw] flex-col items-center justify-center self-center text-center text-xl">
-                    <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
-                    <div>{`Pot: ${pots.join(", ")}`}</div>
-                    <div>
-                      {winner
-                        ? `Hand #${hands.length}`
-                        : `Hand #${hands.length + 1}`}
-                    </div>
-                  </div>
                   <div className="playingCards simpleCards absolute bottom-[45%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
                       <Card
@@ -810,12 +850,12 @@ export default function Index() {
                         winner={
                           winningCards.length > 0
                             ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                    card.rank
-                                );
-                              }).length > 0
+                              return (
+                                w.suit == card.suit.charAt(0) &&
+                                w.value.toString().replace("T", "10") ===
+                                card.rank
+                              );
+                            }).length > 0
                             : false
                         }
                       />
@@ -840,12 +880,12 @@ export default function Index() {
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                      card.rank
-                                  );
-                                }).length > 0
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                  card.rank
+                                );
+                              }).length > 0
                               : false
                           }
                         />
@@ -909,12 +949,12 @@ export default function Index() {
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                      card.rank
-                                  );
-                                }).length > 0
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                  card.rank
+                                );
+                              }).length > 0
                               : false
                           }
                         />
@@ -975,12 +1015,12 @@ export default function Index() {
                       winner={
                         winningCards.length > 0
                           ? winningCards.filter((w) => {
-                              return (
-                                w.suit == card.suit.charAt(0) &&
-                                w.value.toString().replace("T", "10") ===
-                                  card.rank
-                              );
-                            }).length > 0
+                            return (
+                              w.suit == card.suit.charAt(0) &&
+                              w.value.toString().replace("T", "10") ===
+                              card.rank
+                            );
+                          }).length > 0
                           : false
                       }
                     />
@@ -1053,7 +1093,7 @@ export default function Index() {
                       </button>
                       <button
                         className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                        onClick={handleCheckOrCall}
+                        onClick={() => handleCheckOrCall(activePlayer.chips >= activeBet ? activeBet : activePlayer.chips)}
                       >
                         {activeBet > 0 ? `Call ${activePlayer.chips >= activeBet ? activeBet : activePlayer.chips}` : "Check"}
                       </button>
@@ -1067,11 +1107,11 @@ export default function Index() {
                   </div>
                 ) : null}
                 {gameOver &&
-                earlyWin &&
-                winner &&
-                winner.winner.players
-                  .map((p) => p.player.socket)
-                  .includes(player!.socket) ? (
+                  earlyWin &&
+                  winner &&
+                  winner.winner.players
+                    .map((p) => p.player.socket)
+                    .includes(player!.socket) ? (
                   <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
                       <button

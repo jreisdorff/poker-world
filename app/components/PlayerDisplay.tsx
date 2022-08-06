@@ -67,7 +67,7 @@ export default function PlayerDisplay(props: PlayerDisplayProps) {
             : null
         }`}
       >
-        {wonAmount > 0 ? `${player.chips} + ${wonAmount}` : `${player.chips}`}
+        {player.allIn ? 'All In' : player.chips}
       </div>
       {active ? (
         <div id="progressbar"></div>
