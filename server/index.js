@@ -557,6 +557,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("advanceToEnd", (data) => {
+    io.emit("advancingToEnd", true);
     advanceToEnd(data);
   });
 
@@ -640,6 +641,9 @@ io.on("connection", (socket) => {
       dealtCards,
       players: fullPlayers,
       dealerCards: [],
+      dealerIndex: nextDealerIndex,
+      littleBlindIndex: nextLittleBlindIndex,
+      bigBlindIndex: nextBigBlindIndex,
       dealer: fullPlayers[nextDealerIndex],
       littleBlind: fullPlayers[nextLittleBlindIndex],
       bigBlind: fullPlayers[nextBigBlindIndex],

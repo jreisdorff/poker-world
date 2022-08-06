@@ -170,32 +170,24 @@ export default function Index() {
   const [wonAmount, setWonAmount] = useState(0);
   const [playerName, setPlayerName] = useState("");
   const [buttonClicked, setButtonClicked] = useState(false);
-
   const [playerCount, setPlayerCount] = useState(0);
   const [messageSent, setMessageSent] = useState(false);
-
   const [socketConnected, setSocketConnected] = useState(false);
   const [playerNames, setPlayerNames] = useState<any[]>([]);
   const [playerSocket, setPlayerSocket] = useState<any>();
   const [playerSockets, setPlayerSockets] = useState<any[]>([]);
-
   const [player, setPlayer] = useState<Player>();
-
   const [joinedGame, setJoinedGame] = useState(false);
-
   const [turnsThisRound, setTurnsThisRound] = useState(2);
   const [turnsNextRound, setTurnsNextRound] = useState(2);
-
   const [earlyWin, setEarlyWin] = useState(false);
-
   const [needResponsesFrom, setNeedResponsesFrom] = useState(3);
-
   const [littleBlindIndex, setLittleBlindIndex] = useState(1);
   const [bigBlindIndex, setBigBlindIndex] = useState(2);
-
   const [manualAdvance, setManualAdvance] = useState(false);
-
   const [ultimateWinner, setUltimateWinner] = useState<Player | null>(null);
+
+  const [advancingToEnd, setAdvancingToEnd] = useState(false);
 
   const handleCheckOrCall = (callAmount: number) => {
     let tempPlayers = [...players];
@@ -327,14 +319,16 @@ export default function Index() {
 
       setUltimateWinner(null);
 
+      setWinningCards([]);
+
       setActiveBet(bigBlindAmount);
 
       setDealer(data.dealer);
       setLittleBlind(data.littleBlind);
       setBigBlind(data.bigBlind);
 
-      setActivePlayerIndex(0);
-      setActivePlayer(data.players[0]);
+      setActivePlayerIndex(data.dealerIndex);
+      setActivePlayer(data.players[data.dealerIndex]);
     });
 
     socket.on("sendBetData", (data: SendBetDataProps) => {
@@ -551,14 +545,18 @@ export default function Index() {
 
         if (data.players.filter((p) => p.chips > 0).length === 1) {
           //Only one player left. Game is over
-          console.log('setting ultimate winner', data.winner.winner.players[0].player);
           setUltimateWinner(data.winner.winner.players[0].player);
         }
 
         setHands(data.hands);
         setPlayers(data.players);
         setGameOver(data.gameOver);
+        setAdvancingToEnd(false);
       }
+    });
+
+    socket.on("advancingToEnd", (data) => {
+      setAdvancingToEnd(true);
     });
 
     socket.on("sendAdvanceHandsData", (data) => {
@@ -928,7 +926,7 @@ export default function Index() {
                     <PlayerDisplay
                       player={players[1]}
                       active={
-                        activePlayer.name === players[1].name && !gameOver
+                        activePlayer.name === players[1].name && !gameOver && !advancingToEnd
                       }
                       onTimeout={() => handlePlayerTimeout(players[1])}
                       prevPlayer={players[0]}
@@ -997,7 +995,7 @@ export default function Index() {
                     <PlayerDisplay
                       player={players[2]}
                       active={
-                        activePlayer.name === players[2].name && !gameOver
+                        activePlayer.name === players[2].name && !gameOver && !advancingToEnd
                       }
                       onTimeout={() => handlePlayerTimeout(players[2])}
                       prevPlayer={players[1]}
@@ -1063,7 +1061,7 @@ export default function Index() {
                 <div className="fixed bottom-[7.5%] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                   <PlayerDisplay
                     player={players[0]}
-                    active={activePlayer.name === players[0].name && !gameOver}
+                    active={activePlayer.name === players[0].name && !gameOver && !advancingToEnd}
                     onTimeout={() => handlePlayerTimeout(players[0])}
                     prevPlayer={players[players.length - 1]}
                     gameOver={gameOver}
@@ -1098,7 +1096,7 @@ export default function Index() {
                     />
                   </div>
                 ) : null}
-                {!gameOver && activePlayer.socket === playerSocket ? (
+                {!gameOver && !advancingToEnd && activePlayer.socket === playerSocket ? (
                   <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">
