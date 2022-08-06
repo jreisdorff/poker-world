@@ -269,7 +269,6 @@ export default function Index() {
 
       if (tempNeedResponsesFrom === 0) {
         if (data.activePlayer.socket === socket?.id) {
-          console.log('calling advance game');
           advanceGame(data);
         }
         setTurnNumber(0);
@@ -503,11 +502,7 @@ export default function Index() {
     });
 
     socket.on("sendAdvanceData", (data: NextProps) => {
-      console.log('in send advance with data', data);
       if (!isEmpty(data)) {
-        console.log('got here');
-
-
         setActiveBet(0);
 
         setPots(data.pots);
@@ -556,7 +551,8 @@ export default function Index() {
 
         if (data.players.filter((p) => p.chips > 0).length === 1) {
           //Only one player left. Game is over
-          setUltimateWinner(data.winner.winner.player);
+          console.log('setting ultimate winner', data.winner.winner.players[0].player);
+          setUltimateWinner(data.winner.winner.players[0].player);
         }
 
         setHands(data.hands);
