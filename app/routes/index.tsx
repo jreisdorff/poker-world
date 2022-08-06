@@ -573,7 +573,7 @@ export default function Index() {
 
       setEarlyWin(false);
 
-      setActivePlayerCount(3);
+      setActivePlayerCount(players.filter((p) => p.chips > 0).length);
 
       setTurnsThisRound(2);
       setTurnsNextRound(2);
@@ -903,11 +903,7 @@ export default function Index() {
                           key={`${index}-${card.suit}-${card.rank}`}
                           suit={card.suit}
                           rank={card.rank}
-                          faceUp={
-                            (!players[1].folded &&
-                              players[1].socket === playerSocket) ||
-                            card.faceUp
-                          }
+                          faceUp={players[1].folded ? false : players[1].socket === playerSocket || card.faceUp}
                           folded={players[1].folded}
                           winner={
                             winningCards.length > 0
@@ -972,11 +968,7 @@ export default function Index() {
                           key={`${index}-${card.suit}-${card.rank}`}
                           suit={card.suit}
                           rank={card.rank}
-                          faceUp={
-                            (!players[2].folded &&
-                              players[2].socket === playerSocket) ||
-                            card.faceUp
-                          }
+                          faceUp={players[2].folded ? false : players[2].socket === playerSocket || card.faceUp}
                           folded={players[2].folded}
                           winner={
                             winningCards.length > 0
@@ -1038,11 +1030,7 @@ export default function Index() {
                       key={`${index}-${card.suit}-${card.rank}`}
                       suit={card.suit}
                       rank={card.rank}
-                      faceUp={
-                        (!players[0].folded &&
-                          players[0].socket === playerSocket) ||
-                        card.faceUp
-                      }
+                      faceUp={players[0].folded ? false : players[0].socket === playerSocket || card.faceUp}
                       folded={players[0].folded}
                       winner={
                         winningCards.length > 0

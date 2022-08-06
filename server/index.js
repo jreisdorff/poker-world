@@ -576,11 +576,10 @@ io.on("connection", (socket) => {
     let tempPlayers = [...data.players];
 
     let newPlayers = tempPlayers.map((prev, index) => {
-      let newCards = createCards(52, 2, undefined, false);
       let newPlayer = {
         name: tempPlayers[index].name,
         chips: prev.chips,
-        cards: newCards,
+        cards: prev.chips <= 0 ? [] : createCards(52, 2, undefined, false),
         folded: prev.chips <= 0 ? true : false,
         socket: data.playerSockets[index],
         allIn: prev.allIn,
