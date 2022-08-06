@@ -194,6 +194,8 @@ export default function Index() {
 
   const [manualAdvance, setManualAdvance] = useState(false);
 
+  const [ultimateWinner, setUltimateWinner] = useState<Player | null>(null);
+
   const handleCheckOrCall = (callAmount: number) => {
     let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
@@ -209,8 +211,6 @@ export default function Index() {
     tempPots[0] += callAmount;
 
     const advanceProps = getNextPlayerProps(tempPlayers);
-
-    console.log('tempPots', tempPots);
 
     const checkOrCallProps: SendCheckOrCallDataProps = {
       players: tempPlayers,
@@ -319,6 +319,8 @@ export default function Index() {
       setPlayers(data.players);
 
       setPots(data.pots);
+
+      setUltimateWinner(null);
 
       setActiveBet(bigBlindAmount);
 
@@ -499,7 +501,9 @@ export default function Index() {
 
       setPots(data.pots);
 
-      if ((data.players.filter((p) => p.allIn).length === data.players.length) && !data.manualAdvance) {
+      let activePlayers = data.players.length - data.players.filter((p) => p.allIn || p.folded).length
+
+      if ((activePlayers === 0 || activePlayers === 1) && !data.manualAdvance) {
 
         setManualAdvance(true);
 
@@ -516,8 +520,6 @@ export default function Index() {
           manualAdvance: true,
         };
         if (data.activePlayer.socket === socket?.id) {
-          console.log('emitting advance to end');
-          console.log(advanceGameProps);
           socket!.emit("advanceToEnd", advanceGameProps);
         }
       }
@@ -539,6 +541,11 @@ export default function Index() {
         setLogs((prev) => [...prev, data.winner.description]);
         setWinningCards(data.winningCards);
         setWonAmount(data.wonAmount);
+      }
+
+      if (data.players.filter((p) => p.chips === 0).length === (data.players.length - 1)) {
+        //Only one player left. Game is over
+        setUltimateWinner(data.players.filter((p) => p.chips !== 0)[0]);
       }
 
       setHands(data.hands);
@@ -729,6 +736,16 @@ export default function Index() {
     socket!.emit("endRound", data);
   };
 
+  const newGame = () => {
+    let startProps = {
+      playerNames,
+      playerSockets,
+      playerChips: players.map((p) => 1000),
+      pastHands: hands,
+    };
+    socket!.emit("startHoldEmGame", startProps);
+  }
+
   const advanceGame = (data: AdvanceGameProps) => {
     socket!.emit("advanceHoldEmGame", data);
   };
@@ -756,6 +773,8 @@ export default function Index() {
 
     socket!.emit("showCards", { players: tempPlayers });
   };
+
+
 
   const handleMuckCards = () => { };
 
@@ -815,14 +834,21 @@ export default function Index() {
                     }`}
                 >
                   <h1>{winner ? winner.description : null}</h1>
+                  <h1>{ultimateWinner ? `${ultimateWinner.name} wins the game!` : null}</h1>
                 </div>
-                <button
+                {!ultimateWinner ? <button
                   id="next-btn"
                   className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
                   onClick={() => advanceHands()}
                 >
                   Next Hand
-                </button>
+                </button> : <button
+                  id="next-btn"
+                  className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                  onClick={() => newGame()}
+                >
+                  New Game
+                </button>}
               </div>
             )}
 

@@ -198,6 +198,9 @@ const advanceToEnd = (props) => {
       .filter((p) => !p.folded)
       .forEach((player, index) => {
         player.cards = tempCards[index];
+      });
+
+      tempPlayers.forEach((player) => {
         player.allIn = false;
       });
 
