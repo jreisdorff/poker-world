@@ -6,6 +6,8 @@ import Table from "~/components/Table";
 import { AdvanceGameProps, NextProps } from "~/utils/game";
 import { CardProps, PokerWinner, StartHoldEmGameProps } from "~/utils/poker";
 import cardStyles from "../styles/cards.css";
+import cardsIEStyles from '../styles/cards-ie.css';
+import cardsIE9Styles from '../styles/cards-ie9.css';
 import progressStyles from "../styles/progress.css";
 
 import { useSocket } from "~/context";
@@ -15,6 +17,8 @@ import { isEmpty } from "lodash";
 export const links: LinksFunction = () => {
   return [
     { rel: "stylesheet", href: cardStyles },
+    { rel: "stylesheet", href: cardsIEStyles },
+    { rel: "stylesheet", href: cardsIE9Styles },
     { rel: "stylesheet", href: progressStyles },
   ];
 };
