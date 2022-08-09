@@ -43,7 +43,7 @@ export default function PlayerDisplay(props: PlayerDisplayProps) {
 
   useEffect(() => {
     if (!gameOver) {
-      createProgressbar("progressbar", "30s", function () {
+      createProgressbar("progressbar", "60s", function () {
         onTimeout();
       });
     }
