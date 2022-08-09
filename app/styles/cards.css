@@ -438,24 +438,24 @@
 .playingCards .card.rank-a.diams .suit:after {
     content: "\2666";
     right: 20%;
-    font-size: 3.6rem;
+    font-size: 2.6rem;
 }
 .playingCards.simpleCards .card.hearts .suit:after,
 .playingCards .card.rank-a.hearts .suit:after {
     content: "\2665";
     right: 20%;
-    font-size: 3.6rem;
+    font-size: 2.6rem;
 }
 .playingCards.simpleCards .card.spades .suit:after,
 .playingCards .card.rank-a.spades .suit:after {
     content: "\2660";
     right: 20%;
-    font-size: 3.6rem;
+    font-size: 2.6rem;
 }
 .playingCards.simpleCards .card.clubs .suit:after,
 .playingCards .card.rank-a.clubs .suit:after {
     content: "\2663";
-    font-size: 3.6rem;
+    font-size: 2.6rem;
 }
 
 /*____________ smaller cards for use inside text ____________*/
