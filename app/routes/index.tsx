@@ -261,7 +261,7 @@ export default function Index() {
         }
       }
 
-      if (tempNeedResponsesFrom === 0) {
+      if (tempNeedResponsesFrom <= 0) {
         if (data.activePlayer.socket === socket?.id) {
           advanceGame(data);
         }
@@ -324,6 +324,8 @@ export default function Index() {
       setWinningCards([]);
 
       setActiveBet(bigBlindAmount);
+
+      setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length);
 
       setDealer(data.dealer);
       setLittleBlind(data.littleBlind);
@@ -518,7 +520,7 @@ export default function Index() {
             pots: data.pots,
             turnsNextRound: data.turnsNextRound,
             turnsThisRound: data.turnsThisRound,
-            needResponsesFrom: data.players.filter((p) => !p.folded).length,
+            needResponsesFrom: data.turnsThisRound + 1,
             manualAdvance: true,
           };
           if (data.activePlayer.socket === socket?.id) {
@@ -530,8 +532,6 @@ export default function Index() {
 
         setGameState(data.gameState);
         setDealerCards(data.dealerCards);
-
-        setActivePlayerCount(2 - data.players.filter((p) => p.chips <= 0).length);
 
         setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
         setTurnsNextRound(2); // reset turns next round
