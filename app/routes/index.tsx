@@ -1083,7 +1083,7 @@ export default function Index() {
                   </div>
                 ) : null}
                 {!gameOver && !advancingToEnd && activePlayer.socket === playerSocket ? (
-                  <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
+                  <div className="fixed bottom-[10%] right-0 z-[987654321] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">
                         <input
