@@ -13,7 +13,9 @@ export interface AdvanceGameProps {
     turnsNextRound: number;
     turnsThisRound: number;
     needResponsesFrom: number;
+    manualAdvance?: boolean;
 };
+
 
 export interface NextProps {
   gameState: number;
@@ -25,5 +27,8 @@ export interface NextProps {
   players: any[];
   gameOver: boolean;
   activePlayer: any;
-  turnsNextRound: number;
+  turnsNextRound: number; 
+  turnsThisRound: number;
+  manualAdvance?: boolean;
+  pots: any[]
 };

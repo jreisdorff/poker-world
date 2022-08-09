@@ -1,5 +1,3 @@
-import Alert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
 import Card from "~/components/Card";
@@ -12,6 +10,7 @@ import progressStyles from "../styles/progress.css";
 
 import { useSocket } from "~/context";
 import { pluralize } from "~/utils";
+import { isEmpty } from "lodash";
 
 export const links: LinksFunction = () => {
   return [
@@ -37,6 +36,7 @@ export interface Player {
   folded: boolean;
   finalCards?: any | any[];
   socket?: string;
+  allIn?: boolean;
   [key: string]: string | number | boolean | CardProps[] | (string | undefined);
 }
 
@@ -56,6 +56,7 @@ export interface SendCheckOrCallDataProps {
   needResponsesFrom: number;
   littleBlindIndex: number;
   bigBlindIndex: number;
+  callAmount: number;
 }
 
 export interface SendFoldDataProps {
@@ -69,6 +70,7 @@ export interface SendFoldDataProps {
   turnsNextRound: number;
   turnsThisRound: number;
   hands: any[];
+  pots: any[];
   dealerCards: any[];
   needResponsesFrom: number;
   littleBlindIndex: number;
@@ -106,18 +108,21 @@ const initialPlayers: Player[] = [
     chips: 1000,
     cards: [],
     folded: false,
+    allIn: false,
   },
   {
     name: "misterbrother",
     chips: 1000,
     cards: [],
     folded: false,
+    allIn: false,
   },
   {
     name: "copsucker",
     chips: 1000,
     cards: [],
     folded: false,
+    allIn: false,
   },
 ];
 
@@ -165,37 +170,38 @@ export default function Index() {
   const [wonAmount, setWonAmount] = useState(0);
   const [playerName, setPlayerName] = useState("");
   const [buttonClicked, setButtonClicked] = useState(false);
-
   const [playerCount, setPlayerCount] = useState(0);
   const [messageSent, setMessageSent] = useState(false);
-
   const [socketConnected, setSocketConnected] = useState(false);
   const [playerNames, setPlayerNames] = useState<any[]>([]);
   const [playerSocket, setPlayerSocket] = useState<any>();
   const [playerSockets, setPlayerSockets] = useState<any[]>([]);
-
   const [player, setPlayer] = useState<Player>();
-
   const [joinedGame, setJoinedGame] = useState(false);
-
   const [turnsThisRound, setTurnsThisRound] = useState(2);
   const [turnsNextRound, setTurnsNextRound] = useState(2);
-
   const [earlyWin, setEarlyWin] = useState(false);
-
   const [needResponsesFrom, setNeedResponsesFrom] = useState(3);
-
   const [littleBlindIndex, setLittleBlindIndex] = useState(1);
   const [bigBlindIndex, setBigBlindIndex] = useState(2);
+  const [manualAdvance, setManualAdvance] = useState(false);
+  const [ultimateWinner, setUltimateWinner] = useState<Player | null>(null);
 
-  const handleCheckOrCall = () => {
+  const [advancingToEnd, setAdvancingToEnd] = useState(false);
+
+  const handleCheckOrCall = (callAmount: number) => {
     let tempPlayers = [...players];
     let tempActivePlayer = tempPlayers.find(
       (tempP) => tempP.name === activePlayer.name
     );
-    tempActivePlayer!.chips -= activeBet;
+    tempActivePlayer!.chips -= callAmount;
+
+    if (tempActivePlayer!.chips <= 0) {
+      tempActivePlayer!.allIn = true;
+    }
+
     let tempPots = [...pots];
-    tempPots[0] += activeBet;
+    tempPots[0] += callAmount;
 
     const advanceProps = getNextPlayerProps(tempPlayers);
 
@@ -215,6 +221,7 @@ export default function Index() {
       needResponsesFrom,
       littleBlindIndex,
       bigBlindIndex,
+      callAmount,
     };
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
@@ -223,12 +230,11 @@ export default function Index() {
   useEffect(() => {
     if (!socket) return;
 
-    const advance = (tn: number, data: AdvanceGameProps, type: string) => {
+    const advance = (data: AdvanceGameProps, type: string) => {
       let tempNeedResponsesFrom = data.needResponsesFrom;
 
       if (type === "BET") {
-        tempNeedResponsesFrom =
-          data.players.filter((p) => !p.folded).length - 1;
+        tempNeedResponsesFrom = data.players.filter((p) => !p.folded).length - 1;
         setNeedResponsesFrom(data.players.filter((p) => !p.folded).length - 1);
       } else {
         tempNeedResponsesFrom = tempNeedResponsesFrom - 1;
@@ -281,6 +287,10 @@ export default function Index() {
       }
     );
 
+    socket.on("dealerCards", (data) => {
+      setDealerCards(data);
+    });
+
     socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]);
       setPlayerSockets((prevPS) => [...prevPS, data.socket]);
@@ -307,14 +317,18 @@ export default function Index() {
 
       setPots(data.pots);
 
+      setUltimateWinner(null);
+
+      setWinningCards([]);
+
       setActiveBet(bigBlindAmount);
 
       setDealer(data.dealer);
       setLittleBlind(data.littleBlind);
       setBigBlind(data.bigBlind);
 
-      setActivePlayerIndex(0);
-      setActivePlayer(data.players[0]);
+      setActivePlayerIndex(data.dealerIndex);
+      setActivePlayer(data.players[data.dealerIndex]);
     });
 
     socket.on("sendBetData", (data: SendBetDataProps) => {
@@ -326,8 +340,7 @@ export default function Index() {
       setActivePlayer(data.activePlayer);
       setLogs((prev) => [
         ...prev,
-        `${data.players[data.prevActivePlayerIndex].name} bet ${
-          data.activeBet
+        `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet
         }`,
       ]);
       setSnackbarMessage(
@@ -350,7 +363,7 @@ export default function Index() {
         needResponsesFrom: data.needResponsesFrom,
       };
 
-      advance(data.turnNumber, advanceDataProps, "BET");
+      advance(advanceDataProps, "BET");
     });
 
     socket.on("sendShowCardsData", (data: { players: any[] }) => {
@@ -382,9 +395,8 @@ export default function Index() {
       }
 
       let checkOrCallDescription = data.activeBet
-        ? `${data.players[data.prevActivePlayerIndex].name} called ${
-            data.activeBet
-          }`
+        ? `${data.players[data.prevActivePlayerIndex].name} called ${data.callAmount
+        }`
         : `${data.players[data.prevActivePlayerIndex].name} checked`;
 
       setLogs((prev) => [...prev, checkOrCallDescription]);
@@ -406,7 +418,7 @@ export default function Index() {
         needResponsesFrom: data.needResponsesFrom,
       };
 
-      advance(data.turnNumber, advanceDataProps, "CHECK");
+      advance(advanceDataProps, "CHECK");
     });
 
     socket.on("sendFoldData", (data: SendFoldDataProps) => {
@@ -447,13 +459,13 @@ export default function Index() {
         dealerCards: data.dealerCards,
         players: data.players,
         hands: data.hands,
-        pots,
+        pots: data.pots,
         turnsNextRound: data.turnsNextRound - 1,
         turnsThisRound: data.turnsThisRound,
         needResponsesFrom: data.needResponsesFrom,
       };
 
-      advance(data.turnNumber, advanceDataProps, "FOLD");
+      advance(advanceDataProps, "FOLD");
     });
 
     socket.on("sendEndRoundData", (data: NextProps) => {
@@ -484,31 +496,67 @@ export default function Index() {
     });
 
     socket.on("sendAdvanceData", (data: NextProps) => {
-      setActiveBet(0);
+      if (!isEmpty(data)) {
+        setActiveBet(0);
 
-      setBet(bigBlindAmount);
+        setPots(data.pots);
 
-      setGameState(data.gameState);
-      setDealerCards(data.dealerCards);
+        let activePlayers = data.players.length - data.players.filter((p) => p.allIn || p.folded).length
 
-      setActivePlayerCount(data.turnsNextRound);
+        if ((activePlayers === 0 || activePlayers === 1) && !data.manualAdvance) {
 
-      setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
-      setTurnsNextRound(2); // reset turns next round
+          setManualAdvance(true);
 
-      setNeedResponsesFrom(data.players.filter((p) => !p.folded).length);
+          let advanceGameProps: AdvanceGameProps = {
+            activePlayer: data.activePlayer,
+            gameState: data.gameState,
+            dealerCards: data.dealerCards,
+            players: data.players,
+            hands: data.hands,
+            pots: data.pots,
+            turnsNextRound: data.turnsNextRound,
+            turnsThisRound: data.turnsThisRound,
+            needResponsesFrom: data.players.filter((p) => !p.folded).length,
+            manualAdvance: true,
+          };
+          if (data.activePlayer.socket === socket?.id) {
+            socket!.emit("advanceToEnd", advanceGameProps);
+          }
+        }
 
-      if (data.winner) {
-        setWinner(data.winner);
-        setLogs((prev) => [...prev, data.winner.description]);
-        setWinningCards(data.winningCards);
-        setWonAmount(data.wonAmount);
+        setBet(bigBlindAmount);
+
+        setGameState(data.gameState);
+        setDealerCards(data.dealerCards);
+
+        setActivePlayerCount(data.turnsNextRound);
+
+        setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
+        setTurnsNextRound(2); // reset turns next round
+
+        setNeedResponsesFrom(data.players.filter((p) => !p.folded).length);
+
+        if (data.winner) {
+          setWinner(data.winner);
+          setLogs((prev) => [...prev, data.winner.description]);
+          setWinningCards(data.winningCards);
+          setWonAmount(data.wonAmount);
+        }
+
+        if (data.players.filter((p) => p.chips > 0).length === 1) {
+          //Only one player left. Game is over
+          setUltimateWinner(data.winner.winner.players[0].player);
+        }
+
+        setHands(data.hands);
+        setPlayers(data.players);
+        setGameOver(data.gameOver);
+        setAdvancingToEnd(false);
       }
+    });
 
-      setHands(data.hands);
-
-      setPlayers(data.players);
-      setGameOver(data.gameOver);
+    socket.on("advancingToEnd", (data) => {
+      setAdvancingToEnd(true);
     });
 
     socket.on("sendAdvanceHandsData", (data) => {
@@ -520,12 +568,12 @@ export default function Index() {
       setWinningCards([]);
       setWinner(null);
       setWonAmount(0);
-      setNeedResponsesFrom(3);
+      setNeedResponsesFrom(players.filter((p) => p.chips <= 0).length);
       setTurnNumber(0);
 
       setEarlyWin(false);
 
-      setActivePlayerCount(3);
+      setActivePlayerCount(players.filter((p) => p.chips > 0).length);
 
       setTurnsThisRound(2);
       setTurnsNextRound(2);
@@ -610,6 +658,7 @@ export default function Index() {
       needResponsesFrom,
       littleBlindIndex,
       bigBlindIndex,
+      pots,
     };
 
     socket!.emit("playerFolded", foldProps);
@@ -621,6 +670,11 @@ export default function Index() {
       (player) => player.name === activePlayer.name
     );
     tempActivePlayer!.chips -= amount;
+
+    if (tempActivePlayer!.chips <= 0) {
+      tempActivePlayer!.allIn = true;
+    }
+
     let tempPots = [...pots];
     tempPots[0] += amount;
 
@@ -688,6 +742,16 @@ export default function Index() {
     socket!.emit("endRound", data);
   };
 
+  const newGame = () => {
+    let startProps = {
+      playerNames,
+      playerSockets,
+      playerChips: players.map((p) => 1000),
+      pastHands: hands,
+    };
+    socket!.emit("startHoldEmGame", startProps);
+  }
+
   const advanceGame = (data: AdvanceGameProps) => {
     socket!.emit("advanceHoldEmGame", data);
   };
@@ -716,7 +780,9 @@ export default function Index() {
     socket!.emit("showCards", { players: tempPlayers });
   };
 
-  const handleMuckCards = () => {};
+
+
+  const handleMuckCards = () => { };
 
   return (
     <>
@@ -748,9 +814,8 @@ export default function Index() {
                   />
                 ) : null}
                 <button
-                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${
-                    joinedGame ? "disabled" : ""
-                  }`}
+                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${joinedGame ? "disabled" : ""
+                    }`}
                   onClick={handleJoinGame}
                   disabled={joinedGame}
                 >
@@ -771,34 +836,41 @@ export default function Index() {
             {gameOver && (
               <div className="flex flex-col">
                 <div
-                  className={`mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
-                    !winner ? "opacity-0" : "opacity-100"
-                  }`}
+                  className={`z-[410443] mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${!winner ? "opacity-0" : "opacity-100"
+                    }`}
                 >
                   <h1>{winner ? winner.description : null}</h1>
+                  <h1>{ultimateWinner ? `${ultimateWinner.name} wins the game!` : null}</h1>
                 </div>
-                <button
+                {!ultimateWinner ? <button
                   id="next-btn"
                   className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
                   onClick={() => advanceHands()}
                 >
                   Next Hand
-                </button>
+                </button> : <button
+                  id="next-btn"
+                  className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                  onClick={() => newGame()}
+                >
+                  New Game
+                </button>}
               </div>
             )}
+
+            {gameStarted && <div className="flex flex-col w-full justify-center items-center">
+              <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
+              <div>{`Pot: ${!pots ? 0 : pots.join(", ")}`}</div>
+              <div>
+                {winner
+                  ? `Hand #${hands.length}`
+                  : `Hand #${hands.length + 1}`}
+              </div>
+            </div>}
 
             {gameStarted ? (
               <>
                 <div className="flex flex-col items-center justify-center">
-                  <div className="absolute top-[20%] flex w-[100vw] flex-col items-center justify-center self-center text-center text-xl">
-                    <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
-                    <div>{`Pot: ${pots.join(", ")}`}</div>
-                    <div>
-                      {winner
-                        ? `Hand #${hands.length}`
-                        : `Hand #${hands.length + 1}`}
-                    </div>
-                  </div>
                   <div className="playingCards simpleCards absolute bottom-[45%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
                     {dealerCards.map((card, index) => (
                       <Card
@@ -810,12 +882,12 @@ export default function Index() {
                         winner={
                           winningCards.length > 0
                             ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                    card.rank
-                                );
-                              }).length > 0
+                              return (
+                                w.suit == card.suit.charAt(0) &&
+                                w.value.toString().replace("T", "10") ===
+                                card.rank
+                              );
+                            }).length > 0
                             : false
                         }
                       />
@@ -831,21 +903,17 @@ export default function Index() {
                           key={`${index}-${card.suit}-${card.rank}`}
                           suit={card.suit}
                           rank={card.rank}
-                          faceUp={
-                            (!players[1].folded &&
-                              players[1].socket === playerSocket) ||
-                            card.faceUp
-                          }
+                          faceUp={players[1].folded ? false : players[1].socket === playerSocket || card.faceUp}
                           folded={players[1].folded}
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                      card.rank
-                                  );
-                                }).length > 0
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                  card.rank
+                                );
+                              }).length > 0
                               : false
                           }
                         />
@@ -854,7 +922,7 @@ export default function Index() {
                     <PlayerDisplay
                       player={players[1]}
                       active={
-                        activePlayer.name === players[1].name && !gameOver
+                        activePlayer.name === players[1].name && !gameOver && !advancingToEnd
                       }
                       onTimeout={() => handlePlayerTimeout(players[1])}
                       prevPlayer={players[0]}
@@ -900,21 +968,17 @@ export default function Index() {
                           key={`${index}-${card.suit}-${card.rank}`}
                           suit={card.suit}
                           rank={card.rank}
-                          faceUp={
-                            (!players[2].folded &&
-                              players[2].socket === playerSocket) ||
-                            card.faceUp
-                          }
+                          faceUp={players[2].folded ? false : players[2].socket === playerSocket || card.faceUp}
                           folded={players[2].folded}
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                      card.rank
-                                  );
-                                }).length > 0
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                  card.rank
+                                );
+                              }).length > 0
                               : false
                           }
                         />
@@ -923,7 +987,7 @@ export default function Index() {
                     <PlayerDisplay
                       player={players[2]}
                       active={
-                        activePlayer.name === players[2].name && !gameOver
+                        activePlayer.name === players[2].name && !gameOver && !advancingToEnd
                       }
                       onTimeout={() => handlePlayerTimeout(players[2])}
                       prevPlayer={players[1]}
@@ -966,21 +1030,17 @@ export default function Index() {
                       key={`${index}-${card.suit}-${card.rank}`}
                       suit={card.suit}
                       rank={card.rank}
-                      faceUp={
-                        (!players[0].folded &&
-                          players[0].socket === playerSocket) ||
-                        card.faceUp
-                      }
+                      faceUp={players[0].folded ? false : players[0].socket === playerSocket || card.faceUp}
                       folded={players[0].folded}
                       winner={
                         winningCards.length > 0
                           ? winningCards.filter((w) => {
-                              return (
-                                w.suit == card.suit.charAt(0) &&
-                                w.value.toString().replace("T", "10") ===
-                                  card.rank
-                              );
-                            }).length > 0
+                            return (
+                              w.suit == card.suit.charAt(0) &&
+                              w.value.toString().replace("T", "10") ===
+                              card.rank
+                            );
+                          }).length > 0
                           : false
                       }
                     />
@@ -989,7 +1049,7 @@ export default function Index() {
                 <div className="fixed bottom-[7.5%] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                   <PlayerDisplay
                     player={players[0]}
-                    active={activePlayer.name === players[0].name && !gameOver}
+                    active={activePlayer.name === players[0].name && !gameOver && !advancingToEnd}
                     onTimeout={() => handlePlayerTimeout(players[0])}
                     prevPlayer={players[players.length - 1]}
                     gameOver={gameOver}
@@ -1024,7 +1084,7 @@ export default function Index() {
                     />
                   </div>
                 ) : null}
-                {!gameOver && activePlayer.socket === playerSocket ? (
+                {!gameOver && !advancingToEnd && activePlayer.socket === playerSocket ? (
                   <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">
@@ -1053,7 +1113,7 @@ export default function Index() {
                       </button>
                       <button
                         className="mr-1 rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                        onClick={handleCheckOrCall}
+                        onClick={() => handleCheckOrCall(activePlayer.chips >= activeBet ? activeBet : activePlayer.chips)}
                       >
                         {activeBet > 0 ? `Call ${activePlayer.chips >= activeBet ? activeBet : activePlayer.chips}` : "Check"}
                       </button>
@@ -1067,11 +1127,11 @@ export default function Index() {
                   </div>
                 ) : null}
                 {gameOver &&
-                earlyWin &&
-                winner &&
-                winner.winner.players
-                  .map((p) => p.player.socket)
-                  .includes(player!.socket) ? (
+                  earlyWin &&
+                  winner &&
+                  winner.winner.players
+                    .map((p) => p.player.socket)
+                    .includes(player!.socket) ? (
                   <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
                       <button
