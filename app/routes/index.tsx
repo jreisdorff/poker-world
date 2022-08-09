@@ -570,7 +570,7 @@ export default function Index() {
       setWinningCards([]);
       setWinner(null);
       setWonAmount(0);
-      setNeedResponsesFrom(players.filter((p) => p.chips <= 0).length);
+      setNeedResponsesFrom(players.filter((p) => p.chips > 0).length);
       setTurnNumber(0);
 
       setEarlyWin(false);
