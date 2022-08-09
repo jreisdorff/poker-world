@@ -223,7 +223,6 @@ const advanceToEnd = async (props) => {
       tempPlayers
         .filter((p, index) => gameWinner.winnerIndicies.includes(index))
         .forEach((player) => {
-          console.log('player', player.name, player.chips, wonAmount);
           player.chips += wonAmount;
         });
 
@@ -291,8 +290,6 @@ const advanceHoldEmGame = (props) => {
           return { dealerCards: props.dealerCards, player };
         })
     );
-
-    console.log(props.pots);
 
     let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
     const winnerDescription = getWinnerDescription(gameWinner, wonAmount, true);
@@ -386,6 +383,7 @@ const determineWinner = (playerWithDealerCards) => {
     wins,
     winnerIndicies,
     hand: wins[0].descr,
+    ultimateWinner: winnerIndicies.length === 1 ? playerWithDealerCards[winnerIndicies[0]].player : undefined
   };
 
   return pokerWinner;
@@ -563,7 +561,6 @@ io.on("connection", (socket) => {
 
   socket.on("endRound", (data) => {
     let endData = endHoldEmRound(data);
-    console.log('emitting', endData);
     io.emit("sendEndRoundData", endData);
   });
 

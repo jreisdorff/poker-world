@@ -171,8 +171,6 @@ export default function Index() {
   const [playerName, setPlayerName] = useState("");
   const [buttonClicked, setButtonClicked] = useState(false);
   const [playerCount, setPlayerCount] = useState(0);
-  const [messageSent, setMessageSent] = useState(false);
-  const [socketConnected, setSocketConnected] = useState(false);
   const [playerNames, setPlayerNames] = useState<any[]>([]);
   const [playerSocket, setPlayerSocket] = useState<any>();
   const [playerSockets, setPlayerSockets] = useState<any[]>([]);
@@ -475,10 +473,10 @@ export default function Index() {
 
       setGameState(data.gameState);
 
-      setActivePlayerCount(data.turnsNextRound);
+      setActivePlayerCount(2 - data.players.filter((p) => p.chips <= 0).length);
 
       setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
-      setTurnsNextRound(2); // reset turns next round
+      setTurnsNextRound(2 - data.players.filter((p) => p.chips <= 0).length); // reset turns next round
 
       setEarlyWin(true);
 
@@ -529,7 +527,7 @@ export default function Index() {
         setGameState(data.gameState);
         setDealerCards(data.dealerCards);
 
-        setActivePlayerCount(data.turnsNextRound);
+        setActivePlayerCount(2 - data.players.filter((p) => p.chips <= 0).length);
 
         setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
         setTurnsNextRound(2); // reset turns next round
@@ -545,7 +543,7 @@ export default function Index() {
 
         if (data.players.filter((p) => p.chips > 0).length === 1) {
           //Only one player left. Game is over
-          setUltimateWinner(data.winner.winner.players[0].player);
+          setUltimateWinner(data.winner.winner.ultimateWinner);
         }
 
         setHands(data.hands);
@@ -575,8 +573,8 @@ export default function Index() {
 
       setActivePlayerCount(players.filter((p) => p.chips > 0).length);
 
-      setTurnsThisRound(2);
-      setTurnsNextRound(2);
+      setTurnsThisRound(players.filter((p) => p.chips > 0).length);
+      setTurnsNextRound(players.filter((p) => p.chips > 0).length);
 
       setPlayers(data.players);
       setHands(data.hands);
