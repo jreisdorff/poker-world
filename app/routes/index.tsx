@@ -13,6 +13,7 @@ import progressStyles from "../styles/progress.css";
 import { useSocket } from "~/context";
 import { pluralize } from "~/utils";
 import { isEmpty } from "lodash";
+import Pot from "~/components/Pot";
 
 export const links: LinksFunction = () => {
   return [
@@ -79,6 +80,7 @@ export interface SendFoldDataProps {
   needResponsesFrom: number;
   littleBlindIndex: number;
   bigBlindIndex: number;
+  activeBet: number;
 }
 
 export interface SendBetDataProps {
@@ -157,7 +159,7 @@ export default function Index() {
   const [bigBlind, setBigBlind] = useState(initialPlayers[2]);
   const [littleBlindAmount, setLittleBlindAmount] = useState(10);
   const [bigBlindAmount, setBigBlindAmount] = useState(20);
-  const [bet, setBet] = useState(bigBlindAmount);
+  const [bet, setBet] = useState(bigBlindAmount * 2);
   const [pots, setPots] = useState<any[]>([littleBlindAmount, bigBlindAmount]);
   const [activeBet, setActiveBet] = useState(0);
   const [turnNumber, setTurnNumber] = useState(0);
@@ -328,8 +330,6 @@ export default function Index() {
 
       setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length);
 
-      let activePlayers = data.players.filter((p) => p.chips > 0);
-
       setDealer(data.dealer);
       setLittleBlind(data.littleBlind);
       setBigBlind(data.bigBlind);
@@ -342,7 +342,7 @@ export default function Index() {
       setPots(data.pots);
       setPlayers(data.players);
       setActiveBet(data.activeBet);
-      setBet(data.activeBet);
+      setBet(data.activeBet + bigBlindAmount);
       setActivePlayerIndex(data.activePlayerIndex);
       setActivePlayer(data.activePlayer);
       setLogs((prev) => [
@@ -394,12 +394,16 @@ export default function Index() {
           data.littleBlindIndex == data.activePlayerIndex
         ) {
           setActiveBet(littleBlindAmount);
-        } else if (
+        }  else if (
           data.gameState === GameState.Preflop &&
           data.bigBlindIndex == data.activePlayerIndex
         ) {
           setActiveBet(0);
+        } else {
+          setActiveBet(data.activeBet);
         }
+      } else {
+        setActiveBet(data.activeBet);
       }
 
       let checkOrCallDescription = data.activeBet
@@ -448,6 +452,8 @@ export default function Index() {
         data.bigBlindIndex == data.activePlayerIndex
       ) {
         setActiveBet(0);
+      } else {
+        setActiveBet(data.activeBet);
       }
 
       setLogs((prev) => [
@@ -480,7 +486,7 @@ export default function Index() {
     socket.on("sendEndRoundData", (data: NextProps) => {
       setActiveBet(0);
 
-      setBet(bigBlindAmount);
+      setBet(bigBlindAmount * 2);
 
       setGameState(data.gameState);
 
@@ -579,20 +585,30 @@ export default function Index() {
       setWinningCards([]);
       setWinner(null);
       setWonAmount(0);
-      setNeedResponsesFrom(data.players.filter((p: { chips: number; }) => p.chips > 0).length);
+      setNeedResponsesFrom(
+        data.players.filter((p: { chips: number }) => p.chips > 0).length
+      );
       setTurnNumber(0);
 
       setEarlyWin(false);
 
-      setActivePlayerCount(data.players.filter((p: { chips: number; }) => p.chips > 0).length);
+      setActivePlayerCount(
+        data.players.filter((p: { chips: number }) => p.chips > 0).length
+      );
 
-      setTurnsThisRound(data.players.filter((p: { chips: number; }) => p.chips > 0).length);
-      setTurnsNextRound(data.players.filter((p: { chips: number; }) => p.chips > 0).length);
+      setTurnsThisRound(
+        data.players.filter((p: { chips: number }) => p.chips > 0).length
+      );
+      setTurnsNextRound(
+        data.players.filter((p: { chips: number }) => p.chips > 0).length
+      );
 
       setPlayers(data.players);
       setHands(data.hands);
 
-      let activePlayers = data.players.filter((p: { chips: number; }) => p.chips > 0);
+      let activePlayers = data.players.filter(
+        (p: { chips: number }) => p.chips > 0
+      );
 
       let nextDealerIndex = data.hands.length % activePlayers.length;
       let nextLittleBlindIndex = (data.hands.length + 1) % activePlayers.length;
@@ -672,6 +688,7 @@ export default function Index() {
       littleBlindIndex,
       bigBlindIndex,
       pots,
+      activeBet,
     };
 
     socket!.emit("playerFolded", foldProps);
@@ -682,6 +699,7 @@ export default function Index() {
     let tempActivePlayer = tempPlayers.find(
       (player) => player.name === activePlayer.name
     );
+
     tempActivePlayer!.chips -= amount;
 
     if (tempActivePlayer!.chips <= 0) {
@@ -726,7 +744,7 @@ export default function Index() {
     let tempActivePlayerIndex = activePlayerIndex;
     let activePlayerIndicies: number[] = [];
     tempPlayers.map((p, index) => {
-      if (!p.folded) {
+      if (!(p.folded || p.allIn)) {
         activePlayerIndicies.push(index);
       }
     });
@@ -741,7 +759,12 @@ export default function Index() {
     }
 
     if (nextActivePlayerIndex === tempActivePlayerIndex) {
-      nextActivePlayerIndex = activePlayerIndicies[0];
+      if (nextActivePlayerIndex !== activePlayerIndicies[0]) {
+        nextActivePlayerIndex = activePlayerIndicies[0];
+      } else {
+        let notActivePlayers =  activePlayerIndicies.filter((i, index) => i !== nextActivePlayerIndex);
+        nextActivePlayerIndex = notActivePlayers.length > 0 ? notActivePlayers[0] : activePlayerIndicies[0];
+      }
     }
 
     return {
@@ -902,27 +925,36 @@ export default function Index() {
             {gameStarted ? (
               <>
                 <div className="flex flex-col items-center justify-center">
-                  <div className="playingCards simpleCards absolute bottom-[45%] z-[9999] flex w-[100vw] flex-row items-center justify-center">
-                    {dealerCards.map((card, index) => (
-                      <Card
-                        key={`${index}-${card.suit}-${card.rank}`}
-                        suit={card.suit}
-                        rank={card.rank}
-                        faceUp={card.faceUp}
-                        folded={card.faceUp}
-                        winner={
-                          winningCards.length > 0
-                            ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                    card.rank
-                                );
-                              }).length > 0
-                            : false
-                        }
-                      />
-                    ))}
+                  <div className="absolute bottom-[45%] z-[9999] flex w-[100vw] flex-col items-center justify-center">
+                    <div className="playingCards simpleCards flex flex-row">
+                      {dealerCards.map((card, index) => (
+                        <Card
+                          key={`${index}-${card.suit}-${card.rank}`}
+                          suit={card.suit}
+                          rank={card.rank}
+                          faceUp={card.faceUp}
+                          folded={card.faceUp}
+                          winner={
+                            winningCards.length > 0
+                              ? winningCards.filter((w) => {
+                                  return (
+                                    w.suit == card.suit.charAt(0) &&
+                                    w.value.toString().replace("T", "10") ===
+                                      card.rank
+                                  );
+                                }).length > 0
+                              : false
+                          }
+                        />
+                      ))}
+                    </div>
+                    {pots.length > 0 ? (
+                      <div className="flex w-screen flex-row items-center justify-center">
+                        {pots.map((p: number) => {
+                          return <Pot amount={p} />;
+                        })}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -1146,7 +1178,11 @@ export default function Index() {
                         <input
                           type="range"
                           className="form-range w-full p-0 focus:shadow-none focus:outline-none focus:ring-0"
-                          min={activeBet > 0 ? activeBet : bigBlindAmount}
+                          min={
+                            activeBet > 0
+                              ? activeBet + bigBlindAmount
+                              : bigBlindAmount * 2
+                          }
                           max={activePlayer.chips}
                           value={bet}
                           onChange={(event) => {
@@ -1188,7 +1224,7 @@ export default function Index() {
                         className="rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
                         onClick={() => handleBet(bet)}
                       >
-                        {activeBet > 0 ? `Raise` : `Bet`}
+                        {activeBet > 0 ? `Raise to ${bet}` : `Bet ${bet}`}
                       </button>
                     </div>
                   </div>
@@ -1197,7 +1233,7 @@ export default function Index() {
                 earlyWin &&
                 winner &&
                 winner.winner.players
-                  .map((p) => p.player.socket)
+                  .map((p) => p.socket)
                   .includes(player!.socket) ? (
                   <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">

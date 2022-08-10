@@ -77,7 +77,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-YHSQXLDW.css";
+var tailwind_default = "/build/_assets/tailwind-L5IXIHPP.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -266,7 +266,7 @@ __export(routes_exports, {
   links: () => links2,
   meta: () => meta2
 });
-var import_react8 = require("react");
+var import_react9 = require("react");
 
 // app/components/Card.tsx
 function Card(props) {
@@ -379,7 +379,85 @@ function pluralize(count, singular, plural) {
 }
 
 // route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
-var import_lodash = require("lodash"), links2 = () => [
+var import_lodash = require("lodash");
+
+// app/components/Pot.tsx
+var import_react8 = require("react"), getChipsFromAmount = (amount) => {
+  let quotient, remainder, quotient1, remainder1, quotient2, remainder2, quotient3, remainder3, quotient4, remainder4, quotient5, remainder5, quotient6, remainder6, quotient7, remainder7, quotient8, remainder8;
+  quotient = amount / 1e3, remainder = amount % 1e3, quotient1 = remainder / 500, remainder1 = remainder % 500, quotient2 = remainder1 / 100, remainder2 = remainder1 % 100, quotient3 = remainder2 / 50, remainder3 = remainder2 % 50, quotient4 = remainder3 / 20, remainder4 = remainder3 % 20, quotient5 = remainder4 / 10, remainder5 = remainder4 % 10, quotient6 = remainder5 / 5, remainder6 = remainder5 % 5, quotient7 = remainder6 / 2, remainder7 = remainder6 % 2, quotient8 = remainder7 / 1, remainder8 = remainder7 % 1;
+  let totalChips = Math.floor(quotient) + Math.floor(quotient1) + Math.floor(quotient2) + Math.floor(quotient3) + Math.floor(quotient4) + Math.floor(quotient5) + Math.floor(quotient6) + Math.floor(quotient7) + Math.floor(quotient8);
+  return {
+    total: amount,
+    totalChips,
+    chips: {
+      "1000": Math.floor(quotient),
+      "500": Math.floor(quotient1),
+      "100": Math.floor(quotient2),
+      "50": Math.floor(quotient3),
+      "20": Math.floor(quotient4),
+      "10": Math.floor(quotient5),
+      "5": Math.floor(quotient6),
+      "2": Math.floor(quotient7),
+      "1": Math.floor(quotient8)
+    }
+  };
+};
+function Pot(props) {
+  let { amount } = props, [chips, setChips] = (0, import_react8.useState)(getChipsFromAmount(amount || 0));
+  return (0, import_react8.useEffect)(() => {
+    amount > 0 && setChips(getChipsFromAmount(amount));
+  }, [amount]), /* @__PURE__ */ React.createElement("div", {
+    className: "flex h-full w-full flex-row items-center justify-center"
+  }, chips.chips["1000"] > 0 ? Array.from(Array(chips.chips["1000"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/1000.png"
+  })) : null, chips.chips["500"] > 0 ? Array.from(Array(chips.chips["500"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/500.png"
+  })) : null, chips.chips["100"] > 0 ? Array.from(Array(chips.chips["100"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/100.png"
+  })) : null, chips.chips["50"] > 0 ? Array.from(Array(chips.chips["50"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/50.png"
+  })) : null, chips.chips["20"] > 0 ? Array.from(Array(chips.chips["20"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/20.png"
+  })) : null, chips.chips["10"] > 0 ? Array.from(Array(chips.chips["10"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/10.png"
+  })) : null, chips.chips["5"] > 0 ? Array.from(Array(chips.chips["5"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/5.png"
+  })) : null, chips.chips["2"] > 0 ? Array.from(Array(chips.chips["2"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/2.png"
+  })) : null, chips.chips["1"] > 0 ? Array.from(Array(chips.chips["1"]).keys()).map((_, index) => /* @__PURE__ */ React.createElement("img", {
+    className: `relative ${index} -ml-10`,
+    width: "36px",
+    height: "36px",
+    src: "images/chips/1.png"
+  })) : null);
+}
+
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
+var links2 = () => [
   { rel: "stylesheet", href: cards_default },
   { rel: "stylesheet", href: cards_ie_default },
   { rel: "stylesheet", href: cards_ie9_default },
@@ -418,7 +496,7 @@ var import_lodash = require("lodash"), links2 = () => [
   }
 ];
 function Index() {
-  let [gameState, setGameState] = (0, import_react8.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react8.useState)([]), [gameStarted, setGameStarted] = (0, import_react8.useState)(!1), [dealerCards, setDealerCards] = (0, import_react8.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react8.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react8.useState)(""), [dealtCards, setDealtCards] = (0, import_react8.useState)([]), [players, setPlayers] = (0, import_react8.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react8.useState)(0), [activePlayer, setActivePlayer] = (0, import_react8.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react8.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react8.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react8.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react8.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react8.useState)(20), [bet, setBet] = (0, import_react8.useState)(bigBlindAmount), [pots, setPots] = (0, import_react8.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react8.useState)(0), [turnNumber, setTurnNumber] = (0, import_react8.useState)(0), [blinds, setBlinds] = (0, import_react8.useState)([10, 20]), [winner, setWinner] = (0, import_react8.useState)(null), [gameOver, setGameOver] = (0, import_react8.useState)(!1), [hands, setHands] = (0, import_react8.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react8.useState)(3), [winningCards, setWinningCards] = (0, import_react8.useState)([]), [wonAmount, setWonAmount] = (0, import_react8.useState)(0), [playerName, setPlayerName] = (0, import_react8.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react8.useState)(!1), [playerCount, setPlayerCount] = (0, import_react8.useState)(0), [playerNames, setPlayerNames] = (0, import_react8.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react8.useState)(), [playerSockets, setPlayerSockets] = (0, import_react8.useState)([]), [player, setPlayer] = (0, import_react8.useState)(), [joinedGame, setJoinedGame] = (0, import_react8.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react8.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react8.useState)(2), [earlyWin, setEarlyWin] = (0, import_react8.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react8.useState)(3), [littleBlindIndex, setLittleBlindIndex] = (0, import_react8.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react8.useState)(2), [manualAdvance, setManualAdvance] = (0, import_react8.useState)(!1), [ultimateWinner, setUltimateWinner] = (0, import_react8.useState)(null), [advancingToEnd, setAdvancingToEnd] = (0, import_react8.useState)(!1), handleCheckOrCall = (callAmount) => {
+  let [gameState, setGameState] = (0, import_react9.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react9.useState)([]), [gameStarted, setGameStarted] = (0, import_react9.useState)(!1), [dealerCards, setDealerCards] = (0, import_react9.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react9.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react9.useState)(""), [dealtCards, setDealtCards] = (0, import_react9.useState)([]), [players, setPlayers] = (0, import_react9.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react9.useState)(0), [activePlayer, setActivePlayer] = (0, import_react9.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react9.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react9.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react9.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react9.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react9.useState)(20), [bet, setBet] = (0, import_react9.useState)(bigBlindAmount * 2), [pots, setPots] = (0, import_react9.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react9.useState)(0), [turnNumber, setTurnNumber] = (0, import_react9.useState)(0), [blinds, setBlinds] = (0, import_react9.useState)([10, 20]), [winner, setWinner] = (0, import_react9.useState)(null), [gameOver, setGameOver] = (0, import_react9.useState)(!1), [hands, setHands] = (0, import_react9.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react9.useState)(3), [winningCards, setWinningCards] = (0, import_react9.useState)([]), [wonAmount, setWonAmount] = (0, import_react9.useState)(0), [playerName, setPlayerName] = (0, import_react9.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react9.useState)(!1), [playerCount, setPlayerCount] = (0, import_react9.useState)(0), [playerNames, setPlayerNames] = (0, import_react9.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react9.useState)(), [playerSockets, setPlayerSockets] = (0, import_react9.useState)([]), [player, setPlayer] = (0, import_react9.useState)(), [joinedGame, setJoinedGame] = (0, import_react9.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react9.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react9.useState)(2), [earlyWin, setEarlyWin] = (0, import_react9.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react9.useState)(3), [littleBlindIndex, setLittleBlindIndex] = (0, import_react9.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react9.useState)(2), [manualAdvance, setManualAdvance] = (0, import_react9.useState)(!1), [ultimateWinner, setUltimateWinner] = (0, import_react9.useState)(null), [advancingToEnd, setAdvancingToEnd] = (0, import_react9.useState)(!1), handleCheckOrCall = (callAmount) => {
     let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((tempP) => tempP.name === activePlayer.name);
     tempActivePlayer.chips -= callAmount, tempActivePlayer.chips <= 0 && (tempActivePlayer.allIn = !0);
     let tempPots = [...pots];
@@ -443,7 +521,7 @@ function Index() {
     };
     socket.emit("playerCheckedOrCalled", checkOrCallProps);
   };
-  (0, import_react8.useEffect)(() => {
+  (0, import_react9.useEffect)(() => {
     if (!socket)
       return;
     let advance = (data, type) => {
@@ -467,11 +545,9 @@ function Index() {
       let newPlayerCount = 0;
       setPlayerCount((prevPC) => (newPlayerCount = prevPC + 1, newPlayerCount)), setButtonClicked(!1);
     }), socket.on("sendHoldEmData", (data) => {
-      setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setPots(data.pots), setUltimateWinner(null), setWinningCards([]), setActiveBet(bigBlindAmount), setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length);
-      let activePlayers = data.players.filter((p) => p.chips > 0);
-      setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(data.dealerIndex), setActivePlayer(data.players[data.dealerIndex]);
+      setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setPots(data.pots), setUltimateWinner(null), setWinningCards([]), setActiveBet(bigBlindAmount), setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length), setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(data.dealerIndex), setActivePlayer(data.players[data.dealerIndex]);
     }), socket.on("sendBetData", (data) => {
-      setPots(data.pots), setPlayers(data.players), setActiveBet(data.activeBet), setBet(data.activeBet), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLogs((prev) => [
+      setPots(data.pots), setPlayers(data.players), setActiveBet(data.activeBet), setBet(data.activeBet + bigBlindAmount), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLogs((prev) => [
         ...prev,
         `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`
       ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
@@ -491,7 +567,7 @@ function Index() {
     }), socket.on("sendShowCardsData", (data) => {
       setPlayers(data.players);
     }), socket.on("sendCheckOrCallData", (data) => {
-      setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLittleBlindIndex(data.littleBlindIndex), setBigBlindIndex(data.bigBlindIndex), data.activeBet <= bigBlindAmount && (data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex && setActiveBet(0));
+      setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLittleBlindIndex(data.littleBlindIndex), setBigBlindIndex(data.bigBlindIndex), data.activeBet <= bigBlindAmount ? data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex ? setActiveBet(0) : setActiveBet(data.activeBet) : setActiveBet(data.activeBet);
       let checkOrCallDescription = data.activeBet ? `${data.players[data.prevActivePlayerIndex].name} called ${data.callAmount}` : `${data.players[data.prevActivePlayerIndex].name} checked`;
       setLogs((prev) => [...prev, checkOrCallDescription]), setSnackbarMessage(checkOrCallDescription), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
@@ -507,7 +583,7 @@ function Index() {
       };
       advance(advanceDataProps, "CHECK");
     }), socket.on("sendFoldData", (data) => {
-      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex && setActiveBet(0), setLogs((prev) => [
+      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex ? setActiveBet(0) : setActiveBet(data.activeBet), setLogs((prev) => [
         ...prev,
         `${data.players[data.prevActivePlayerIndex].name} folded`
       ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
@@ -524,7 +600,7 @@ function Index() {
       };
       advance(advanceDataProps, "FOLD");
     }), socket.on("sendEndRoundData", (data) => {
-      setActiveBet(0), setBet(bigBlindAmount), setGameState(data.gameState), setActivePlayerCount(2 - data.players.filter((p) => p.chips <= 0).length), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(2 - data.players.filter((p) => p.chips <= 0).length), setEarlyWin(!0), data.winner && (setWinner(data.winner), setLogs((prev) => [...prev, data.winner.description]), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver);
+      setActiveBet(0), setBet(bigBlindAmount * 2), setGameState(data.gameState), setActivePlayerCount(2 - data.players.filter((p) => p.chips <= 0).length), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(2 - data.players.filter((p) => p.chips <= 0).length), setEarlyWin(!0), data.winner && (setWinner(data.winner), setLogs((prev) => [...prev, data.winner.description]), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver);
     }), socket.on("sendAdvanceData", (data) => {
       if (!(0, import_lodash.isEmpty)(data)) {
         setActiveBet(0), setPots(data.pots);
@@ -554,7 +630,7 @@ function Index() {
       let activePlayers = data.players.filter((p) => p.chips > 0), nextDealerIndex = data.hands.length % activePlayers.length, nextLittleBlindIndex = (data.hands.length + 1) % activePlayers.length, nextBigBlindIndex = (data.hands.length + 2) % activePlayers.length;
       setActiveBet(bigBlindAmount), setDealer(activePlayers[nextDealerIndex]), setLittleBlind(activePlayers[nextLittleBlindIndex]), setBigBlind(activePlayers[nextBigBlindIndex]), setLittleBlindIndex(nextLittleBlindIndex), setBigBlindIndex(nextBigBlindIndex), setActivePlayerIndex(nextDealerIndex), setActivePlayer(activePlayers[nextDealerIndex]), setPots([littleBlindAmount + bigBlindAmount]);
     });
-  }, [socket]), (0, import_react8.useEffect)(() => {
+  }, [socket]), (0, import_react9.useEffect)(() => {
     if (playerCount === 3 && playerSocket === playerSockets[2]) {
       let startProps = {
         playerNames,
@@ -564,7 +640,7 @@ function Index() {
       };
       socket.emit("startHoldEmGame", startProps);
     }
-  }, [playerCount]), (0, import_react8.useEffect)(() => {
+  }, [playerCount]), (0, import_react9.useEffect)(() => {
     if (buttonClicked) {
       if (!socket)
         return;
@@ -591,7 +667,8 @@ function Index() {
       needResponsesFrom,
       littleBlindIndex,
       bigBlindIndex,
-      pots
+      pots,
+      activeBet
     };
     socket.emit("playerFolded", foldProps);
   }, handleBet = (amount) => {
@@ -621,7 +698,7 @@ function Index() {
   }, getNextPlayerProps = (tempPlayers) => {
     let tempActivePlayerIndex = activePlayerIndex, activePlayerIndicies = [];
     tempPlayers.map((p, index) => {
-      p.folded || activePlayerIndicies.push(index);
+      p.folded || p.allIn || activePlayerIndicies.push(index);
     });
     let nextActivePlayerIndex = tempActivePlayerIndex;
     for (let i = 0; i < activePlayerIndicies.length; i++)
@@ -629,7 +706,14 @@ function Index() {
         nextActivePlayerIndex = activePlayerIndicies[i];
         break;
       }
-    return nextActivePlayerIndex === tempActivePlayerIndex && (nextActivePlayerIndex = activePlayerIndicies[0]), {
+    if (nextActivePlayerIndex === tempActivePlayerIndex)
+      if (nextActivePlayerIndex !== activePlayerIndicies[0])
+        nextActivePlayerIndex = activePlayerIndicies[0];
+      else {
+        let notActivePlayers = activePlayerIndicies.filter((i, index) => i !== nextActivePlayerIndex);
+        nextActivePlayerIndex = notActivePlayers.length > 0 ? notActivePlayers[0] : activePlayerIndicies[0];
+      }
+    return {
       prevActivePlayerIndex: activePlayerIndex,
       activePlayerIndex: nextActivePlayerIndex,
       activePlayer: tempPlayers[nextActivePlayerIndex]
@@ -701,7 +785,9 @@ function Index() {
   }, /* @__PURE__ */ React.createElement("div", null, `Blinds: ${blinds[0]}/${blinds[1]}`), /* @__PURE__ */ React.createElement("div", null, `Pot: ${pots ? pots.join(", ") : 0}`), /* @__PURE__ */ React.createElement("div", null, winner ? `Hand #${hands.length}` : `Hand #${hands.length + 1}`)), gameStarted ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col items-center justify-center"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "playingCards simpleCards absolute bottom-[45%] z-[9999] flex w-[100vw] flex-row items-center justify-center"
+    className: "absolute bottom-[45%] z-[9999] flex w-[100vw] flex-col items-center justify-center"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "playingCards simpleCards flex flex-row"
   }, dealerCards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
     key: `${index}-${card.suit}-${card.rank}`,
     suit: card.suit,
@@ -709,7 +795,11 @@ function Index() {
     faceUp: card.faceUp,
     folded: card.faceUp,
     winner: winningCards.length > 0 ? winningCards.filter((w) => w.suit == card.suit.charAt(0) && w.value.toString().replace("T", "10") === card.rank).length > 0 : !1
-  })))), /* @__PURE__ */ React.createElement("div", {
+  }))), pots.length > 0 ? /* @__PURE__ */ React.createElement("div", {
+    className: "flex w-screen flex-row items-center justify-center"
+  }, pots.map((p) => /* @__PURE__ */ React.createElement(Pot, {
+    amount: p
+  }))) : null)), /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col gap-1"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "fixed bottom-[47vh] right-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center"
@@ -839,7 +929,7 @@ function Index() {
   }, /* @__PURE__ */ React.createElement("input", {
     type: "range",
     className: "form-range w-full p-0 focus:shadow-none focus:outline-none focus:ring-0",
-    min: activeBet > 0 ? activeBet : bigBlindAmount,
+    min: activeBet > 0 ? activeBet + bigBlindAmount : bigBlindAmount * 2,
     max: activePlayer.chips,
     value: bet,
     onChange: (event) => {
@@ -860,7 +950,7 @@ function Index() {
   }, activeBet > 0 ? `Call ${activePlayer.chips >= activeBet ? activeBet : activePlayer.chips}` : "Check"), /* @__PURE__ */ React.createElement("button", {
     className: "rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
     onClick: () => handleBet(bet)
-  }, activeBet > 0 ? "Raise" : "Bet"))) : null, gameOver && earlyWin && winner && winner.winner.players.map((p) => p.player.socket).includes(player.socket) ? /* @__PURE__ */ React.createElement("div", {
+  }, activeBet > 0 ? `Raise to ${bet}` : `Bet ${bet}`))) : null, gameOver && earlyWin && winner && winner.winner.players.map((p) => p.socket).includes(player.socket) ? /* @__PURE__ */ React.createElement("div", {
     className: "fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end"
@@ -881,7 +971,7 @@ __export(login_exports, {
   loader: () => loader4,
   meta: () => meta3
 });
-var import_node5 = require("@remix-run/node"), import_react9 = require("@remix-run/react"), React2 = __toESM(require("react"));
+var import_node5 = require("@remix-run/node"), import_react10 = require("@remix-run/react"), React2 = __toESM(require("react"));
 async function loader4({ request }) {
   return await getUserId(request) ? (0, import_node5.redirect)("/") : (0, import_node5.json)({});
 }
@@ -906,7 +996,7 @@ var meta3 = () => ({
 });
 function LoginPage() {
   var _a, _b, _c, _d;
-  let [searchParams] = (0, import_react9.useSearchParams)(), redirectTo = searchParams.get("redirectTo") || "/notes", actionData = (0, import_react9.useActionData)(), emailRef = React2.useRef(null), passwordRef = React2.useRef(null);
+  let [searchParams] = (0, import_react10.useSearchParams)(), redirectTo = searchParams.get("redirectTo") || "/notes", actionData = (0, import_react10.useActionData)(), emailRef = React2.useRef(null), passwordRef = React2.useRef(null);
   return React2.useEffect(() => {
     var _a2, _b2, _c2, _d2;
     ((_a2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _a2.email) ? (_b2 = emailRef.current) == null || _b2.focus() : ((_c2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _c2.password) && ((_d2 = passwordRef.current) == null || _d2.focus());
@@ -914,7 +1004,7 @@ function LoginPage() {
     className: "flex min-h-full flex-col justify-center"
   }, /* @__PURE__ */ React2.createElement("div", {
     className: "mx-auto w-full max-w-md px-8"
-  }, /* @__PURE__ */ React2.createElement(import_react9.Form, {
+  }, /* @__PURE__ */ React2.createElement(import_react10.Form, {
     method: "post",
     className: "space-y-6"
   }, /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("label", {
@@ -974,7 +1064,7 @@ function LoginPage() {
     className: "ml-2 block text-sm text-gray-900"
   }, "Remember me")), /* @__PURE__ */ React2.createElement("div", {
     className: "text-center text-sm text-gray-500"
-  }, "Don't have an account?", " ", /* @__PURE__ */ React2.createElement(import_react9.Link, {
+  }, "Don't have an account?", " ", /* @__PURE__ */ React2.createElement(import_react10.Link, {
     className: "text-blue-500 underline",
     to: {
       pathname: "/join",
@@ -989,7 +1079,7 @@ __export(notes_exports, {
   default: () => NotesPage,
   loader: () => loader5
 });
-var import_node6 = require("@remix-run/node"), import_react10 = require("@remix-run/react");
+var import_node6 = require("@remix-run/node"), import_react11 = require("@remix-run/react");
 
 // app/models/note.server.ts
 function getNote({
@@ -1040,16 +1130,16 @@ async function loader5({ request }) {
   return (0, import_node6.json)({ noteListItems });
 }
 function NotesPage() {
-  let data = (0, import_react10.useLoaderData)(), user = useUser();
+  let data = (0, import_react11.useLoaderData)(), user = useUser();
   return /* @__PURE__ */ React.createElement("div", {
     className: "flex h-full min-h-screen flex-col"
   }, /* @__PURE__ */ React.createElement("header", {
     className: "flex items-center justify-between bg-slate-800 p-4 text-white"
   }, /* @__PURE__ */ React.createElement("h1", {
     className: "text-3xl font-bold"
-  }, /* @__PURE__ */ React.createElement(import_react10.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react11.Link, {
     to: "."
-  }, "Notes")), /* @__PURE__ */ React.createElement("p", null, user.email), /* @__PURE__ */ React.createElement(import_react10.Form, {
+  }, "Notes")), /* @__PURE__ */ React.createElement("p", null, user.email), /* @__PURE__ */ React.createElement(import_react11.Form, {
     action: "/logout",
     method: "post"
   }, /* @__PURE__ */ React.createElement("button", {
@@ -1059,19 +1149,19 @@ function NotesPage() {
     className: "flex h-full bg-white"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "h-full w-80 border-r bg-gray-50"
-  }, /* @__PURE__ */ React.createElement(import_react10.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react11.Link, {
     to: "new",
     className: "block p-4 text-xl text-blue-500"
   }, "+ New Note"), /* @__PURE__ */ React.createElement("hr", null), data.noteListItems.length === 0 ? /* @__PURE__ */ React.createElement("p", {
     className: "p-4"
   }, "No notes yet") : /* @__PURE__ */ React.createElement("ol", null, data.noteListItems.map((note) => /* @__PURE__ */ React.createElement("li", {
     key: note.id
-  }, /* @__PURE__ */ React.createElement(import_react10.NavLink, {
+  }, /* @__PURE__ */ React.createElement(import_react11.NavLink, {
     className: ({ isActive }) => `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`,
     to: note.id
   }, "\u{1F4DD} ", note.title))))), /* @__PURE__ */ React.createElement("div", {
     className: "flex-1 p-6"
-  }, /* @__PURE__ */ React.createElement(import_react10.Outlet, null))));
+  }, /* @__PURE__ */ React.createElement(import_react11.Outlet, null))));
 }
 
 // route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\$noteId.tsx
@@ -1083,7 +1173,7 @@ __export(noteId_exports, {
   default: () => NoteDetailsPage,
   loader: () => loader6
 });
-var import_node7 = require("@remix-run/node"), import_react11 = require("@remix-run/react"), import_tiny_invariant2 = __toESM(require("tiny-invariant"));
+var import_node7 = require("@remix-run/node"), import_react12 = require("@remix-run/react"), import_tiny_invariant2 = __toESM(require("tiny-invariant"));
 async function loader6({ request, params }) {
   let userId = await requireUserId(request);
   (0, import_tiny_invariant2.default)(params.noteId, "noteId not found");
@@ -1097,14 +1187,14 @@ async function action3({ request, params }) {
   return (0, import_tiny_invariant2.default)(params.noteId, "noteId not found"), await deleteNote({ userId, id: params.noteId }), (0, import_node7.redirect)("/notes");
 }
 function NoteDetailsPage() {
-  let data = (0, import_react11.useLoaderData)();
+  let data = (0, import_react12.useLoaderData)();
   return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", {
     className: "text-2xl font-bold"
   }, data.note.title), /* @__PURE__ */ React.createElement("p", {
     className: "py-6"
   }, data.note.body), /* @__PURE__ */ React.createElement("hr", {
     className: "my-4"
-  }), /* @__PURE__ */ React.createElement(import_react11.Form, {
+  }), /* @__PURE__ */ React.createElement(import_react12.Form, {
     method: "post"
   }, /* @__PURE__ */ React.createElement("button", {
     type: "submit",
@@ -1115,7 +1205,7 @@ function ErrorBoundary({ error }) {
   return console.error(error), /* @__PURE__ */ React.createElement("div", null, "An unexpected error occurred: ", error.message);
 }
 function CatchBoundary() {
-  let caught = (0, import_react11.useCatch)();
+  let caught = (0, import_react12.useCatch)();
   if (caught.status === 404)
     return /* @__PURE__ */ React.createElement("div", null, "Note not found");
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
@@ -1126,9 +1216,9 @@ var notes_exports2 = {};
 __export(notes_exports2, {
   default: () => NoteIndexPage
 });
-var import_react12 = require("@remix-run/react");
+var import_react13 = require("@remix-run/react");
 function NoteIndexPage() {
-  return /* @__PURE__ */ React.createElement("p", null, "No note selected. Select a note on the left, or", " ", /* @__PURE__ */ React.createElement(import_react12.Link, {
+  return /* @__PURE__ */ React.createElement("p", null, "No note selected. Select a note on the left, or", " ", /* @__PURE__ */ React.createElement(import_react13.Link, {
     to: "new",
     className: "text-blue-500 underline"
   }, "create a new note."));
@@ -1140,7 +1230,7 @@ __export(new_exports, {
   action: () => action4,
   default: () => NewNotePage
 });
-var import_node8 = require("@remix-run/node"), import_react13 = require("@remix-run/react"), React3 = __toESM(require("react"));
+var import_node8 = require("@remix-run/node"), import_react14 = require("@remix-run/react"), React3 = __toESM(require("react"));
 async function action4({ request }) {
   let userId = await requireUserId(request), formData = await request.formData(), title = formData.get("title"), body = formData.get("body");
   if (typeof title != "string" || title.length === 0)
@@ -1152,11 +1242,11 @@ async function action4({ request }) {
 }
 function NewNotePage() {
   var _a, _b, _c, _d, _e, _f;
-  let actionData = (0, import_react13.useActionData)(), titleRef = React3.useRef(null), bodyRef = React3.useRef(null);
+  let actionData = (0, import_react14.useActionData)(), titleRef = React3.useRef(null), bodyRef = React3.useRef(null);
   return React3.useEffect(() => {
     var _a2, _b2, _c2, _d2;
     ((_a2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _a2.title) ? (_b2 = titleRef.current) == null || _b2.focus() : ((_c2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _c2.body) && ((_d2 = bodyRef.current) == null || _d2.focus());
-  }, [actionData]), /* @__PURE__ */ React3.createElement(import_react13.Form, {
+  }, [actionData]), /* @__PURE__ */ React3.createElement(import_react14.Form, {
     method: "post",
     style: {
       display: "flex",
@@ -1203,7 +1293,7 @@ __export(join_exports, {
   loader: () => loader7,
   meta: () => meta4
 });
-var import_node9 = require("@remix-run/node"), import_react14 = require("@remix-run/react"), React4 = __toESM(require("react"));
+var import_node9 = require("@remix-run/node"), import_react15 = require("@remix-run/react"), React4 = __toESM(require("react"));
 async function loader7({ request }) {
   return await getUserId(request) ? (0, import_node9.redirect)("/") : (0, import_node9.json)({});
 }
@@ -1235,7 +1325,7 @@ var meta4 = () => ({
 });
 function Join() {
   var _a, _b, _c, _d;
-  let [searchParams] = (0, import_react14.useSearchParams)(), redirectTo = searchParams.get("redirectTo") ?? void 0, actionData = (0, import_react14.useActionData)(), emailRef = React4.useRef(null), passwordRef = React4.useRef(null);
+  let [searchParams] = (0, import_react15.useSearchParams)(), redirectTo = searchParams.get("redirectTo") ?? void 0, actionData = (0, import_react15.useActionData)(), emailRef = React4.useRef(null), passwordRef = React4.useRef(null);
   return React4.useEffect(() => {
     var _a2, _b2, _c2, _d2;
     ((_a2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _a2.email) ? (_b2 = emailRef.current) == null || _b2.focus() : ((_c2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _c2.password) && ((_d2 = passwordRef.current) == null || _d2.focus());
@@ -1243,7 +1333,7 @@ function Join() {
     className: "flex min-h-full flex-col justify-center"
   }, /* @__PURE__ */ React4.createElement("div", {
     className: "mx-auto w-full max-w-md px-8"
-  }, /* @__PURE__ */ React4.createElement(import_react14.Form, {
+  }, /* @__PURE__ */ React4.createElement(import_react15.Form, {
     method: "post",
     className: "space-y-6"
   }, /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("label", {
@@ -1293,7 +1383,7 @@ function Join() {
     className: "flex items-center justify-center"
   }, /* @__PURE__ */ React4.createElement("div", {
     className: "text-center text-sm text-gray-500"
-  }, "Already have an account?", " ", /* @__PURE__ */ React4.createElement(import_react14.Link, {
+  }, "Already have an account?", " ", /* @__PURE__ */ React4.createElement(import_react15.Link, {
     className: "text-blue-500 underline",
     to: {
       pathname: "/login",
@@ -1303,7 +1393,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "edc5570d", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-D5VPOPNL.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-THRPLTID.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-EDC5570D.js" };
+var assets_manifest_default = { version: "7b8574cf", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-Q2Z6GWNJ.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-RSIYNWNM.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-7B8574CF.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

@@ -64,7 +64,7 @@ const endHoldEmRound = (props) => {
       )
       .map((player) => {
         return { dealerCards: props.dealerCards, player };
-      })
+      }), props.players
   );
 
   let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
@@ -121,12 +121,13 @@ const advanceToEnd = async (props) => {
 
   let tempDealerCards = [...props.dealerCards];
 
+  let tempPlayers = [...props.players];
+  tempPlayers.forEach(
+    (player) =>
+      (player.cards = player.cards.map((card) => ({ ...card, faceUp: true })))
+  );
 
-    let tempPlayers = [...props.players];
-    tempPlayers.forEach((player) => 
-      player.cards = player.cards.map((card) => ({ ...card, faceUp: true })));
-
-      io.emit("sendShowCardsData", { players: tempPlayers });
+  io.emit("sendShowCardsData", { players: tempPlayers });
 
   if (nextProps.gameState === GameState.Preflop) {
     //we need to deal flop, turn and river
@@ -176,11 +177,15 @@ const advanceToEnd = async (props) => {
           )
           .map((player) => {
             return { dealerCards: nextProps.dealerCards, player };
-          })
+          }), props.players
       );
 
       let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
-      const winnerDescription = getWinnerDescription(gameWinner, wonAmount, true);
+      const winnerDescription = getWinnerDescription(
+        gameWinner,
+        wonAmount,
+        true
+      );
 
       let tempHands = [...props.hands];
       let winnar = { winner: gameWinner, description: winnerDescription };
@@ -202,7 +207,9 @@ const advanceToEnd = async (props) => {
       nextProps.winningCards = tempWinningCards;
       nextProps.wonAmount = wonAmount;
 
-      let tempCards = props.players.filter((p) => !p.folded).map((p) => p.cards);
+      let tempCards = props.players
+        .filter((p) => !p.folded)
+        .map((p) => p.cards);
 
       tempCards.forEach((cardArray) => {
         cardArray.forEach((card) => {
@@ -236,8 +243,7 @@ const advanceToEnd = async (props) => {
 
     io.emit("sendAdvanceData", nextProps);
   }, 9000);
-
-}
+};
 
 const advanceHoldEmGame = (props) => {
   let nextProps = {
@@ -288,7 +294,7 @@ const advanceHoldEmGame = (props) => {
         )
         .map((player) => {
           return { dealerCards: props.dealerCards, player };
-        })
+        }), props.players
     );
 
     let wonAmount = getWonAmount({ winner: gameWinner }, props.pots);
@@ -346,13 +352,14 @@ const advanceHoldEmGame = (props) => {
   return nextProps;
 };
 
-const determineWinner = (playerWithDealerCards) => {
+const determineWinner = (playerWithDealerCards, allPlayers) => {
   const dealerCards = playerWithDealerCards[0].dealerCards;
 
   const dealerCardsArray = dealerCards.map(
     (card) => `${card.rank == "10" ? "T" : card.rank}${card.suit.charAt(0)}`
   );
 
+  // Form a 7-card array from dealer cards + players cards
   const handsArray = playerWithDealerCards.map((player) => {
     return [
       ...dealerCardsArray,
@@ -362,43 +369,53 @@ const determineWinner = (playerWithDealerCards) => {
     ];
   });
 
-  let solvedHands = handsArray.map((hand) => Hand.solve(hand));
+  let solvedHands = handsArray.map((hand, index) => {
+    return { solvedHand: Hand.solve(hand), player: playerWithDealerCards[index].player, originalPlayerIndex: allPlayers.indexOf(playerWithDealerCards[index].player) };
+    });
 
-  var wins = Hand.winners(solvedHands);
+  var wins = Hand.winners(solvedHands.map((sh) => sh.solvedHand));
 
   let winnerIndicies = [];
 
-  solvedHands.filter((item, index) => {
-    if (wins.includes(item)) {
-      winnerIndicies.push(index);
+  solvedHands.forEach((item, index) => {
+    if (wins.includes(item.solvedHand)) {
+      winnerIndicies.push(item.originalPlayerIndex);
       return true;
     }
     return false;
   });
 
   const pokerWinner = {
-    players: playerWithDealerCards.filter((item, index) =>
+    players: allPlayers.filter((item, index) =>
       winnerIndicies.includes(index)
     ),
     wins,
     winnerIndicies,
     hand: wins[0].descr,
-    ultimateWinner: winnerIndicies.length === 1 ? playerWithDealerCards[winnerIndicies[0]].player : undefined
+    ultimateWinner:
+      winnerIndicies.length === 1
+        ? allPlayers[winnerIndicies[0]]
+        : undefined,
   };
 
   return pokerWinner;
 };
 
 const getWinnerDescription = (winner, amount, fullDescription = false) => {
-
-  let winnerDescription = '';
+  let winnerDescription = "";
 
   if (winner.players.length === 1) {
-    winnerDescription = `${winner.players[0].player.name} won`;
+    winnerDescription = `${winner.players[0].name} won`;
   } else if (winner.players.length === 2) {
-    winnerDescription = `${winner.players.map((winner) => winner.player.name).join(", ").replace(/, ((?:.(?!, ))+)$/, " and $1")} split the pot`;
+    winnerDescription = `${winner.players
+      .map((winner) => winner.player.name)
+      .join(", ")
+      .replace(/, ((?:.(?!, ))+)$/, " and $1")} split the pot`;
   } else if (winner.players.length > 2) {
-    winnerDescription = `${winner.players.map((winner) => winner.player.name).join(", ").replace(/, ((?:.(?!, ))+)$/, ", and $1")} split the pot`;
+    winnerDescription = `${winner.players
+      .map((winner) => winner.player.name)
+      .join(", ")
+      .replace(/, ((?:.(?!, ))+)$/, ", and $1")} split the pot`;
   }
 
   if (fullDescription) {
@@ -406,7 +423,7 @@ const getWinnerDescription = (winner, amount, fullDescription = false) => {
   }
 
   return winnerDescription;
-}
+};
 
 const getWonAmount = (winner, pots) => {
   let daMoney = 0;
@@ -619,7 +636,6 @@ io.on("connection", (socket) => {
       if (index == nextLittleBlindIndex) {
         newGuy.chips = newGuy.chips - 10;
         tempPot = tempPot + 10;
-
       } else if (index == nextBigBlindIndex) {
         newGuy.chips = newGuy.chips - 20;
         tempPot = tempPot + 20;
@@ -664,10 +680,10 @@ app.all(
   MODE === "production"
     ? createRequestHandler({ build: require("./build") })
     : (req, res, next) => {
-      purgeRequireCache();
-      const build = require("./build");
-      return createRequestHandler({ build, mode: MODE })(req, res, next);
-    }
+        purgeRequireCache();
+        const build = require("./build");
+        return createRequestHandler({ build, mode: MODE })(req, res, next);
+      }
 );
 
 const port = process.env.PORT || 3000;
