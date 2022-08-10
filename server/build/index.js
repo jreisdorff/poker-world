@@ -1,8 +1,13 @@
 var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames, __getOwnPropSymbols = Object.getOwnPropertySymbols, __getProtoOf = Object.getPrototypeOf, __hasOwnProp = Object.prototype.hasOwnProperty, __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: !0 });
+var __defProp = Object.defineProperty, __defProps = Object.defineProperties, __getOwnPropDesc = Object.getOwnPropertyDescriptor, __getOwnPropDescs = Object.getOwnPropertyDescriptors, __getOwnPropNames = Object.getOwnPropertyNames, __getOwnPropSymbols = Object.getOwnPropertySymbols, __getProtoOf = Object.getPrototypeOf, __hasOwnProp = Object.prototype.hasOwnProperty, __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: !0, configurable: !0, writable: !0, value }) : obj[key] = value, __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    __hasOwnProp.call(b, prop) && __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b))
+      __propIsEnum.call(b, prop) && __defNormalProp(a, prop, b[prop]);
+  return a;
+}, __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b)), __markAsModule = (target) => __defProp(target, "__esModule", { value: !0 });
 var __objRest = (source, exclude) => {
   var target = {};
   for (var prop in source)
@@ -77,7 +82,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-L5IXIHPP.css";
+var tailwind_default = "/build/_assets/tailwind-LX5BRS3Q.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -496,17 +501,25 @@ var links2 = () => [
   }
 ];
 function Index() {
-  let [gameState, setGameState] = (0, import_react9.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react9.useState)([]), [gameStarted, setGameStarted] = (0, import_react9.useState)(!1), [dealerCards, setDealerCards] = (0, import_react9.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react9.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react9.useState)(""), [dealtCards, setDealtCards] = (0, import_react9.useState)([]), [players, setPlayers] = (0, import_react9.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react9.useState)(0), [activePlayer, setActivePlayer] = (0, import_react9.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react9.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react9.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react9.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react9.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react9.useState)(20), [bet, setBet] = (0, import_react9.useState)(bigBlindAmount * 2), [pots, setPots] = (0, import_react9.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react9.useState)(0), [turnNumber, setTurnNumber] = (0, import_react9.useState)(0), [blinds, setBlinds] = (0, import_react9.useState)([10, 20]), [winner, setWinner] = (0, import_react9.useState)(null), [gameOver, setGameOver] = (0, import_react9.useState)(!1), [hands, setHands] = (0, import_react9.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react9.useState)(3), [winningCards, setWinningCards] = (0, import_react9.useState)([]), [wonAmount, setWonAmount] = (0, import_react9.useState)(0), [playerName, setPlayerName] = (0, import_react9.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react9.useState)(!1), [playerCount, setPlayerCount] = (0, import_react9.useState)(0), [playerNames, setPlayerNames] = (0, import_react9.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react9.useState)(), [playerSockets, setPlayerSockets] = (0, import_react9.useState)([]), [player, setPlayer] = (0, import_react9.useState)(), [joinedGame, setJoinedGame] = (0, import_react9.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react9.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react9.useState)(2), [earlyWin, setEarlyWin] = (0, import_react9.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react9.useState)(3), [littleBlindIndex, setLittleBlindIndex] = (0, import_react9.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react9.useState)(2), [manualAdvance, setManualAdvance] = (0, import_react9.useState)(!1), [ultimateWinner, setUltimateWinner] = (0, import_react9.useState)(null), [advancingToEnd, setAdvancingToEnd] = (0, import_react9.useState)(!1), handleCheckOrCall = (callAmount) => {
-    let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((tempP) => tempP.name === activePlayer.name);
+  let [gameState, setGameState] = (0, import_react9.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react9.useState)([]), [gameStarted, setGameStarted] = (0, import_react9.useState)(!1), [dealerCards, setDealerCards] = (0, import_react9.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react9.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react9.useState)(""), [dealtCards, setDealtCards] = (0, import_react9.useState)([]), [players, setPlayers] = (0, import_react9.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react9.useState)(0), [activePlayer, setActivePlayer] = (0, import_react9.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react9.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react9.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react9.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react9.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react9.useState)(20), [bet, setBet] = (0, import_react9.useState)(bigBlindAmount * 2), [pots, setPots] = (0, import_react9.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react9.useState)(0), [turnNumber, setTurnNumber] = (0, import_react9.useState)(0), [blinds, setBlinds] = (0, import_react9.useState)([10, 20]), [winner, setWinner] = (0, import_react9.useState)(null), [gameOver, setGameOver] = (0, import_react9.useState)(!1), [hands, setHands] = (0, import_react9.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react9.useState)(3), [winningCards, setWinningCards] = (0, import_react9.useState)([]), [wonAmount, setWonAmount] = (0, import_react9.useState)(0), [playerName, setPlayerName] = (0, import_react9.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react9.useState)(!1), [playerCount, setPlayerCount] = (0, import_react9.useState)(0), [playerNames, setPlayerNames] = (0, import_react9.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react9.useState)(), [playerSockets, setPlayerSockets] = (0, import_react9.useState)([]), [player, setPlayer] = (0, import_react9.useState)(), [joinedGame, setJoinedGame] = (0, import_react9.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react9.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react9.useState)(2), [earlyWin, setEarlyWin] = (0, import_react9.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react9.useState)(3), [littleBlindIndex, setLittleBlindIndex] = (0, import_react9.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react9.useState)(2), [manualAdvance, setManualAdvance] = (0, import_react9.useState)(!1), [ultimateWinner, setUltimateWinner] = (0, import_react9.useState)(null), [needResponsesFromIndicies, setNeedResponsesFromIndicies] = (0, import_react9.useState)([0, 1, 2]), [advancingToEnd, setAdvancingToEnd] = (0, import_react9.useState)(!1), handleCheckOrCall = (callAmount) => {
+    let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((tempP) => tempP.name === activePlayer.name), tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer);
     tempActivePlayer.chips -= callAmount, tempActivePlayer.chips <= 0 && (tempActivePlayer.allIn = !0);
     let tempPots = [...pots];
     tempPots[0] += callAmount;
-    let advanceProps = getNextPlayerProps(tempPlayers), checkOrCallProps = {
+    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
+    tempNeedResponsesFromIndicies.shift();
+    let tempActivePlayers = [], tempActivePlayerIndicies = [];
+    tempPlayers.forEach((p, index) => {
+      p.folded || p.chips <= 0 || (tempActivePlayers.push(p), tempActivePlayerIndicies.push(index));
+    });
+    let newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0];
+    tempActivePlayerIndicies.length > 0 ? tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1], tempAPI = tempPrevActivePlayerIndex + 1) : tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2], tempAPI = tempPrevActivePlayerIndex + 2) : (newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0]) : (newActivePlayer = tempActivePlayer, tempAPI = tempPrevActivePlayerIndex);
+    let checkOrCallProps = {
       players: tempPlayers,
       pots: tempPots,
-      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
-      activePlayerIndex: advanceProps.activePlayerIndex,
-      activePlayer: advanceProps.activePlayer,
+      prevActivePlayerIndex: tempPrevActivePlayerIndex,
+      activePlayerIndex: tempAPI,
+      activePlayer: newActivePlayer,
       turnNumber,
       playerSocket,
       gameState,
@@ -517,7 +530,8 @@ function Index() {
       needResponsesFrom,
       littleBlindIndex,
       bigBlindIndex,
-      callAmount
+      callAmount,
+      needResponsesFromIndicies: tempNeedResponsesFromIndicies
     };
     socket.emit("playerCheckedOrCalled", checkOrCallProps);
   };
@@ -525,14 +539,18 @@ function Index() {
     if (!socket)
       return;
     let advance = (data, type) => {
-      let tempNeedResponsesFrom = data.needResponsesFrom;
-      if (type === "BET" ? (tempNeedResponsesFrom = data.players.filter((p) => !p.folded).length - 1, setNeedResponsesFrom(data.players.filter((p) => !p.folded).length - 1)) : (tempNeedResponsesFrom = tempNeedResponsesFrom - 1, setNeedResponsesFrom(tempNeedResponsesFrom)), type === "FOLD" && setActivePlayerCount((prev) => prev - 1), data.players.filter((p) => !p.folded).length === 1)
+      let tempNeedResponsesFrom = data.needResponsesFrom, needResponsesIndicies = [];
+      if (type === "BET" ? (tempNeedResponsesFrom = data.players.filter((p) => !p.folded).length - 1, setNeedResponsesFrom(data.players.filter((p) => !p.folded).length - 1), data.players.forEach((p, index) => {
+        p.folded || needResponsesIndicies.push(index);
+      }), setNeedResponsesFromIndicies(needResponsesIndicies)) : (tempNeedResponsesFrom = tempNeedResponsesFrom - 1, setNeedResponsesFrom(tempNeedResponsesFrom)), type === "FOLD" && setActivePlayerCount((prev) => prev - 1), data.players.filter((p) => !p.folded).length === 1)
         if (data.activePlayer.socket === (socket == null ? void 0 : socket.id)) {
           endRound(data);
           return;
         } else
           return;
-      tempNeedResponsesFrom <= 0 ? (data.activePlayer.socket === (socket == null ? void 0 : socket.id) && advanceGame(data), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
+      tempNeedResponsesFrom <= 0 ? (data.activePlayer.socket === (socket == null ? void 0 : socket.id) && advanceGame(__spreadProps(__spreadValues({}, data), {
+        needResponsesFromIndicies: needResponsesIndicies
+      })), setTurnNumber(0)) : setTurnNumber((prev) => prev + 1);
     };
     socket.on("confirmation", (data) => {
       setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
@@ -545,12 +563,16 @@ function Index() {
       let newPlayerCount = 0;
       setPlayerCount((prevPC) => (newPlayerCount = prevPC + 1, newPlayerCount)), setButtonClicked(!1);
     }), socket.on("sendHoldEmData", (data) => {
-      setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setPots(data.pots), setUltimateWinner(null), setWinningCards([]), setActiveBet(bigBlindAmount), setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length), setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(data.dealerIndex), setActivePlayer(data.players[data.dealerIndex]);
+      setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setPots(data.pots), setUltimateWinner(null), setWinningCards([]), setActiveBet(bigBlindAmount);
+      let needResponsesIndicies = [];
+      data.players.forEach((p, index) => {
+        p.chips > 0 && needResponsesIndicies.push(index);
+      }), setNeedResponsesFromIndicies(needResponsesIndicies), setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length), setDealer(data.dealer), setLittleBlind(data.littleBlind), setBigBlind(data.bigBlind), setActivePlayerIndex(data.dealerIndex), setActivePlayer(data.players[data.dealerIndex]);
     }), socket.on("sendBetData", (data) => {
       setPots(data.pots), setPlayers(data.players), setActiveBet(data.activeBet), setBet(data.activeBet + bigBlindAmount), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLogs((prev) => [
         ...prev,
         `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`
-      ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
+      ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`), setIsSnackbarOpen(!0), setNeedResponsesFromIndicies(data.needResponsesFromIndicies), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -561,7 +583,8 @@ function Index() {
         activeBet: data.activeBet,
         turnsNextRound: data.turnsNextRound,
         turnsThisRound: data.turnsThisRound,
-        needResponsesFrom: data.needResponsesFrom
+        needResponsesFrom: data.needResponsesFrom,
+        needResponsesFromIndicies: data.needResponsesFromIndicies
       };
       advance(advanceDataProps, "BET");
     }), socket.on("sendShowCardsData", (data) => {
@@ -569,7 +592,7 @@ function Index() {
     }), socket.on("sendCheckOrCallData", (data) => {
       setPots(data.pots), setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setLittleBlindIndex(data.littleBlindIndex), setBigBlindIndex(data.bigBlindIndex), data.activeBet <= bigBlindAmount ? data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex ? setActiveBet(0) : setActiveBet(data.activeBet) : setActiveBet(data.activeBet);
       let checkOrCallDescription = data.activeBet ? `${data.players[data.prevActivePlayerIndex].name} called ${data.callAmount}` : `${data.players[data.prevActivePlayerIndex].name} checked`;
-      setLogs((prev) => [...prev, checkOrCallDescription]), setSnackbarMessage(checkOrCallDescription), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
+      setLogs((prev) => [...prev, checkOrCallDescription]), setSnackbarMessage(checkOrCallDescription), setIsSnackbarOpen(!0), setNeedResponsesFromIndicies(data.needResponsesFromIndicies), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -579,14 +602,15 @@ function Index() {
         pots: data.pots,
         turnsNextRound,
         turnsThisRound: data.turnsThisRound,
-        needResponsesFrom: data.needResponsesFrom
+        needResponsesFrom: data.needResponsesFrom,
+        needResponsesFromIndicies: data.needResponsesFromIndicies
       };
       advance(advanceDataProps, "CHECK");
     }), socket.on("sendFoldData", (data) => {
-      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex ? setActiveBet(0) : setActiveBet(data.activeBet), setLogs((prev) => [
+      setPlayers(data.players), setGameState(data.gameState), setActivePlayerIndex(data.activePlayerIndex), setActivePlayer(data.activePlayer), setTurnsNextRound(data.turnsNextRound), data.activeBet ? setActiveBet(data.activeBet) : data.gameState === GameState.Preflop && data.littleBlindIndex == data.activePlayerIndex ? setActiveBet(littleBlindAmount) : data.gameState === GameState.Preflop && data.bigBlindIndex == data.activePlayerIndex ? setActiveBet(0) : setActiveBet(data.activeBet), setLogs((prev) => [
         ...prev,
         `${data.players[data.prevActivePlayerIndex].name} folded`
-      ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0), setNeedResponsesFrom(data.needResponsesFrom);
+      ]), setSnackbarMessage(`${data.players[data.prevActivePlayerIndex].name} folded`), setIsSnackbarOpen(!0), setNeedResponsesFromIndicies(data.needResponsesFromIndicies), setNeedResponsesFrom(data.needResponsesFrom);
       let advanceDataProps = {
         activePlayer: data.activePlayer,
         gameState: data.gameState,
@@ -596,7 +620,8 @@ function Index() {
         pots: data.pots,
         turnsNextRound: data.turnsNextRound - 1,
         turnsThisRound: data.turnsThisRound,
-        needResponsesFrom: data.needResponsesFrom
+        needResponsesFrom: data.needResponsesFrom,
+        needResponsesFromIndicies: data.needResponsesFromIndicies
       };
       advance(advanceDataProps, "FOLD");
     }), socket.on("sendEndRoundData", (data) => {
@@ -617,18 +642,27 @@ function Index() {
             turnsNextRound: data.turnsNextRound,
             turnsThisRound: data.turnsThisRound,
             needResponsesFrom: data.turnsThisRound + 1,
-            manualAdvance: !0
+            manualAdvance: !0,
+            needResponsesFromIndicies: data.needResponsesFromIndicies
           };
           data.activePlayer.socket === (socket == null ? void 0 : socket.id) && socket.emit("advanceToEnd", advanceGameProps);
         }
-        setBet(bigBlindAmount), setGameState(data.gameState), setDealerCards(data.dealerCards), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(2), setNeedResponsesFrom(data.players.filter((p) => !p.folded).length), data.winner && (setWinner(data.winner), setLogs((prev) => [...prev, data.winner.description]), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), data.players.filter((p) => p.chips > 0).length === 1 && setUltimateWinner(data.winner.winner.ultimateWinner), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver), setAdvancingToEnd(!1);
+        setBet(bigBlindAmount), setGameState(data.gameState), setDealerCards(data.dealerCards), setTurnsThisRound(data.turnsNextRound), setTurnsNextRound(2);
+        let tempIndicies = [];
+        data.players.forEach((p, index) => {
+          p.chips > 0 && tempIndicies.push(index);
+        }), setNeedResponsesFromIndicies(tempIndicies), setNeedResponsesFrom(data.players.filter((p) => !p.folded).length), data.winner && (setWinner(data.winner), setLogs((prev) => [...prev, data.winner.description]), setWinningCards(data.winningCards), setWonAmount(data.wonAmount)), data.players.filter((p) => p.chips > 0).length === 1 && setUltimateWinner(data.winner.winner.ultimateWinner), setHands(data.hands), setPlayers(data.players), setGameOver(data.gameOver), setAdvancingToEnd(!1);
       }
     }), socket.on("advancingToEnd", (data) => {
       setAdvancingToEnd(!0);
     }), socket.on("sendAdvanceHandsData", (data) => {
-      setGameState(GameState.Preflop), setGameStarted(!0), setGameOver(!1), setDealtCards([]), setDealerCards([]), setWinningCards([]), setWinner(null), setWonAmount(0), setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length), setTurnNumber(0), setEarlyWin(!1), setActivePlayerCount(data.players.filter((p) => p.chips > 0).length), setTurnsThisRound(data.players.filter((p) => p.chips > 0).length), setTurnsNextRound(data.players.filter((p) => p.chips > 0).length), setPlayers(data.players), setHands(data.hands);
+      setGameState(GameState.Preflop), setGameStarted(!0), setGameOver(!1), setDealtCards([]), setDealerCards([]), setWinningCards([]), setWinner(null), setWonAmount(0);
+      let needResponsesIndicies = [];
+      data.players.forEach((p, index) => {
+        p.chips > 0 && needResponsesIndicies.push(index);
+      }), setNeedResponsesFromIndicies(needResponsesIndicies), setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length), setTurnNumber(0), setEarlyWin(!1), setActivePlayerCount(data.players.filter((p) => p.chips > 0).length), setTurnsThisRound(data.players.filter((p) => p.chips > 0).length), setTurnsNextRound(data.players.filter((p) => p.chips > 0).length), setPlayers(data.players), setHands(data.hands);
       let activePlayers = data.players.filter((p) => p.chips > 0), nextDealerIndex = data.hands.length % activePlayers.length, nextLittleBlindIndex = (data.hands.length + 1) % activePlayers.length, nextBigBlindIndex = (data.hands.length + 2) % activePlayers.length;
-      setActiveBet(bigBlindAmount), setDealer(activePlayers[nextDealerIndex]), setLittleBlind(activePlayers[nextLittleBlindIndex]), setBigBlind(activePlayers[nextBigBlindIndex]), setLittleBlindIndex(nextLittleBlindIndex), setBigBlindIndex(nextBigBlindIndex), setActivePlayerIndex(nextDealerIndex), setActivePlayer(activePlayers[nextDealerIndex]), setPots([littleBlindAmount + bigBlindAmount]);
+      setActiveBet(bigBlindAmount), setDealer(activePlayers[nextDealerIndex]), setLittleBlind(activePlayers[nextLittleBlindIndex]), setBigBlind(activePlayers[nextBigBlindIndex]), setLittleBlindIndex(nextLittleBlindIndex), setBigBlindIndex(nextBigBlindIndex), setActivePlayerIndex(nextDealerIndex), activePlayers.length > 0 && setActivePlayer(activePlayers[nextDealerIndex]), setPots([littleBlindAmount + bigBlindAmount]);
     });
   }, [socket]), (0, import_react9.useEffect)(() => {
     if (playerCount === 3 && playerSocket === playerSockets[2]) {
@@ -650,13 +684,21 @@ function Index() {
   let handleJoinGame = () => {
     setButtonClicked(!0);
   }, handleFold = () => {
-    let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name);
+    let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name), tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer);
     tempActivePlayer.cards = tempActivePlayer.cards.map((card) => (card.faceUp = !1, card)), tempActivePlayer.folded = !0;
-    let advanceProps = getNextPlayerProps(tempPlayers), foldProps = {
+    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
+    tempNeedResponsesFromIndicies.shift();
+    let tempActivePlayers = [], tempActivePlayerIndicies = [];
+    tempPlayers.forEach((p, index) => {
+      p.folded || p.chips <= 0 || (tempActivePlayers.push(p), tempActivePlayerIndicies.push(index));
+    });
+    let newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0];
+    tempActivePlayerIndicies.length > 0 ? tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1], tempAPI = tempPrevActivePlayerIndex + 1) : tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2], tempAPI = tempPrevActivePlayerIndex + 2) : (newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0]) : (newActivePlayer = tempActivePlayer, tempAPI = tempPrevActivePlayerIndex);
+    let foldProps = {
       players: tempPlayers,
-      activePlayerIndex: advanceProps.activePlayerIndex,
-      activePlayer: advanceProps.activePlayer,
-      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
+      activePlayerIndex: tempAPI,
+      activePlayer: newActivePlayer,
+      prevActivePlayerIndex: tempPrevActivePlayerIndex,
       turnNumber,
       playerSocket,
       gameState,
@@ -668,20 +710,29 @@ function Index() {
       littleBlindIndex,
       bigBlindIndex,
       pots,
-      activeBet
+      activeBet,
+      needResponsesFromIndicies: tempNeedResponsesFromIndicies
     };
     socket.emit("playerFolded", foldProps);
   }, handleBet = (amount) => {
-    let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name);
+    let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name), tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer);
     tempActivePlayer.chips -= amount, tempActivePlayer.chips <= 0 && (tempActivePlayer.allIn = !0);
     let tempPots = [...pots];
     tempPots[0] += amount;
-    let advanceProps = getNextPlayerProps(tempPlayers), betProps = {
+    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
+    tempNeedResponsesFromIndicies.shift();
+    let tempActivePlayers = [], tempActivePlayerIndicies = [];
+    tempPlayers.forEach((p, index) => {
+      p.folded || p.chips <= 0 || (tempActivePlayers.push(p), tempActivePlayerIndicies.push(index));
+    });
+    let newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0];
+    tempActivePlayerIndicies.length > 0 ? tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1], tempAPI = tempPrevActivePlayerIndex + 1) : tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2], tempAPI = tempPrevActivePlayerIndex + 2) : (newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0]) : (newActivePlayer = tempActivePlayer, tempAPI = tempPrevActivePlayerIndex);
+    let betProps = {
       players: tempPlayers,
       pots: tempPots,
-      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
-      activePlayerIndex: advanceProps.activePlayerIndex,
-      activePlayer: advanceProps.activePlayer,
+      prevActivePlayerIndex: tempPrevActivePlayerIndex,
+      activePlayerIndex: tempAPI,
+      activePlayer: newActivePlayer,
       turnNumber,
       playerSocket,
       gameState,
@@ -690,34 +741,12 @@ function Index() {
       turnsNextRound,
       turnsThisRound,
       hands,
-      needResponsesFrom
+      needResponsesFrom,
+      needResponsesFromIndicies: tempNeedResponsesFromIndicies
     };
     socket.emit("playerBet", betProps);
   }, handlePlayerTimeout = (player2) => {
     setLogs((prev) => [...prev, `${player2.name} timed out and auto-folded`]), setSnackbarMessage(`${player2.name} timed out and auto-folded`), setIsSnackbarOpen(!0), playerSocket === player2.socket && handleFold();
-  }, getNextPlayerProps = (tempPlayers) => {
-    let tempActivePlayerIndex = activePlayerIndex, activePlayerIndicies = [];
-    tempPlayers.map((p, index) => {
-      p.folded || p.allIn || activePlayerIndicies.push(index);
-    });
-    let nextActivePlayerIndex = tempActivePlayerIndex;
-    for (let i = 0; i < activePlayerIndicies.length; i++)
-      if (activePlayerIndicies[i] > nextActivePlayerIndex) {
-        nextActivePlayerIndex = activePlayerIndicies[i];
-        break;
-      }
-    if (nextActivePlayerIndex === tempActivePlayerIndex)
-      if (nextActivePlayerIndex !== activePlayerIndicies[0])
-        nextActivePlayerIndex = activePlayerIndicies[0];
-      else {
-        let notActivePlayers = activePlayerIndicies.filter((i, index) => i !== nextActivePlayerIndex);
-        nextActivePlayerIndex = notActivePlayers.length > 0 ? notActivePlayers[0] : activePlayerIndicies[0];
-      }
-    return {
-      prevActivePlayerIndex: activePlayerIndex,
-      activePlayerIndex: nextActivePlayerIndex,
-      activePlayer: tempPlayers[nextActivePlayerIndex]
-    };
   }, endRound = (data) => {
     socket.emit("endRound", data);
   }, newGame = () => {
@@ -1393,7 +1422,7 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "7b8574cf", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-Q2Z6GWNJ.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-RSIYNWNM.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-7B8574CF.js" };
+var assets_manifest_default = { version: "92ba340e", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-YISKOBHI.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-6VRZQJCP.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-92BA340E.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

@@ -14,6 +14,7 @@ export interface AdvanceGameProps {
     turnsThisRound: number;
     needResponsesFrom: number;
     manualAdvance?: boolean;
+    needResponsesFromIndicies: number[];
 };
 
 
@@ -31,4 +32,5 @@ export interface NextProps {
   turnsThisRound: number;
   manualAdvance?: boolean;
   pots: any[]
+  needResponsesFromIndicies: number[];
 };

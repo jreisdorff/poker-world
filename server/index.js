@@ -46,6 +46,7 @@ const endHoldEmRound = (props) => {
     activePlayer: props.activePlayer,
     gameOver: false,
     turnsNextRound: props.turnsNextRound,
+    needResponsesFromIndicies: props.needResponsesFromIndicies,
   };
 
   nextProps.gameState = GameState.Showdown;
@@ -117,6 +118,7 @@ const advanceToEnd = async (props) => {
     turnsNextRound: props.turnsNextRound,
     manualAdvance: props.manualAdvance,
     pots: props.pots,
+    needResponsesFromIndicies: props.needResponsesFromIndicies,
   };
 
   let tempDealerCards = [...props.dealerCards];
@@ -259,6 +261,7 @@ const advanceHoldEmGame = (props) => {
     gameOver: false,
     turnsNextRound: props.turnsNextRound,
     manualAdvance: props.manualAdvance,
+    needResponsesFromIndicies: props.needResponsesFromIndicies,
   };
 
   if (props.gameState === GameState.Preflop) {
@@ -328,11 +331,14 @@ const advanceHoldEmGame = (props) => {
       });
     });
 
+    tempPlayers.forEach((player) => {
+      player.allIn = false;
+    });
+
     tempPlayers
       .filter((p) => !p.folded)
       .forEach((player, index) => {
         player.cards = tempCards[index];
-        player.allIn = false;
       });
 
     tempPlayers
@@ -408,12 +414,12 @@ const getWinnerDescription = (winner, amount, fullDescription = false) => {
     winnerDescription = `${winner.players[0].name} won`;
   } else if (winner.players.length === 2) {
     winnerDescription = `${winner.players
-      .map((winner) => winner.player.name)
+      .map((p) => p.name)
       .join(", ")
       .replace(/, ((?:.(?!, ))+)$/, " and $1")} split the pot`;
   } else if (winner.players.length > 2) {
     winnerDescription = `${winner.players
-      .map((winner) => winner.player.name)
+      .map((p) => p.name)
       .join(", ")
       .replace(/, ((?:.(?!, ))+)$/, ", and $1")} split the pot`;
   }
@@ -660,6 +666,7 @@ io.on("connection", (socket) => {
       littleBlind: fullPlayers[nextLittleBlindIndex],
       bigBlind: fullPlayers[nextBigBlindIndex],
       pots: [tempPot],
+      activePlayer: fullPlayers[nextDealerIndex],
     };
 
     io.emit("sendHoldEmData", startHoldEmGameProps);

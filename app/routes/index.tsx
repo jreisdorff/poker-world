@@ -1,5 +1,5 @@
 import { LinksFunction, MetaFunction } from "@remix-run/node";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import Card from "~/components/Card";
 import PlayerDisplay from "~/components/PlayerDisplay";
 import Table from "~/components/Table";
@@ -14,6 +14,7 @@ import { useSocket } from "~/context";
 import { pluralize } from "~/utils";
 import { isEmpty } from "lodash";
 import Pot from "~/components/Pot";
+import { Console } from "console";
 
 export const links: LinksFunction = () => {
   return [
@@ -62,6 +63,7 @@ export interface SendCheckOrCallDataProps {
   littleBlindIndex: number;
   bigBlindIndex: number;
   callAmount: number;
+  needResponsesFromIndicies: number[];
 }
 
 export interface SendFoldDataProps {
@@ -81,6 +83,7 @@ export interface SendFoldDataProps {
   littleBlindIndex: number;
   bigBlindIndex: number;
   activeBet: number;
+  needResponsesFromIndicies: number[];
 }
 
 export interface SendBetDataProps {
@@ -98,6 +101,7 @@ export interface SendBetDataProps {
   turnsThisRound: number;
   hands: any[];
   needResponsesFrom: number;
+  needResponsesFromIndicies: number[];
 }
 
 const GameState = Object.freeze({
@@ -191,6 +195,10 @@ export default function Index() {
   const [manualAdvance, setManualAdvance] = useState(false);
   const [ultimateWinner, setUltimateWinner] = useState<Player | null>(null);
 
+  const [needResponsesFromIndicies, setNeedResponsesFromIndicies] = useState<
+    number[]
+  >([0, 1, 2]);
+
   const [advancingToEnd, setAdvancingToEnd] = useState(false);
 
   const handleCheckOrCall = (callAmount: number) => {
@@ -198,6 +206,7 @@ export default function Index() {
     let tempActivePlayer = tempPlayers.find(
       (tempP) => tempP.name === activePlayer.name
     );
+    let tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer!);
     tempActivePlayer!.chips -= callAmount;
 
     if (tempActivePlayer!.chips <= 0) {
@@ -207,14 +216,47 @@ export default function Index() {
     let tempPots = [...pots];
     tempPots[0] += callAmount;
 
-    const advanceProps = getNextPlayerProps(tempPlayers);
+    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
+
+    tempNeedResponsesFromIndicies.shift();
+
+    let tempActivePlayers: Player[] = [];
+    let tempActivePlayerIndicies: number[] = [];
+
+    tempPlayers.forEach((p, index) => {
+      if (!(p.folded || p.chips <= 0)) {
+        tempActivePlayers.push(p);
+        tempActivePlayerIndicies.push(index);
+      }
+    });
+
+    let newActivePlayer: Player = tempActivePlayers[0];
+    let tempAPI: number = tempActivePlayerIndicies[0];
+
+    if (tempActivePlayerIndicies.length > 0) {
+      if (tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1)) {
+        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1];
+        tempAPI = tempPrevActivePlayerIndex + 1;
+      } else if (
+        tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2)
+      ) {
+        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2];
+        tempAPI = tempPrevActivePlayerIndex + 2;
+      } else {
+        newActivePlayer = tempActivePlayers[0];
+        tempAPI = tempActivePlayerIndicies[0];
+      }
+    } else {
+      newActivePlayer = tempActivePlayer!;
+      tempAPI = tempPrevActivePlayerIndex;
+    }
 
     const checkOrCallProps: SendCheckOrCallDataProps = {
       players: tempPlayers,
       pots: tempPots,
-      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
-      activePlayerIndex: advanceProps.activePlayerIndex,
-      activePlayer: advanceProps.activePlayer,
+      prevActivePlayerIndex: tempPrevActivePlayerIndex,
+      activePlayerIndex: tempAPI,
+      activePlayer: newActivePlayer,
       turnNumber,
       playerSocket,
       gameState,
@@ -226,6 +268,7 @@ export default function Index() {
       littleBlindIndex,
       bigBlindIndex,
       callAmount,
+      needResponsesFromIndicies: tempNeedResponsesFromIndicies,
     };
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
@@ -237,10 +280,20 @@ export default function Index() {
     const advance = (data: AdvanceGameProps, type: string) => {
       let tempNeedResponsesFrom = data.needResponsesFrom;
 
+      let needResponsesIndicies: number[] = [];
+
       if (type === "BET") {
         tempNeedResponsesFrom =
           data.players.filter((p) => !p.folded).length - 1;
         setNeedResponsesFrom(data.players.filter((p) => !p.folded).length - 1);
+
+        data.players.forEach((p, index) => {
+          if (!p.folded) {
+            needResponsesIndicies.push(index);
+          }
+        });
+
+        setNeedResponsesFromIndicies(needResponsesIndicies);
       } else {
         tempNeedResponsesFrom = tempNeedResponsesFrom - 1;
         setNeedResponsesFrom(tempNeedResponsesFrom);
@@ -266,7 +319,10 @@ export default function Index() {
 
       if (tempNeedResponsesFrom <= 0) {
         if (data.activePlayer.socket === socket?.id) {
-          advanceGame(data);
+          advanceGame({
+            ...data,
+            needResponsesFromIndicies: needResponsesIndicies,
+          });
         }
         setTurnNumber(0);
       } else {
@@ -328,6 +384,16 @@ export default function Index() {
 
       setActiveBet(bigBlindAmount);
 
+      let needResponsesIndicies: number[] = [];
+
+      data.players.forEach((p, index) => {
+        if (p.chips > 0) {
+          needResponsesIndicies.push(index);
+        }
+      });
+
+      setNeedResponsesFromIndicies(needResponsesIndicies);
+
       setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length);
 
       setDealer(data.dealer);
@@ -335,6 +401,7 @@ export default function Index() {
       setBigBlind(data.bigBlind);
 
       setActivePlayerIndex(data.dealerIndex);
+
       setActivePlayer(data.players[data.dealerIndex]);
     });
 
@@ -344,6 +411,7 @@ export default function Index() {
       setActiveBet(data.activeBet);
       setBet(data.activeBet + bigBlindAmount);
       setActivePlayerIndex(data.activePlayerIndex);
+
       setActivePlayer(data.activePlayer);
       setLogs((prev) => [
         ...prev,
@@ -355,6 +423,8 @@ export default function Index() {
         `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet}`
       );
       setIsSnackbarOpen(true);
+
+      setNeedResponsesFromIndicies(data.needResponsesFromIndicies);
 
       setNeedResponsesFrom(data.needResponsesFrom);
 
@@ -369,6 +439,7 @@ export default function Index() {
         turnsNextRound: data.turnsNextRound,
         turnsThisRound: data.turnsThisRound,
         needResponsesFrom: data.needResponsesFrom,
+        needResponsesFromIndicies: data.needResponsesFromIndicies,
       };
 
       advance(advanceDataProps, "BET");
@@ -383,6 +454,7 @@ export default function Index() {
       setPlayers(data.players);
       setGameState(data.gameState);
       setActivePlayerIndex(data.activePlayerIndex);
+
       setActivePlayer(data.activePlayer);
 
       setLittleBlindIndex(data.littleBlindIndex);
@@ -394,7 +466,7 @@ export default function Index() {
           data.littleBlindIndex == data.activePlayerIndex
         ) {
           setActiveBet(littleBlindAmount);
-        }  else if (
+        } else if (
           data.gameState === GameState.Preflop &&
           data.bigBlindIndex == data.activePlayerIndex
         ) {
@@ -417,6 +489,8 @@ export default function Index() {
       setSnackbarMessage(checkOrCallDescription);
       setIsSnackbarOpen(true);
 
+      setNeedResponsesFromIndicies(data.needResponsesFromIndicies);
+
       setNeedResponsesFrom(data.needResponsesFrom);
 
       const advanceDataProps: AdvanceGameProps = {
@@ -429,6 +503,7 @@ export default function Index() {
         turnsNextRound,
         turnsThisRound: data.turnsThisRound,
         needResponsesFrom: data.needResponsesFrom,
+        needResponsesFromIndicies: data.needResponsesFromIndicies,
       };
 
       advance(advanceDataProps, "CHECK");
@@ -438,22 +513,27 @@ export default function Index() {
       setPlayers(data.players);
       setGameState(data.gameState);
       setActivePlayerIndex(data.activePlayerIndex);
+
       setActivePlayer(data.activePlayer);
 
       setTurnsNextRound(data.turnsNextRound);
 
-      if (
-        data.gameState === GameState.Preflop &&
-        data.littleBlindIndex == data.activePlayerIndex
-      ) {
-        setActiveBet(littleBlindAmount);
-      } else if (
-        data.gameState === GameState.Preflop &&
-        data.bigBlindIndex == data.activePlayerIndex
-      ) {
-        setActiveBet(0);
-      } else {
+      if (data.activeBet) {
         setActiveBet(data.activeBet);
+      } else {
+        if (
+          data.gameState === GameState.Preflop &&
+          data.littleBlindIndex == data.activePlayerIndex
+        ) {
+          setActiveBet(littleBlindAmount);
+        } else if (
+          data.gameState === GameState.Preflop &&
+          data.bigBlindIndex == data.activePlayerIndex
+        ) {
+          setActiveBet(0);
+        } else {
+          setActiveBet(data.activeBet);
+        }
       }
 
       setLogs((prev) => [
@@ -465,6 +545,8 @@ export default function Index() {
         `${data.players[data.prevActivePlayerIndex].name} folded`
       );
       setIsSnackbarOpen(true);
+
+      setNeedResponsesFromIndicies(data.needResponsesFromIndicies);
 
       setNeedResponsesFrom(data.needResponsesFrom);
 
@@ -478,6 +560,7 @@ export default function Index() {
         turnsNextRound: data.turnsNextRound - 1,
         turnsThisRound: data.turnsThisRound,
         needResponsesFrom: data.needResponsesFrom,
+        needResponsesFromIndicies: data.needResponsesFromIndicies,
       };
 
       advance(advanceDataProps, "FOLD");
@@ -537,6 +620,7 @@ export default function Index() {
             turnsThisRound: data.turnsThisRound,
             needResponsesFrom: data.turnsThisRound + 1,
             manualAdvance: true,
+            needResponsesFromIndicies: data.needResponsesFromIndicies,
           };
           if (data.activePlayer.socket === socket?.id) {
             socket!.emit("advanceToEnd", advanceGameProps);
@@ -550,6 +634,16 @@ export default function Index() {
 
         setTurnsThisRound(data.turnsNextRound); // Keep Track of who folded this hand
         setTurnsNextRound(2); // reset turns next round
+
+        let tempIndicies: number[] = [];
+
+        data.players.forEach((p, index) => {
+          if (p.chips > 0) {
+            tempIndicies.push(index);
+          }
+        });
+
+        setNeedResponsesFromIndicies(tempIndicies);
 
         setNeedResponsesFrom(data.players.filter((p) => !p.folded).length);
 
@@ -585,6 +679,17 @@ export default function Index() {
       setWinningCards([]);
       setWinner(null);
       setWonAmount(0);
+
+      let needResponsesIndicies: number[] = [];
+
+      data.players.forEach((p: { chips: number }, index: number) => {
+        if (p.chips > 0) {
+          needResponsesIndicies.push(index);
+        }
+      });
+
+      setNeedResponsesFromIndicies(needResponsesIndicies);
+
       setNeedResponsesFrom(
         data.players.filter((p: { chips: number }) => p.chips > 0).length
       );
@@ -625,7 +730,9 @@ export default function Index() {
 
       setActivePlayerIndex(nextDealerIndex);
 
-      setActivePlayer(activePlayers[nextDealerIndex]);
+      if (activePlayers.length > 0) {
+        setActivePlayer(activePlayers[nextDealerIndex]);
+      }
 
       setPots([littleBlindAmount + bigBlindAmount]);
     });
@@ -664,19 +771,52 @@ export default function Index() {
     let tempActivePlayer = tempPlayers.find(
       (player) => player.name === activePlayer.name
     );
+    let tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer!);
     tempActivePlayer!.cards = tempActivePlayer!.cards.map((card) => {
       card.faceUp = false;
       return card;
     });
     tempActivePlayer!.folded = true;
 
-    const advanceProps = getNextPlayerProps(tempPlayers);
+    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
+
+    tempNeedResponsesFromIndicies.shift();
+
+    let tempActivePlayers: Player[] = [];
+    let tempActivePlayerIndicies: number[] = [];
+
+    tempPlayers.forEach((p, index) => {
+      if (!(p.folded || p.chips <= 0)) {
+        tempActivePlayers.push(p);
+        tempActivePlayerIndicies.push(index);
+      }
+    });
+
+    let newActivePlayer: Player = tempActivePlayers[0];
+    let tempAPI: number = tempActivePlayerIndicies[0];
+    if (tempActivePlayerIndicies.length > 0) {
+      if (tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1)) {
+        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1];
+        tempAPI = tempPrevActivePlayerIndex + 1;
+      } else if (
+        tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2)
+      ) {
+        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2];
+        tempAPI = tempPrevActivePlayerIndex + 2;
+      } else {
+        newActivePlayer = tempActivePlayers[0];
+        tempAPI = tempActivePlayerIndicies[0];
+      }
+    } else {
+      newActivePlayer = tempActivePlayer!;
+      tempAPI = tempPrevActivePlayerIndex;
+    }
 
     const foldProps: SendFoldDataProps = {
       players: tempPlayers,
-      activePlayerIndex: advanceProps.activePlayerIndex,
-      activePlayer: advanceProps.activePlayer,
-      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
+      activePlayerIndex: tempAPI,
+      activePlayer: newActivePlayer,
+      prevActivePlayerIndex: tempPrevActivePlayerIndex,
       turnNumber,
       playerSocket,
       gameState,
@@ -689,6 +829,7 @@ export default function Index() {
       bigBlindIndex,
       pots,
       activeBet,
+      needResponsesFromIndicies: tempNeedResponsesFromIndicies,
     };
 
     socket!.emit("playerFolded", foldProps);
@@ -699,7 +840,7 @@ export default function Index() {
     let tempActivePlayer = tempPlayers.find(
       (player) => player.name === activePlayer.name
     );
-
+    let tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer!);
     tempActivePlayer!.chips -= amount;
 
     if (tempActivePlayer!.chips <= 0) {
@@ -709,14 +850,47 @@ export default function Index() {
     let tempPots = [...pots];
     tempPots[0] += amount;
 
-    const advanceProps = getNextPlayerProps(tempPlayers);
+    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
+
+    tempNeedResponsesFromIndicies.shift();
+
+    let tempActivePlayers: Player[] = [];
+    let tempActivePlayerIndicies: number[] = [];
+
+    tempPlayers.forEach((p, index) => {
+      if (!(p.folded || p.chips <= 0)) {
+        tempActivePlayers.push(p);
+        tempActivePlayerIndicies.push(index);
+      }
+    });
+
+    let newActivePlayer: Player = tempActivePlayers[0];
+    let tempAPI: number = tempActivePlayerIndicies[0];
+
+    if (tempActivePlayerIndicies.length > 0) {
+      if (tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1)) {
+        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1];
+        tempAPI = tempPrevActivePlayerIndex + 1;
+      } else if (
+        tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2)
+      ) {
+        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2];
+        tempAPI = tempPrevActivePlayerIndex + 2;
+      } else {
+        newActivePlayer = tempActivePlayers[0];
+        tempAPI = tempActivePlayerIndicies[0];
+      }
+    } else {
+      newActivePlayer = tempActivePlayer!;
+      tempAPI = tempPrevActivePlayerIndex;
+    }
 
     const betProps: SendBetDataProps = {
       players: tempPlayers,
       pots: tempPots,
-      prevActivePlayerIndex: advanceProps.prevActivePlayerIndex,
-      activePlayerIndex: advanceProps.activePlayerIndex,
-      activePlayer: advanceProps.activePlayer,
+      prevActivePlayerIndex: tempPrevActivePlayerIndex,
+      activePlayerIndex: tempAPI,
+      activePlayer: newActivePlayer,
       turnNumber,
       playerSocket,
       gameState,
@@ -726,6 +900,7 @@ export default function Index() {
       turnsThisRound,
       hands,
       needResponsesFrom,
+      needResponsesFromIndicies: tempNeedResponsesFromIndicies,
     };
 
     socket!.emit("playerBet", betProps);
@@ -738,40 +913,6 @@ export default function Index() {
     if (playerSocket === player.socket) {
       handleFold();
     }
-  };
-
-  const getNextPlayerProps = (tempPlayers: Player[]) => {
-    let tempActivePlayerIndex = activePlayerIndex;
-    let activePlayerIndicies: number[] = [];
-    tempPlayers.map((p, index) => {
-      if (!(p.folded || p.allIn)) {
-        activePlayerIndicies.push(index);
-      }
-    });
-
-    let nextActivePlayerIndex = tempActivePlayerIndex;
-
-    for (let i = 0; i < activePlayerIndicies.length; i++) {
-      if (activePlayerIndicies[i] > nextActivePlayerIndex) {
-        nextActivePlayerIndex = activePlayerIndicies[i];
-        break;
-      }
-    }
-
-    if (nextActivePlayerIndex === tempActivePlayerIndex) {
-      if (nextActivePlayerIndex !== activePlayerIndicies[0]) {
-        nextActivePlayerIndex = activePlayerIndicies[0];
-      } else {
-        let notActivePlayers =  activePlayerIndicies.filter((i, index) => i !== nextActivePlayerIndex);
-        nextActivePlayerIndex = notActivePlayers.length > 0 ? notActivePlayers[0] : activePlayerIndicies[0];
-      }
-    }
-
-    return {
-      prevActivePlayerIndex: activePlayerIndex,
-      activePlayerIndex: nextActivePlayerIndex,
-      activePlayer: tempPlayers[nextActivePlayerIndex],
-    };
   };
 
   const endRound = (data: AdvanceGameProps) => {
@@ -841,7 +982,12 @@ export default function Index() {
                 className="flex flex-col"
                 style={{ boxSizing: "content-box", paddingRight: "17px" }}
               >
-                {`Need responses from: ${needResponsesFrom}`}
+                <div>{`Need responses from: ${needResponsesFrom}`}</div>
+                {needResponsesFromIndicies ? (
+                  <div>{`Response needed from: ${needResponsesFromIndicies.join(
+                    ", "
+                  )}`}</div>
+                ) : null}
               </div>
             </div> */}
             {!gameStarted && (

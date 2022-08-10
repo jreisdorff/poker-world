@@ -44,6 +44,7 @@ export interface StartHoldEmGameProps {
   littleBlindIndex: number,
   bigBlindIndex: number,
   pots: any[];
+  activePlayer: Player,
 };
 
 //
