@@ -1,20 +1,23 @@
 import { LinksFunction, MetaFunction } from "@remix-run/node";
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect } from "react";
 import Card from "~/components/Card";
 import PlayerDisplay from "~/components/PlayerDisplay";
 import Table from "~/components/Table";
 import { AdvanceGameProps, NextProps } from "~/utils/game";
-import { CardProps, PokerWinner, StartHoldEmGameProps } from "~/utils/poker";
-import cardStyles from "../styles/cards.css";
+import { CardProps, StartHoldEmGameProps } from "~/utils/poker";
 import cardsIEStyles from "../styles/cards-ie.css";
 import cardsIE9Styles from "../styles/cards-ie9.css";
+import cardStyles from "../styles/cards.css";
 import progressStyles from "../styles/progress.css";
 
-import { useSocket } from "~/context";
-import { pluralize } from "~/utils";
 import { isEmpty } from "lodash";
 import Pot from "~/components/Pot";
-import { Console } from "console";
+import { useSocket } from "~/context";
+import useGameState from "~/hooks/useGameState";
+import { pluralize } from "~/utils";
+import { Player, SendCheckOrCallDataProps, SendBetDataProps, GameState, SendFoldDataProps } from "~/interfaces";
+import prepareForFold from "~/functions/prepareForFold";
+import prepareForCheckCall from "~/functions/prepareForCheckCall";
 
 export const links: LinksFunction = () => {
   return [
@@ -31,245 +34,103 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-// export const loader: LoaderFunction = async ({ request }) => {
-//     return null;
-// }
-
-export interface Player {
-  name: string;
-  cards: CardProps[];
-  chips: number;
-  folded: boolean;
-  finalCards?: any | any[];
-  socket?: string;
-  allIn?: boolean;
-  [key: string]: string | number | boolean | CardProps[] | (string | undefined);
-}
-
-export interface SendCheckOrCallDataProps {
-  players: Player[];
-  pots: any[];
-  prevActivePlayerIndex: number;
-  activePlayerIndex: number;
-  activePlayer: Player;
-  turnNumber: number;
-  playerSocket: string;
-  gameState: number;
-  dealerCards: any[];
-  activeBet: number;
-  turnsThisRound: number;
-  hands: any[];
-  needResponsesFrom: number;
-  littleBlindIndex: number;
-  bigBlindIndex: number;
-  callAmount: number;
-  needResponsesFromIndicies: number[];
-}
-
-export interface SendFoldDataProps {
-  players: Player[];
-  prevActivePlayerIndex: number;
-  activePlayerIndex: number;
-  activePlayer: Player;
-  turnNumber: number;
-  playerSocket: string;
-  gameState: number;
-  turnsNextRound: number;
-  turnsThisRound: number;
-  hands: any[];
-  pots: any[];
-  dealerCards: any[];
-  needResponsesFrom: number;
-  littleBlindIndex: number;
-  bigBlindIndex: number;
-  activeBet: number;
-  needResponsesFromIndicies: number[];
-}
-
-export interface SendBetDataProps {
-  players: Player[];
-  pots: any[];
-  prevActivePlayerIndex: number;
-  activePlayerIndex: number;
-  activePlayer: Player;
-  turnNumber: number;
-  playerSocket: string;
-  gameState: number;
-  dealerCards: any[];
-  activeBet: number;
-  turnsNextRound: number;
-  turnsThisRound: number;
-  hands: any[];
-  needResponsesFrom: number;
-  needResponsesFromIndicies: number[];
-}
-
-const GameState = Object.freeze({
-  Preflop: 0,
-  Flop: 1,
-  Turn: 2,
-  River: 3,
-  Showdown: 4,
-});
-
-const initialPlayers: Player[] = [
-  {
-    name: "riceflair",
-    chips: 1000,
-    cards: [],
-    folded: false,
-    allIn: false,
-  },
-  {
-    name: "misterbrother",
-    chips: 1000,
-    cards: [],
-    folded: false,
-    allIn: false,
-  },
-  {
-    name: "copsucker",
-    chips: 1000,
-    cards: [],
-    folded: false,
-    allIn: false,
-  },
-];
-
-let isMount = true;
 export default function Index() {
-  const [gameState, setGameState] = useState(GameState.Preflop);
-
   const socket = useSocket();
 
-  const [logs, setLogs] = useState<string[]>([]);
+  const { values, actions } = useGameState();
 
-  const [gameStarted, setGameStarted] = useState(false);
-
-  const [dealerCards, setDealerCards] = useState<any[]>([]);
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-
-  const [dealtCards, setDealtCards] = useState<any[]>([]);
-
-  const [players, setPlayers] = useState<Player[]>(initialPlayers);
-  const [activePlayerIndex, setActivePlayerIndex] = useState(0);
-  const [activePlayer, setActivePlayer] = useState(
-    initialPlayers[activePlayerIndex]
-  );
-
-  const [dealer, setDealer] = useState(initialPlayers[0]);
-  const [littleBlind, setLittleBlind] = useState(initialPlayers[1]);
-  const [bigBlind, setBigBlind] = useState(initialPlayers[2]);
-  const [littleBlindAmount, setLittleBlindAmount] = useState(10);
-  const [bigBlindAmount, setBigBlindAmount] = useState(20);
-  const [bet, setBet] = useState(bigBlindAmount * 2);
-  const [pots, setPots] = useState<any[]>([littleBlindAmount, bigBlindAmount]);
-  const [activeBet, setActiveBet] = useState(0);
-  const [turnNumber, setTurnNumber] = useState(0);
-  const [blinds, setBlinds] = useState([10, 20]);
-  const [winner, setWinner] = useState<{
-    winner: PokerWinner;
-    description: string;
-  } | null>(null);
-  const [gameOver, setGameOver] = useState(false);
-
-  const [hands, setHands] = useState<any[]>([]);
-  const [activePlayerCount, setActivePlayerCount] = useState(3);
-  const [winningCards, setWinningCards] = useState<any[]>([]);
-  const [wonAmount, setWonAmount] = useState(0);
-  const [playerName, setPlayerName] = useState("");
-  const [buttonClicked, setButtonClicked] = useState(false);
-  const [playerCount, setPlayerCount] = useState(0);
-  const [playerNames, setPlayerNames] = useState<any[]>([]);
-  const [playerSocket, setPlayerSocket] = useState<any>();
-  const [playerSockets, setPlayerSockets] = useState<any[]>([]);
-  const [player, setPlayer] = useState<Player>();
-  const [joinedGame, setJoinedGame] = useState(false);
-  const [turnsThisRound, setTurnsThisRound] = useState(2);
-  const [turnsNextRound, setTurnsNextRound] = useState(2);
-  const [earlyWin, setEarlyWin] = useState(false);
-  const [needResponsesFrom, setNeedResponsesFrom] = useState(3);
-  const [littleBlindIndex, setLittleBlindIndex] = useState(1);
-  const [bigBlindIndex, setBigBlindIndex] = useState(2);
-  const [manualAdvance, setManualAdvance] = useState(false);
-  const [ultimateWinner, setUltimateWinner] = useState<Player | null>(null);
-
-  const [needResponsesFromIndicies, setNeedResponsesFromIndicies] = useState<
-    number[]
-  >([0, 1, 2]);
-
-  const [advancingToEnd, setAdvancingToEnd] = useState(false);
+  const { gameState,
+    logs,
+    gameStarted,
+    dealerCards,
+    isSnackbarOpen,
+    snackbarMessage,
+    dealtCards,
+    players,
+    activePlayerIndex,
+    activePlayer,
+    dealer,
+    littleBlind,
+    bigBlind,
+    littleBlindAmount,
+    bigBlindAmount,
+    bet,
+    pots,
+    activeBet,
+    turnNumber,
+    blinds,
+    winner,
+    gameOver,
+    hands,
+    activePlayerCount,
+    winningCards,
+    wonAmount,
+    playerName,
+    buttonClicked,
+    playerCount,
+    playerNames,
+    playerSocket,
+    playerSockets,
+    player,
+    joinedGame,
+    turnsThisRound,
+    turnsNextRound,
+    earlyWin,
+    needResponsesFrom,
+    littleBlindIndex,
+    bigBlindIndex,
+    manualAdvance,
+    ultimateWinner,
+    needResponsesFromIndicies,
+    advancingToEnd } = values;
+  const { setGameState,
+    setLogs,
+    setGameStarted,
+    setDealerCards,
+    setIsSnackbarOpen,
+    setSnackbarMessage,
+    setDealtCards,
+    setPlayers,
+    setActivePlayerIndex,
+    setActivePlayer,
+    setDealer,
+    setLittleBlind,
+    setBigBlind,
+    setLittleBlindAmount,
+    setBigBlindAmount,
+    setBet,
+    setPots,
+    setActiveBet,
+    setTurnNumber,
+    setBlinds,
+    setWinner,
+    setGameOver,
+    setHands,
+    setActivePlayerCount,
+    setWinningCards,
+    setWonAmount,
+    setPlayerName,
+    setButtonClicked,
+    setPlayerCount,
+    setPlayerNames,
+    setPlayerSocket,
+    setPlayerSockets,
+    setPlayer,
+    setJoinedGame,
+    setTurnsThisRound,
+    setTurnsNextRound,
+    setEarlyWin,
+    setNeedResponsesFrom,
+    setLittleBlindIndex,
+    setBigBlindIndex,
+    setManualAdvance,
+    setUltimateWinner,
+    setNeedResponsesFromIndicies,
+    setAdvancingToEnd,
+  } = actions;
 
   const handleCheckOrCall = (callAmount: number) => {
-    let tempPlayers = [...players];
-    let tempActivePlayer = tempPlayers.find(
-      (tempP) => tempP.name === activePlayer.name
-    );
-    let tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer!);
-    tempActivePlayer!.chips -= callAmount;
-
-    if (tempActivePlayer!.chips <= 0) {
-      tempActivePlayer!.allIn = true;
-    }
-
-    let tempPots = [...pots];
-    tempPots[0] += callAmount;
-
-    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
-
-    tempNeedResponsesFromIndicies.shift();
-
-    let tempActivePlayers: Player[] = [];
-    let tempActivePlayerIndicies: number[] = [];
-
-    tempPlayers.forEach((p, index) => {
-      if (!(p.folded || p.chips <= 0)) {
-        tempActivePlayers.push(p);
-        tempActivePlayerIndicies.push(index);
-      }
-    });
-
-    let newActivePlayer: Player = tempActivePlayers[0];
-    let tempAPI: number = tempActivePlayerIndicies[0];
-
-    if (tempActivePlayerIndicies.length > 0) {
-      if (tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1)) {
-        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1];
-        tempAPI = tempPrevActivePlayerIndex + 1;
-      } else if (
-        tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2)
-      ) {
-        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2];
-        tempAPI = tempPrevActivePlayerIndex + 2;
-      } else {
-        newActivePlayer = tempActivePlayers[0];
-        tempAPI = tempActivePlayerIndicies[0];
-      }
-    } else {
-      newActivePlayer = tempActivePlayer!;
-      tempAPI = tempPrevActivePlayerIndex;
-    }
-
-    const checkOrCallProps: SendCheckOrCallDataProps = {
-      players: tempPlayers,
-      pots: tempPots,
-      prevActivePlayerIndex: tempPrevActivePlayerIndex,
-      activePlayerIndex: tempAPI,
-      activePlayer: newActivePlayer,
-      turnNumber,
-      playerSocket,
-      gameState,
-      dealerCards,
-      activeBet,
-      turnsThisRound,
-      hands,
-      needResponsesFrom,
-      littleBlindIndex,
-      bigBlindIndex,
-      callAmount,
-      needResponsesFromIndicies: tempNeedResponsesFromIndicies,
-    };
+    let checkOrCallProps = prepareForCheckCall(values);
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
   };
@@ -415,8 +276,7 @@ export default function Index() {
       setActivePlayer(data.activePlayer);
       setLogs((prev) => [
         ...prev,
-        `${data.players[data.prevActivePlayerIndex].name} bet ${
-          data.activeBet
+        `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet
         }`,
       ]);
       setSnackbarMessage(
@@ -479,9 +339,8 @@ export default function Index() {
       }
 
       let checkOrCallDescription = data.activeBet
-        ? `${data.players[data.prevActivePlayerIndex].name} called ${
-            data.callAmount
-          }`
+        ? `${data.players[data.prevActivePlayerIndex].name} called ${data.callAmount
+        }`
         : `${data.players[data.prevActivePlayerIndex].name} checked`;
 
       setLogs((prev) => [...prev, checkOrCallDescription]);
@@ -767,70 +626,7 @@ export default function Index() {
   };
 
   const handleFold = () => {
-    let tempPlayers = [...players];
-    let tempActivePlayer = tempPlayers.find(
-      (player) => player.name === activePlayer.name
-    );
-    let tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer!);
-    tempActivePlayer!.cards = tempActivePlayer!.cards.map((card) => {
-      card.faceUp = false;
-      return card;
-    });
-    tempActivePlayer!.folded = true;
-
-    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
-
-    tempNeedResponsesFromIndicies.shift();
-
-    let tempActivePlayers: Player[] = [];
-    let tempActivePlayerIndicies: number[] = [];
-
-    tempPlayers.forEach((p, index) => {
-      if (!(p.folded || p.chips <= 0)) {
-        tempActivePlayers.push(p);
-        tempActivePlayerIndicies.push(index);
-      }
-    });
-
-    let newActivePlayer: Player = tempActivePlayers[0];
-    let tempAPI: number = tempActivePlayerIndicies[0];
-    if (tempActivePlayerIndicies.length > 0) {
-      if (tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1)) {
-        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1];
-        tempAPI = tempPrevActivePlayerIndex + 1;
-      } else if (
-        tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2)
-      ) {
-        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2];
-        tempAPI = tempPrevActivePlayerIndex + 2;
-      } else {
-        newActivePlayer = tempActivePlayers[0];
-        tempAPI = tempActivePlayerIndicies[0];
-      }
-    } else {
-      newActivePlayer = tempActivePlayer!;
-      tempAPI = tempPrevActivePlayerIndex;
-    }
-
-    const foldProps: SendFoldDataProps = {
-      players: tempPlayers,
-      activePlayerIndex: tempAPI,
-      activePlayer: newActivePlayer,
-      prevActivePlayerIndex: tempPrevActivePlayerIndex,
-      turnNumber,
-      playerSocket,
-      gameState,
-      turnsNextRound: turnsNextRound - 1,
-      turnsThisRound: turnsNextRound,
-      hands,
-      dealerCards,
-      needResponsesFrom,
-      littleBlindIndex,
-      bigBlindIndex,
-      pots,
-      activeBet,
-      needResponsesFromIndicies: tempNeedResponsesFromIndicies,
-    };
+    let foldProps = prepareForFold(values);
 
     socket!.emit("playerFolded", foldProps);
   };
@@ -949,7 +745,7 @@ export default function Index() {
       .map((p) => p.cards);
 
     tempCards.forEach((cardArray) => {
-      cardArray.forEach((card) => {
+      cardArray.forEach((card: { faceUp: boolean; }) => {
         card.faceUp = true;
       });
     });
@@ -957,7 +753,7 @@ export default function Index() {
     socket!.emit("showCards", { players: tempPlayers });
   };
 
-  const handleMuckCards = () => {};
+  const handleMuckCards = () => { };
 
   return (
     <>
@@ -1002,9 +798,8 @@ export default function Index() {
                   />
                 ) : null}
                 <button
-                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${
-                    joinedGame ? "disabled" : ""
-                  }`}
+                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${joinedGame ? "disabled" : ""
+                    }`}
                   onClick={handleJoinGame}
                   disabled={joinedGame}
                 >
@@ -1025,9 +820,8 @@ export default function Index() {
             {gameOver && (
               <div className="flex flex-col">
                 <div
-                  className={`z-[410443] mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
-                    !winner ? "opacity-0" : "opacity-100"
-                  }`}
+                  className={`z-[410443] mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${!winner ? "opacity-0" : "opacity-100"
+                    }`}
                 >
                   <h1>{winner ? winner.description : null}</h1>
                   <h1>
@@ -1083,12 +877,12 @@ export default function Index() {
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                      card.rank
-                                  );
-                                }).length > 0
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                  card.rank
+                                );
+                              }).length > 0
                               : false
                           }
                         />
@@ -1107,7 +901,7 @@ export default function Index() {
                   {/* <div className="playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
                   <div className="fixed bottom-[47vh] right-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
-                      {players[1].cards.map((card, index) => (
+                      {players[1].cards.map((card: { suit: string; rank: string; faceUp: any; }, index: any) => (
                         <Card
                           key={`${index}-${card.suit}-${card.rank}`}
                           suit={card.suit}
@@ -1116,18 +910,18 @@ export default function Index() {
                             players[1].folded
                               ? false
                               : players[1].socket === playerSocket ||
-                                card.faceUp
+                              card.faceUp
                           }
                           folded={players[1].folded}
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                      card.rank
-                                  );
-                                }).length > 0
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                  card.rank
+                                );
+                              }).length > 0
                               : false
                           }
                         />
@@ -1179,7 +973,7 @@ export default function Index() {
                   {/* <div className="playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
                   <div className="fixed bottom-[47vh] left-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
-                      {players[2].cards.map((card, index) => (
+                      {players[2].cards.map((card: { suit: string; rank: string; faceUp: any; }, index: any) => (
                         <Card
                           key={`${index}-${card.suit}-${card.rank}`}
                           suit={card.suit}
@@ -1188,18 +982,18 @@ export default function Index() {
                             players[2].folded
                               ? false
                               : players[2].socket === playerSocket ||
-                                card.faceUp
+                              card.faceUp
                           }
                           folded={players[2].folded}
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                      card.rank
-                                  );
-                                }).length > 0
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                  card.rank
+                                );
+                              }).length > 0
                               : false
                           }
                         />
@@ -1248,7 +1042,7 @@ export default function Index() {
                   ) : null}
                 </div>
                 <div className="playingCards simpleCards fixed bottom-[20%] flex w-[100vw] flex-row items-center justify-center">
-                  {players[0].cards.map((card, index) => (
+                  {players[0].cards.map((card: { suit: string; rank: string; faceUp: any; }, index: any) => (
                     <Card
                       key={`${index}-${card.suit}-${card.rank}`}
                       suit={card.suit}
@@ -1262,12 +1056,12 @@ export default function Index() {
                       winner={
                         winningCards.length > 0
                           ? winningCards.filter((w) => {
-                              return (
-                                w.suit == card.suit.charAt(0) &&
-                                w.value.toString().replace("T", "10") ===
-                                  card.rank
-                              );
-                            }).length > 0
+                            return (
+                              w.suit == card.suit.charAt(0) &&
+                              w.value.toString().replace("T", "10") ===
+                              card.rank
+                            );
+                          }).length > 0
                           : false
                       }
                     />
@@ -1316,8 +1110,8 @@ export default function Index() {
                   </div>
                 ) : null}
                 {!gameOver &&
-                !advancingToEnd &&
-                activePlayer.socket === playerSocket ? (
+                  !advancingToEnd &&
+                  activePlayer.socket === playerSocket ? (
                   <div className="fixed bottom-[10%] right-0 z-[987654321] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">
@@ -1359,11 +1153,10 @@ export default function Index() {
                         }
                       >
                         {activeBet > 0
-                          ? `Call ${
-                              activePlayer.chips >= activeBet
-                                ? activeBet
-                                : activePlayer.chips
-                            }`
+                          ? `Call ${activePlayer.chips >= activeBet
+                            ? activeBet
+                            : activePlayer.chips
+                          }`
                           : "Check"}
                       </button>
                       <button
@@ -1376,11 +1169,11 @@ export default function Index() {
                   </div>
                 ) : null}
                 {gameOver &&
-                earlyWin &&
-                winner &&
-                winner.winner.players
-                  .map((p) => p.socket)
-                  .includes(player!.socket) ? (
+                  earlyWin &&
+                  winner &&
+                  winner.winner.players
+                    .map((p) => p.socket)
+                    .includes(player!.socket) ? (
                   <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
                       <button

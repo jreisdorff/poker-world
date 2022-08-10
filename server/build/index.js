@@ -71,7 +71,7 @@ function handleRequest(request, responseStatusCode, responseHeaders, remixContex
   });
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
 var root_exports = {};
 __export(root_exports, {
   default: () => App,
@@ -187,7 +187,7 @@ async function logout(request) {
   });
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
 var import_react4 = require("react"), import_socket = require("socket.io-client");
 
 // app/context.tsx
@@ -201,7 +201,7 @@ function SocketProvider({ socket, children }) {
   }, children);
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
 var links = () => [{ rel: "stylesheet", href: tailwind_default }], meta = () => ({
   charset: "utf-8",
   title: "Remix Notes",
@@ -229,7 +229,7 @@ function App() {
   }, /* @__PURE__ */ React.createElement(import_react3.Outlet, null)), /* @__PURE__ */ React.createElement(import_react3.ScrollRestoration, null), /* @__PURE__ */ React.createElement(import_react3.Scripts, null), /* @__PURE__ */ React.createElement(import_react3.LiveReload, null)));
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\healthcheck.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/healthcheck.tsx
 var healthcheck_exports = {};
 __export(healthcheck_exports, {
   loader: () => loader2
@@ -250,7 +250,7 @@ async function loader2({ request }) {
   }
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\logout.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/logout.tsx
 var logout_exports = {};
 __export(logout_exports, {
   action: () => action,
@@ -264,14 +264,14 @@ async function loader3() {
   return (0, import_node4.redirect)("/");
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
 var routes_exports = {};
 __export(routes_exports, {
   default: () => Index,
   links: () => links2,
   meta: () => meta2
 });
-var import_react9 = require("react");
+var import_react10 = require("react");
 
 // app/components/Card.tsx
 function Card(props) {
@@ -341,53 +341,23 @@ function Table() {
   });
 }
 
-// app/styles/cards.css
-var cards_default = "/build/_assets/cards-RC2VKTQW.css";
-
 // app/styles/cards-ie.css
-var cards_ie_default = "/build/_assets/cards-ie-K2KFIEE6.css";
+var cards_ie_default = "/build/_assets/cards-ie-KXYXFTMX.css";
 
 // app/styles/cards-ie9.css
-var cards_ie9_default = "/build/_assets/cards-ie9-FJ2H4YNU.css";
+var cards_ie9_default = "/build/_assets/cards-ie9-OIEF3GYU.css";
+
+// app/styles/cards.css
+var cards_default = "/build/_assets/cards-DWTR5WFF.css";
 
 // app/styles/progress.css
-var progress_default = "/build/_assets/progress-4XQ5EFCP.css";
+var progress_default = "/build/_assets/progress-DNTSZ2WT.css";
 
-// app/utils.ts
-var import_react6 = require("@remix-run/react"), import_react7 = require("react"), DEFAULT_REDIRECT = "/";
-function safeRedirect(to, defaultRedirect = DEFAULT_REDIRECT) {
-  return !to || typeof to != "string" || !to.startsWith("/") || to.startsWith("//") ? defaultRedirect : to;
-}
-function useMatchesData(id) {
-  let matchingRoutes = (0, import_react6.useMatches)(), route = (0, import_react7.useMemo)(() => matchingRoutes.find((route2) => route2.id === id), [matchingRoutes, id]);
-  return route == null ? void 0 : route.data;
-}
-function isUser(user) {
-  return user && typeof user == "object" && typeof user.email == "string";
-}
-function useOptionalUser() {
-  let data = useMatchesData("root");
-  if (!(!data || !isUser(data.user)))
-    return data.user;
-}
-function useUser() {
-  let maybeUser = useOptionalUser();
-  if (!maybeUser)
-    throw new Error("No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead.");
-  return maybeUser;
-}
-function validateEmail(email) {
-  return typeof email == "string" && email.length > 3 && email.includes("@");
-}
-function pluralize(count, singular, plural) {
-  return count === 1 ? singular : plural;
-}
-
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
 var import_lodash = require("lodash");
 
 // app/components/Pot.tsx
-var import_react8 = require("react"), getChipsFromAmount = (amount) => {
+var import_react6 = require("react"), getChipsFromAmount = (amount) => {
   let quotient, remainder, quotient1, remainder1, quotient2, remainder2, quotient3, remainder3, quotient4, remainder4, quotient5, remainder5, quotient6, remainder6, quotient7, remainder7, quotient8, remainder8;
   quotient = amount / 1e3, remainder = amount % 1e3, quotient1 = remainder / 500, remainder1 = remainder % 500, quotient2 = remainder1 / 100, remainder2 = remainder1 % 100, quotient3 = remainder2 / 50, remainder3 = remainder2 % 50, quotient4 = remainder3 / 20, remainder4 = remainder3 % 20, quotient5 = remainder4 / 10, remainder5 = remainder4 % 10, quotient6 = remainder5 / 5, remainder6 = remainder5 % 5, quotient7 = remainder6 / 2, remainder7 = remainder6 % 2, quotient8 = remainder7 / 1, remainder8 = remainder7 % 1;
   let totalChips = Math.floor(quotient) + Math.floor(quotient1) + Math.floor(quotient2) + Math.floor(quotient3) + Math.floor(quotient4) + Math.floor(quotient5) + Math.floor(quotient6) + Math.floor(quotient7) + Math.floor(quotient8);
@@ -408,8 +378,8 @@ var import_react8 = require("react"), getChipsFromAmount = (amount) => {
   };
 };
 function Pot(props) {
-  let { amount } = props, [chips, setChips] = (0, import_react8.useState)(getChipsFromAmount(amount || 0));
-  return (0, import_react8.useEffect)(() => {
+  let { amount } = props, [chips, setChips] = (0, import_react6.useState)(getChipsFromAmount(amount || 0));
+  return (0, import_react6.useEffect)(() => {
     amount > 0 && setChips(getChipsFromAmount(amount));
   }, [amount]), /* @__PURE__ */ React.createElement("div", {
     className: "flex h-full w-full flex-row items-center justify-center"
@@ -461,17 +431,11 @@ function Pot(props) {
   })) : null);
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
-var links2 = () => [
-  { rel: "stylesheet", href: cards_default },
-  { rel: "stylesheet", href: cards_ie_default },
-  { rel: "stylesheet", href: cards_ie9_default },
-  { rel: "stylesheet", href: progress_default }
-], meta2 = () => ({
-  charset: "utf-8",
-  title: "Poker World",
-  viewport: "width=device-width,initial-scale=1"
-}), GameState = Object.freeze({
+// app/hooks/useGameState.ts
+var import_react7 = require("react");
+
+// app/interfaces/index.ts
+var GameState = Object.freeze({
   Preflop: 0,
   Flop: 1,
   Turn: 2,
@@ -500,42 +464,340 @@ var links2 = () => [
     allIn: !1
   }
 ];
-function Index() {
-  let [gameState, setGameState] = (0, import_react9.useState)(GameState.Preflop), socket = useSocket(), [logs, setLogs] = (0, import_react9.useState)([]), [gameStarted, setGameStarted] = (0, import_react9.useState)(!1), [dealerCards, setDealerCards] = (0, import_react9.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react9.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react9.useState)(""), [dealtCards, setDealtCards] = (0, import_react9.useState)([]), [players, setPlayers] = (0, import_react9.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react9.useState)(0), [activePlayer, setActivePlayer] = (0, import_react9.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react9.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react9.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react9.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react9.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react9.useState)(20), [bet, setBet] = (0, import_react9.useState)(bigBlindAmount * 2), [pots, setPots] = (0, import_react9.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react9.useState)(0), [turnNumber, setTurnNumber] = (0, import_react9.useState)(0), [blinds, setBlinds] = (0, import_react9.useState)([10, 20]), [winner, setWinner] = (0, import_react9.useState)(null), [gameOver, setGameOver] = (0, import_react9.useState)(!1), [hands, setHands] = (0, import_react9.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react9.useState)(3), [winningCards, setWinningCards] = (0, import_react9.useState)([]), [wonAmount, setWonAmount] = (0, import_react9.useState)(0), [playerName, setPlayerName] = (0, import_react9.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react9.useState)(!1), [playerCount, setPlayerCount] = (0, import_react9.useState)(0), [playerNames, setPlayerNames] = (0, import_react9.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react9.useState)(), [playerSockets, setPlayerSockets] = (0, import_react9.useState)([]), [player, setPlayer] = (0, import_react9.useState)(), [joinedGame, setJoinedGame] = (0, import_react9.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react9.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react9.useState)(2), [earlyWin, setEarlyWin] = (0, import_react9.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react9.useState)(3), [littleBlindIndex, setLittleBlindIndex] = (0, import_react9.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react9.useState)(2), [manualAdvance, setManualAdvance] = (0, import_react9.useState)(!1), [ultimateWinner, setUltimateWinner] = (0, import_react9.useState)(null), [needResponsesFromIndicies, setNeedResponsesFromIndicies] = (0, import_react9.useState)([0, 1, 2]), [advancingToEnd, setAdvancingToEnd] = (0, import_react9.useState)(!1), handleCheckOrCall = (callAmount) => {
-    let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((tempP) => tempP.name === activePlayer.name), tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer);
-    tempActivePlayer.chips -= callAmount, tempActivePlayer.chips <= 0 && (tempActivePlayer.allIn = !0);
-    let tempPots = [...pots];
-    tempPots[0] += callAmount;
-    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
-    tempNeedResponsesFromIndicies.shift();
-    let tempActivePlayers = [], tempActivePlayerIndicies = [];
-    tempPlayers.forEach((p, index) => {
-      p.folded || p.chips <= 0 || (tempActivePlayers.push(p), tempActivePlayerIndicies.push(index));
-    });
-    let newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0];
-    tempActivePlayerIndicies.length > 0 ? tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1], tempAPI = tempPrevActivePlayerIndex + 1) : tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2], tempAPI = tempPrevActivePlayerIndex + 2) : (newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0]) : (newActivePlayer = tempActivePlayer, tempAPI = tempPrevActivePlayerIndex);
-    let checkOrCallProps = {
-      players: tempPlayers,
-      pots: tempPots,
-      prevActivePlayerIndex: tempPrevActivePlayerIndex,
-      activePlayerIndex: tempAPI,
-      activePlayer: newActivePlayer,
-      turnNumber,
-      playerSocket,
+
+// app/hooks/useGameState.ts
+function useGameState() {
+  let [gameState, setGameState] = (0, import_react7.useState)(GameState.Preflop), [logs, setLogs] = (0, import_react7.useState)([]), [gameStarted, setGameStarted] = (0, import_react7.useState)(!1), [dealerCards, setDealerCards] = (0, import_react7.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react7.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react7.useState)(""), [dealtCards, setDealtCards] = (0, import_react7.useState)([]), [players, setPlayers] = (0, import_react7.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react7.useState)(0), [activePlayer, setActivePlayer] = (0, import_react7.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react7.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react7.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react7.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react7.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react7.useState)(20), [bet, setBet] = (0, import_react7.useState)(bigBlindAmount * 2), [pots, setPots] = (0, import_react7.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react7.useState)(0), [turnNumber, setTurnNumber] = (0, import_react7.useState)(0), [blinds, setBlinds] = (0, import_react7.useState)([10, 20]), [winner, setWinner] = (0, import_react7.useState)(null), [gameOver, setGameOver] = (0, import_react7.useState)(!1), [hands, setHands] = (0, import_react7.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react7.useState)(3), [winningCards, setWinningCards] = (0, import_react7.useState)([]), [wonAmount, setWonAmount] = (0, import_react7.useState)(0), [playerName, setPlayerName] = (0, import_react7.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react7.useState)(!1), [playerCount, setPlayerCount] = (0, import_react7.useState)(0), [playerNames, setPlayerNames] = (0, import_react7.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react7.useState)(), [playerSockets, setPlayerSockets] = (0, import_react7.useState)([]), [player, setPlayer] = (0, import_react7.useState)(), [joinedGame, setJoinedGame] = (0, import_react7.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react7.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react7.useState)(2), [earlyWin, setEarlyWin] = (0, import_react7.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react7.useState)(3), [littleBlindIndex, setLittleBlindIndex] = (0, import_react7.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react7.useState)(2), [manualAdvance, setManualAdvance] = (0, import_react7.useState)(!1), [ultimateWinner, setUltimateWinner] = (0, import_react7.useState)(null), [needResponsesFromIndicies, setNeedResponsesFromIndicies] = (0, import_react7.useState)([0, 1, 2]), [advancingToEnd, setAdvancingToEnd] = (0, import_react7.useState)(!1);
+  return {
+    values: {
       gameState,
+      logs,
+      gameStarted,
       dealerCards,
+      isSnackbarOpen,
+      snackbarMessage,
+      dealtCards,
+      players,
+      activePlayerIndex,
+      activePlayer,
+      dealer,
+      littleBlind,
+      bigBlind,
+      littleBlindAmount,
+      bigBlindAmount,
+      bet,
+      pots,
       activeBet,
-      turnsThisRound,
+      turnNumber,
+      blinds,
+      winner,
+      gameOver,
       hands,
+      activePlayerCount,
+      winningCards,
+      wonAmount,
+      playerName,
+      buttonClicked,
+      playerCount,
+      playerNames,
+      playerSocket,
+      playerSockets,
+      player,
+      joinedGame,
+      turnsThisRound,
+      turnsNextRound,
+      earlyWin,
       needResponsesFrom,
       littleBlindIndex,
       bigBlindIndex,
-      callAmount,
-      needResponsesFromIndicies: tempNeedResponsesFromIndicies
-    };
+      manualAdvance,
+      ultimateWinner,
+      needResponsesFromIndicies,
+      advancingToEnd
+    },
+    actions: {
+      setGameState,
+      setLogs,
+      setGameStarted,
+      setDealerCards,
+      setIsSnackbarOpen,
+      setSnackbarMessage,
+      setDealtCards,
+      setPlayers,
+      setActivePlayerIndex,
+      setActivePlayer,
+      setDealer,
+      setLittleBlind,
+      setBigBlind,
+      setLittleBlindAmount,
+      setBigBlindAmount,
+      setBet,
+      setPots,
+      setActiveBet,
+      setTurnNumber,
+      setBlinds,
+      setWinner,
+      setGameOver,
+      setHands,
+      setActivePlayerCount,
+      setWinningCards,
+      setWonAmount,
+      setPlayerName,
+      setButtonClicked,
+      setPlayerCount,
+      setPlayerNames,
+      setPlayerSocket,
+      setPlayerSockets,
+      setPlayer,
+      setJoinedGame,
+      setTurnsThisRound,
+      setTurnsNextRound,
+      setEarlyWin,
+      setNeedResponsesFrom,
+      setLittleBlindIndex,
+      setBigBlindIndex,
+      setManualAdvance,
+      setUltimateWinner,
+      setNeedResponsesFromIndicies,
+      setAdvancingToEnd
+    }
+  };
+}
+
+// app/utils.ts
+var import_react8 = require("@remix-run/react"), import_react9 = require("react"), DEFAULT_REDIRECT = "/";
+function safeRedirect(to, defaultRedirect = DEFAULT_REDIRECT) {
+  return !to || typeof to != "string" || !to.startsWith("/") || to.startsWith("//") ? defaultRedirect : to;
+}
+function useMatchesData(id) {
+  let matchingRoutes = (0, import_react8.useMatches)(), route = (0, import_react9.useMemo)(() => matchingRoutes.find((route2) => route2.id === id), [matchingRoutes, id]);
+  return route == null ? void 0 : route.data;
+}
+function isUser(user) {
+  return user && typeof user == "object" && typeof user.email == "string";
+}
+function useOptionalUser() {
+  let data = useMatchesData("root");
+  if (!(!data || !isUser(data.user)))
+    return data.user;
+}
+function useUser() {
+  let maybeUser = useOptionalUser();
+  if (!maybeUser)
+    throw new Error("No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead.");
+  return maybeUser;
+}
+function validateEmail(email) {
+  return typeof email == "string" && email.length > 3 && email.includes("@");
+}
+function pluralize(count, singular, plural) {
+  return count === 1 ? singular : plural;
+}
+
+// app/functions/prepareForFold.ts
+function prepareForFold(values) {
+  let {
+    players,
+    activePlayer,
+    needResponsesFromIndicies,
+    turnNumber,
+    playerSocket,
+    gameState,
+    turnsNextRound,
+    hands,
+    dealerCards,
+    needResponsesFrom,
+    littleBlindIndex,
+    bigBlindIndex,
+    pots,
+    activeBet
+  } = values, tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player) => player.name === activePlayer.name), tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer);
+  tempActivePlayer.cards = tempActivePlayer.cards.map((card) => (card.faceUp = !1, card)), tempActivePlayer.folded = !0;
+  let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
+  tempNeedResponsesFromIndicies.shift();
+  let tempActivePlayers = [], tempActivePlayerIndicies = [];
+  tempPlayers.forEach((p, index) => {
+    p.folded || p.chips <= 0 || (tempActivePlayers.push(p), tempActivePlayerIndicies.push(index));
+  });
+  let newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0];
+  return tempActivePlayerIndicies.length > 0 ? tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1], tempAPI = tempPrevActivePlayerIndex + 1) : tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2], tempAPI = tempPrevActivePlayerIndex + 2) : (newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0]) : (newActivePlayer = tempActivePlayer, tempAPI = tempPrevActivePlayerIndex), {
+    players: tempPlayers,
+    activePlayerIndex: tempAPI,
+    activePlayer: newActivePlayer,
+    prevActivePlayerIndex: tempPrevActivePlayerIndex,
+    turnNumber,
+    playerSocket,
+    gameState,
+    turnsNextRound: turnsNextRound - 1,
+    turnsThisRound: turnsNextRound,
+    hands,
+    dealerCards,
+    needResponsesFrom,
+    littleBlindIndex,
+    bigBlindIndex,
+    pots,
+    activeBet,
+    needResponsesFromIndicies: tempNeedResponsesFromIndicies
+  };
+}
+
+// app/functions/prepareForCheckCall.ts
+function prepareForCheckCall(values) {
+  let {
+    players,
+    activePlayer,
+    turnNumber,
+    playerSocket,
+    gameState,
+    dealerCards,
+    activeBet,
+    turnsThisRound,
+    hands,
+    needResponsesFrom,
+    littleBlindIndex,
+    bigBlindIndex,
+    callAmount,
+    pots,
+    needResponsesFromIndicies
+  } = values, tempPlayers = [...players], tempActivePlayer = tempPlayers.find((tempP) => tempP.name === activePlayer.name), tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer);
+  tempActivePlayer.chips -= callAmount, tempActivePlayer.chips <= 0 && (tempActivePlayer.allIn = !0);
+  let tempPots = [...pots];
+  tempPots[0] += callAmount;
+  let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
+  tempNeedResponsesFromIndicies.shift();
+  let tempActivePlayers = [], tempActivePlayerIndicies = [];
+  tempPlayers.forEach((p, index) => {
+    p.folded || p.chips <= 0 || (tempActivePlayers.push(p), tempActivePlayerIndicies.push(index));
+  });
+  let newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0];
+  return tempActivePlayerIndicies.length > 0 ? tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1], tempAPI = tempPrevActivePlayerIndex + 1) : tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2], tempAPI = tempPrevActivePlayerIndex + 2) : (newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0]) : (newActivePlayer = tempActivePlayer, tempAPI = tempPrevActivePlayerIndex), {
+    players: tempPlayers,
+    pots: tempPots,
+    prevActivePlayerIndex: tempPrevActivePlayerIndex,
+    activePlayerIndex: tempAPI,
+    activePlayer: newActivePlayer,
+    turnNumber,
+    playerSocket,
+    gameState,
+    dealerCards,
+    activeBet,
+    turnsThisRound,
+    hands,
+    needResponsesFrom,
+    littleBlindIndex,
+    bigBlindIndex,
+    callAmount,
+    needResponsesFromIndicies: tempNeedResponsesFromIndicies
+  };
+}
+
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+var links2 = () => [
+  { rel: "stylesheet", href: cards_default },
+  { rel: "stylesheet", href: cards_ie_default },
+  { rel: "stylesheet", href: cards_ie9_default },
+  { rel: "stylesheet", href: progress_default }
+], meta2 = () => ({
+  charset: "utf-8",
+  title: "Poker World",
+  viewport: "width=device-width,initial-scale=1"
+});
+function Index() {
+  let socket = useSocket(), { values, actions } = useGameState(), {
+    gameState,
+    logs,
+    gameStarted,
+    dealerCards,
+    isSnackbarOpen,
+    snackbarMessage,
+    dealtCards,
+    players,
+    activePlayerIndex,
+    activePlayer,
+    dealer,
+    littleBlind,
+    bigBlind,
+    littleBlindAmount,
+    bigBlindAmount,
+    bet,
+    pots,
+    activeBet,
+    turnNumber,
+    blinds,
+    winner,
+    gameOver,
+    hands,
+    activePlayerCount,
+    winningCards,
+    wonAmount,
+    playerName,
+    buttonClicked,
+    playerCount,
+    playerNames,
+    playerSocket,
+    playerSockets,
+    player,
+    joinedGame,
+    turnsThisRound,
+    turnsNextRound,
+    earlyWin,
+    needResponsesFrom,
+    littleBlindIndex,
+    bigBlindIndex,
+    manualAdvance,
+    ultimateWinner,
+    needResponsesFromIndicies,
+    advancingToEnd
+  } = values, {
+    setGameState,
+    setLogs,
+    setGameStarted,
+    setDealerCards,
+    setIsSnackbarOpen,
+    setSnackbarMessage,
+    setDealtCards,
+    setPlayers,
+    setActivePlayerIndex,
+    setActivePlayer,
+    setDealer,
+    setLittleBlind,
+    setBigBlind,
+    setLittleBlindAmount,
+    setBigBlindAmount,
+    setBet,
+    setPots,
+    setActiveBet,
+    setTurnNumber,
+    setBlinds,
+    setWinner,
+    setGameOver,
+    setHands,
+    setActivePlayerCount,
+    setWinningCards,
+    setWonAmount,
+    setPlayerName,
+    setButtonClicked,
+    setPlayerCount,
+    setPlayerNames,
+    setPlayerSocket,
+    setPlayerSockets,
+    setPlayer,
+    setJoinedGame,
+    setTurnsThisRound,
+    setTurnsNextRound,
+    setEarlyWin,
+    setNeedResponsesFrom,
+    setLittleBlindIndex,
+    setBigBlindIndex,
+    setManualAdvance,
+    setUltimateWinner,
+    setNeedResponsesFromIndicies,
+    setAdvancingToEnd
+  } = actions, handleCheckOrCall = (callAmount) => {
+    let checkOrCallProps = prepareForCheckCall(values);
     socket.emit("playerCheckedOrCalled", checkOrCallProps);
   };
-  (0, import_react9.useEffect)(() => {
+  (0, import_react10.useEffect)(() => {
     if (!socket)
       return;
     let advance = (data, type) => {
@@ -664,7 +926,7 @@ function Index() {
       let activePlayers = data.players.filter((p) => p.chips > 0), nextDealerIndex = data.hands.length % activePlayers.length, nextLittleBlindIndex = (data.hands.length + 1) % activePlayers.length, nextBigBlindIndex = (data.hands.length + 2) % activePlayers.length;
       setActiveBet(bigBlindAmount), setDealer(activePlayers[nextDealerIndex]), setLittleBlind(activePlayers[nextLittleBlindIndex]), setBigBlind(activePlayers[nextBigBlindIndex]), setLittleBlindIndex(nextLittleBlindIndex), setBigBlindIndex(nextBigBlindIndex), setActivePlayerIndex(nextDealerIndex), activePlayers.length > 0 && setActivePlayer(activePlayers[nextDealerIndex]), setPots([littleBlindAmount + bigBlindAmount]);
     });
-  }, [socket]), (0, import_react9.useEffect)(() => {
+  }, [socket]), (0, import_react10.useEffect)(() => {
     if (playerCount === 3 && playerSocket === playerSockets[2]) {
       let startProps = {
         playerNames,
@@ -674,7 +936,7 @@ function Index() {
       };
       socket.emit("startHoldEmGame", startProps);
     }
-  }, [playerCount]), (0, import_react9.useEffect)(() => {
+  }, [playerCount]), (0, import_react10.useEffect)(() => {
     if (buttonClicked) {
       if (!socket)
         return;
@@ -684,35 +946,7 @@ function Index() {
   let handleJoinGame = () => {
     setButtonClicked(!0);
   }, handleFold = () => {
-    let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name), tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer);
-    tempActivePlayer.cards = tempActivePlayer.cards.map((card) => (card.faceUp = !1, card)), tempActivePlayer.folded = !0;
-    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
-    tempNeedResponsesFromIndicies.shift();
-    let tempActivePlayers = [], tempActivePlayerIndicies = [];
-    tempPlayers.forEach((p, index) => {
-      p.folded || p.chips <= 0 || (tempActivePlayers.push(p), tempActivePlayerIndicies.push(index));
-    });
-    let newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0];
-    tempActivePlayerIndicies.length > 0 ? tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1], tempAPI = tempPrevActivePlayerIndex + 1) : tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2) ? (newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2], tempAPI = tempPrevActivePlayerIndex + 2) : (newActivePlayer = tempActivePlayers[0], tempAPI = tempActivePlayerIndicies[0]) : (newActivePlayer = tempActivePlayer, tempAPI = tempPrevActivePlayerIndex);
-    let foldProps = {
-      players: tempPlayers,
-      activePlayerIndex: tempAPI,
-      activePlayer: newActivePlayer,
-      prevActivePlayerIndex: tempPrevActivePlayerIndex,
-      turnNumber,
-      playerSocket,
-      gameState,
-      turnsNextRound: turnsNextRound - 1,
-      turnsThisRound: turnsNextRound,
-      hands,
-      dealerCards,
-      needResponsesFrom,
-      littleBlindIndex,
-      bigBlindIndex,
-      pots,
-      activeBet,
-      needResponsesFromIndicies: tempNeedResponsesFromIndicies
-    };
+    let foldProps = prepareForFold(values);
     socket.emit("playerFolded", foldProps);
   }, handleBet = (amount) => {
     let tempPlayers = [...players], tempActivePlayer = tempPlayers.find((player2) => player2.name === activePlayer.name), tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer);
@@ -992,7 +1226,7 @@ function Index() {
   }, "Muck"))) : null) : null))));
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\login.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/login.tsx
 var login_exports = {};
 __export(login_exports, {
   action: () => action2,
@@ -1000,7 +1234,7 @@ __export(login_exports, {
   loader: () => loader4,
   meta: () => meta3
 });
-var import_node5 = require("@remix-run/node"), import_react10 = require("@remix-run/react"), React2 = __toESM(require("react"));
+var import_node5 = require("@remix-run/node"), import_react11 = require("@remix-run/react"), React2 = __toESM(require("react"));
 async function loader4({ request }) {
   return await getUserId(request) ? (0, import_node5.redirect)("/") : (0, import_node5.json)({});
 }
@@ -1025,7 +1259,7 @@ var meta3 = () => ({
 });
 function LoginPage() {
   var _a, _b, _c, _d;
-  let [searchParams] = (0, import_react10.useSearchParams)(), redirectTo = searchParams.get("redirectTo") || "/notes", actionData = (0, import_react10.useActionData)(), emailRef = React2.useRef(null), passwordRef = React2.useRef(null);
+  let [searchParams] = (0, import_react11.useSearchParams)(), redirectTo = searchParams.get("redirectTo") || "/notes", actionData = (0, import_react11.useActionData)(), emailRef = React2.useRef(null), passwordRef = React2.useRef(null);
   return React2.useEffect(() => {
     var _a2, _b2, _c2, _d2;
     ((_a2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _a2.email) ? (_b2 = emailRef.current) == null || _b2.focus() : ((_c2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _c2.password) && ((_d2 = passwordRef.current) == null || _d2.focus());
@@ -1033,7 +1267,7 @@ function LoginPage() {
     className: "flex min-h-full flex-col justify-center"
   }, /* @__PURE__ */ React2.createElement("div", {
     className: "mx-auto w-full max-w-md px-8"
-  }, /* @__PURE__ */ React2.createElement(import_react10.Form, {
+  }, /* @__PURE__ */ React2.createElement(import_react11.Form, {
     method: "post",
     className: "space-y-6"
   }, /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("label", {
@@ -1093,7 +1327,7 @@ function LoginPage() {
     className: "ml-2 block text-sm text-gray-900"
   }, "Remember me")), /* @__PURE__ */ React2.createElement("div", {
     className: "text-center text-sm text-gray-500"
-  }, "Don't have an account?", " ", /* @__PURE__ */ React2.createElement(import_react10.Link, {
+  }, "Don't have an account?", " ", /* @__PURE__ */ React2.createElement(import_react11.Link, {
     className: "text-blue-500 underline",
     to: {
       pathname: "/join",
@@ -1102,13 +1336,13 @@ function LoginPage() {
   }, "Sign up"))))));
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes.tsx
 var notes_exports = {};
 __export(notes_exports, {
   default: () => NotesPage,
   loader: () => loader5
 });
-var import_node6 = require("@remix-run/node"), import_react11 = require("@remix-run/react");
+var import_node6 = require("@remix-run/node"), import_react12 = require("@remix-run/react");
 
 // app/models/note.server.ts
 function getNote({
@@ -1153,22 +1387,22 @@ function deleteNote({
   });
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes.tsx
 async function loader5({ request }) {
   let userId = await requireUserId(request), noteListItems = await getNoteListItems({ userId });
   return (0, import_node6.json)({ noteListItems });
 }
 function NotesPage() {
-  let data = (0, import_react11.useLoaderData)(), user = useUser();
+  let data = (0, import_react12.useLoaderData)(), user = useUser();
   return /* @__PURE__ */ React.createElement("div", {
     className: "flex h-full min-h-screen flex-col"
   }, /* @__PURE__ */ React.createElement("header", {
     className: "flex items-center justify-between bg-slate-800 p-4 text-white"
   }, /* @__PURE__ */ React.createElement("h1", {
     className: "text-3xl font-bold"
-  }, /* @__PURE__ */ React.createElement(import_react11.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react12.Link, {
     to: "."
-  }, "Notes")), /* @__PURE__ */ React.createElement("p", null, user.email), /* @__PURE__ */ React.createElement(import_react11.Form, {
+  }, "Notes")), /* @__PURE__ */ React.createElement("p", null, user.email), /* @__PURE__ */ React.createElement(import_react12.Form, {
     action: "/logout",
     method: "post"
   }, /* @__PURE__ */ React.createElement("button", {
@@ -1178,22 +1412,22 @@ function NotesPage() {
     className: "flex h-full bg-white"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "h-full w-80 border-r bg-gray-50"
-  }, /* @__PURE__ */ React.createElement(import_react11.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react12.Link, {
     to: "new",
     className: "block p-4 text-xl text-blue-500"
   }, "+ New Note"), /* @__PURE__ */ React.createElement("hr", null), data.noteListItems.length === 0 ? /* @__PURE__ */ React.createElement("p", {
     className: "p-4"
   }, "No notes yet") : /* @__PURE__ */ React.createElement("ol", null, data.noteListItems.map((note) => /* @__PURE__ */ React.createElement("li", {
     key: note.id
-  }, /* @__PURE__ */ React.createElement(import_react11.NavLink, {
+  }, /* @__PURE__ */ React.createElement(import_react12.NavLink, {
     className: ({ isActive }) => `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`,
     to: note.id
   }, "\u{1F4DD} ", note.title))))), /* @__PURE__ */ React.createElement("div", {
     className: "flex-1 p-6"
-  }, /* @__PURE__ */ React.createElement(import_react11.Outlet, null))));
+  }, /* @__PURE__ */ React.createElement(import_react12.Outlet, null))));
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\$noteId.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/$noteId.tsx
 var noteId_exports = {};
 __export(noteId_exports, {
   CatchBoundary: () => CatchBoundary,
@@ -1202,7 +1436,7 @@ __export(noteId_exports, {
   default: () => NoteDetailsPage,
   loader: () => loader6
 });
-var import_node7 = require("@remix-run/node"), import_react12 = require("@remix-run/react"), import_tiny_invariant2 = __toESM(require("tiny-invariant"));
+var import_node7 = require("@remix-run/node"), import_react13 = require("@remix-run/react"), import_tiny_invariant2 = __toESM(require("tiny-invariant"));
 async function loader6({ request, params }) {
   let userId = await requireUserId(request);
   (0, import_tiny_invariant2.default)(params.noteId, "noteId not found");
@@ -1216,14 +1450,14 @@ async function action3({ request, params }) {
   return (0, import_tiny_invariant2.default)(params.noteId, "noteId not found"), await deleteNote({ userId, id: params.noteId }), (0, import_node7.redirect)("/notes");
 }
 function NoteDetailsPage() {
-  let data = (0, import_react12.useLoaderData)();
+  let data = (0, import_react13.useLoaderData)();
   return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", {
     className: "text-2xl font-bold"
   }, data.note.title), /* @__PURE__ */ React.createElement("p", {
     className: "py-6"
   }, data.note.body), /* @__PURE__ */ React.createElement("hr", {
     className: "my-4"
-  }), /* @__PURE__ */ React.createElement(import_react12.Form, {
+  }), /* @__PURE__ */ React.createElement(import_react13.Form, {
     method: "post"
   }, /* @__PURE__ */ React.createElement("button", {
     type: "submit",
@@ -1234,32 +1468,32 @@ function ErrorBoundary({ error }) {
   return console.error(error), /* @__PURE__ */ React.createElement("div", null, "An unexpected error occurred: ", error.message);
 }
 function CatchBoundary() {
-  let caught = (0, import_react12.useCatch)();
+  let caught = (0, import_react13.useCatch)();
   if (caught.status === 404)
     return /* @__PURE__ */ React.createElement("div", null, "Note not found");
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\index.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/index.tsx
 var notes_exports2 = {};
 __export(notes_exports2, {
   default: () => NoteIndexPage
 });
-var import_react13 = require("@remix-run/react");
+var import_react14 = require("@remix-run/react");
 function NoteIndexPage() {
-  return /* @__PURE__ */ React.createElement("p", null, "No note selected. Select a note on the left, or", " ", /* @__PURE__ */ React.createElement(import_react13.Link, {
+  return /* @__PURE__ */ React.createElement("p", null, "No note selected. Select a note on the left, or", " ", /* @__PURE__ */ React.createElement(import_react14.Link, {
     to: "new",
     className: "text-blue-500 underline"
   }, "create a new note."));
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\new.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/new.tsx
 var new_exports = {};
 __export(new_exports, {
   action: () => action4,
   default: () => NewNotePage
 });
-var import_node8 = require("@remix-run/node"), import_react14 = require("@remix-run/react"), React3 = __toESM(require("react"));
+var import_node8 = require("@remix-run/node"), import_react15 = require("@remix-run/react"), React3 = __toESM(require("react"));
 async function action4({ request }) {
   let userId = await requireUserId(request), formData = await request.formData(), title = formData.get("title"), body = formData.get("body");
   if (typeof title != "string" || title.length === 0)
@@ -1271,11 +1505,11 @@ async function action4({ request }) {
 }
 function NewNotePage() {
   var _a, _b, _c, _d, _e, _f;
-  let actionData = (0, import_react14.useActionData)(), titleRef = React3.useRef(null), bodyRef = React3.useRef(null);
+  let actionData = (0, import_react15.useActionData)(), titleRef = React3.useRef(null), bodyRef = React3.useRef(null);
   return React3.useEffect(() => {
     var _a2, _b2, _c2, _d2;
     ((_a2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _a2.title) ? (_b2 = titleRef.current) == null || _b2.focus() : ((_c2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _c2.body) && ((_d2 = bodyRef.current) == null || _d2.focus());
-  }, [actionData]), /* @__PURE__ */ React3.createElement(import_react14.Form, {
+  }, [actionData]), /* @__PURE__ */ React3.createElement(import_react15.Form, {
     method: "post",
     style: {
       display: "flex",
@@ -1314,7 +1548,7 @@ function NewNotePage() {
   }, "Save")));
 }
 
-// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\join.tsx
+// route:/Users/jreisdorff/Sites/poker-world/app/routes/join.tsx
 var join_exports = {};
 __export(join_exports, {
   action: () => action5,
@@ -1322,7 +1556,7 @@ __export(join_exports, {
   loader: () => loader7,
   meta: () => meta4
 });
-var import_node9 = require("@remix-run/node"), import_react15 = require("@remix-run/react"), React4 = __toESM(require("react"));
+var import_node9 = require("@remix-run/node"), import_react16 = require("@remix-run/react"), React4 = __toESM(require("react"));
 async function loader7({ request }) {
   return await getUserId(request) ? (0, import_node9.redirect)("/") : (0, import_node9.json)({});
 }
@@ -1354,7 +1588,7 @@ var meta4 = () => ({
 });
 function Join() {
   var _a, _b, _c, _d;
-  let [searchParams] = (0, import_react15.useSearchParams)(), redirectTo = searchParams.get("redirectTo") ?? void 0, actionData = (0, import_react15.useActionData)(), emailRef = React4.useRef(null), passwordRef = React4.useRef(null);
+  let [searchParams] = (0, import_react16.useSearchParams)(), redirectTo = searchParams.get("redirectTo") ?? void 0, actionData = (0, import_react16.useActionData)(), emailRef = React4.useRef(null), passwordRef = React4.useRef(null);
   return React4.useEffect(() => {
     var _a2, _b2, _c2, _d2;
     ((_a2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _a2.email) ? (_b2 = emailRef.current) == null || _b2.focus() : ((_c2 = actionData == null ? void 0 : actionData.errors) == null ? void 0 : _c2.password) && ((_d2 = passwordRef.current) == null || _d2.focus());
@@ -1362,7 +1596,7 @@ function Join() {
     className: "flex min-h-full flex-col justify-center"
   }, /* @__PURE__ */ React4.createElement("div", {
     className: "mx-auto w-full max-w-md px-8"
-  }, /* @__PURE__ */ React4.createElement(import_react15.Form, {
+  }, /* @__PURE__ */ React4.createElement(import_react16.Form, {
     method: "post",
     className: "space-y-6"
   }, /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("label", {
@@ -1412,7 +1646,7 @@ function Join() {
     className: "flex items-center justify-center"
   }, /* @__PURE__ */ React4.createElement("div", {
     className: "text-center text-sm text-gray-500"
-  }, "Already have an account?", " ", /* @__PURE__ */ React4.createElement(import_react15.Link, {
+  }, "Already have an account?", " ", /* @__PURE__ */ React4.createElement(import_react16.Link, {
     className: "text-blue-500 underline",
     to: {
       pathname: "/login",
@@ -1422,10 +1656,10 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "92ba340e", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-YISKOBHI.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-6VRZQJCP.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-92BA340E.js" };
+var assets_manifest_default = { version: "363e7709", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-IUA4ZOOQ.js", imports: ["/build/_shared/chunk-NT25MWPM.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-OBLKZMS6.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-KD3XF54D.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-JEXU6V47.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-JIEBQSR3.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-WIWPYHNW.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KB24HJ3S.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-E6U7HO44.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-6SMFZZ43.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-6IDDKACF.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-363E7709.js" };
 
 // server-entry-module:@remix-run/dev/server-build
-var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
+var assetsBuildDirectory = "public/build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
   root: {
     id: "root",
     parentId: void 0,
