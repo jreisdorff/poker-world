@@ -52,6 +52,7 @@ export default function useGameState() {
     const [turnsNextRound, setTurnsNextRound] = useState(2);
     const [earlyWin, setEarlyWin] = useState(false);
     const [needResponsesFrom, setNeedResponsesFrom] = useState(3);
+    const [dealerIndex, setDealerIndex] = useState(0);
     const [littleBlindIndex, setLittleBlindIndex] = useState(1);
     const [bigBlindIndex, setBigBlindIndex] = useState(2);
     const [manualAdvance, setManualAdvance] = useState(false);
@@ -103,6 +104,7 @@ export default function useGameState() {
             turnsNextRound,
             earlyWin,
             needResponsesFrom,
+            dealerIndex,
             littleBlindIndex,
             bigBlindIndex,
             manualAdvance,
@@ -149,6 +151,7 @@ export default function useGameState() {
             setTurnsNextRound,
             setEarlyWin,
             setNeedResponsesFrom,
+            setDealerIndex,
             setLittleBlindIndex,
             setBigBlindIndex,
             setManualAdvance,

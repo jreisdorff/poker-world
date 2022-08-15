@@ -10,7 +10,7 @@ import cardsIE9Styles from "../styles/cards-ie9.css";
 import cardStyles from "../styles/cards.css";
 import progressStyles from "../styles/progress.css";
 
-import { isEmpty } from "lodash";
+import { isEmpty, isNumber } from "lodash";
 import Pot from "~/components/Pot";
 import { useSocket } from "~/context";
 import useGameState from "~/hooks/useGameState";
@@ -24,6 +24,7 @@ import {
 } from "~/interfaces";
 import prepareForFold from "~/functions/prepareForFold";
 import prepareForCheckCall from "~/functions/prepareForCheckCall";
+import prepareForBet from "~/functions/prepareForBet";
 
 export const links: LinksFunction = () => {
   return [
@@ -131,6 +132,7 @@ export default function Index() {
     setEarlyWin,
     setNeedResponsesFrom,
     setLittleBlindIndex,
+    setDealerIndex,
     setBigBlindIndex,
     setManualAdvance,
     setUltimateWinner,
@@ -252,7 +254,15 @@ export default function Index() {
 
       setWinningCards([]);
 
-      setActiveBet(bigBlindAmount);
+      setActiveBet(data.blinds[1]);
+
+      let playersWithChips = data.players.filter((p) => p.chips > 0).length;
+
+      if (playersWithChips === 2) {
+        setBet(data.blinds[0]);
+      } else {
+        setBet(data.blinds[1]);
+      }
 
       let needResponsesIndicies: number[] = [];
 
@@ -266,20 +276,49 @@ export default function Index() {
 
       setNeedResponsesFrom(data.players.filter((p) => p.chips > 0).length);
 
-      setDealer(data.dealer);
-      setLittleBlind(data.littleBlind);
-      setBigBlind(data.bigBlind);
+      let activePlayers = data.players.filter(
+        (p: { chips: number }) => p.chips > 0
+      );
 
-      setActivePlayerIndex(data.dealerIndex);
+      let nextDealerIndex = data.hands.length % activePlayers.length;
+      let nextLittleBlindIndex = (data.hands.length + 1) % activePlayers.length;
+      let nextBigBlindIndex = (data.hands.length + 2) % activePlayers.length;
 
-      setActivePlayer(data.players[data.dealerIndex]);
+      setActiveBet(activePlayers.length === 2 ? data.blinds[0] : data.blinds[1]);
+
+      setDealer(activePlayers[nextDealerIndex]);
+      setLittleBlind(activePlayers[nextLittleBlindIndex]);
+      setBigBlind(activePlayers[nextBigBlindIndex]);
+
+      setDealerIndex(nextDealerIndex);
+      setLittleBlindIndex(nextLittleBlindIndex);
+      setBigBlindIndex(nextBigBlindIndex);
+
+      setActivePlayerIndex(
+        activePlayers.length >= 3 ? nextDealerIndex : nextLittleBlindIndex
+      );
+
+      if (activePlayers.length > 0) {
+        setActivePlayer(
+          activePlayers.length >= 3 || activePlayers.length === 0
+            ? activePlayers[nextDealerIndex]
+            : activePlayers[nextLittleBlindIndex]
+        );
+      }
+
+      setBlinds(data.blinds);
+
+      setLittleBlindAmount(data.blinds[0]);
+      setBigBlindAmount(data.blinds[1]);
     });
 
     socket.on("sendBetData", (data: SendBetDataProps) => {
       setPots(data.pots);
       setPlayers(data.players);
+
       setActiveBet(data.activeBet);
-      setBet(data.activeBet + bigBlindAmount);
+
+      setBet(data.activeBet + data.bigBlindAmount);
       setActivePlayerIndex(data.activePlayerIndex);
 
       setActivePlayer(data.activePlayer);
@@ -310,6 +349,7 @@ export default function Index() {
         turnsThisRound: data.turnsThisRound,
         needResponsesFrom: data.needResponsesFrom,
         needResponsesFromIndicies: data.needResponsesFromIndicies,
+        bigBlindAmount: data.bigBlindAmount,
       };
 
       advance(advanceDataProps, "BET");
@@ -330,22 +370,26 @@ export default function Index() {
       setLittleBlindIndex(data.littleBlindIndex);
       setBigBlindIndex(data.bigBlindIndex);
 
-      if (data.activeBet <= bigBlindAmount) {
+      if (data.activeBet <= data.bigBlindAmount!) {
         if (
           data.gameState === GameState.Preflop &&
           data.littleBlindIndex == data.activePlayerIndex
         ) {
-          setActiveBet(littleBlindAmount);
+          setActiveBet(data.littleBlindAmount!);
         } else if (
           data.gameState === GameState.Preflop &&
-          data.bigBlindIndex == data.activePlayerIndex
+          data.prevActivePlayerIndex == data.littleBlindIndex
         ) {
           setActiveBet(0);
         } else {
-          setActiveBet(data.activeBet);
+          if (isNumber(data.activeBet)) {
+            setActiveBet(data.activeBet);
+          }
         }
       } else {
-        setActiveBet(data.activeBet);
+        if (isNumber(data.activeBet)) {
+          setActiveBet(data.activeBet);
+        }
       }
 
       let checkOrCallDescription = data.activeBet
@@ -374,6 +418,7 @@ export default function Index() {
         turnsThisRound: data.turnsThisRound,
         needResponsesFrom: data.needResponsesFrom,
         needResponsesFromIndicies: data.needResponsesFromIndicies,
+        bigBlindAmount: data.bigBlindAmount!,
       };
 
       advance(advanceDataProps, "CHECK");
@@ -395,7 +440,7 @@ export default function Index() {
           data.gameState === GameState.Preflop &&
           data.littleBlindIndex == data.activePlayerIndex
         ) {
-          setActiveBet(littleBlindAmount);
+          setActiveBet(data.littleBlindAmount);
         } else if (
           data.gameState === GameState.Preflop &&
           data.bigBlindIndex == data.activePlayerIndex
@@ -431,6 +476,7 @@ export default function Index() {
         turnsThisRound: data.turnsThisRound,
         needResponsesFrom: data.needResponsesFrom,
         needResponsesFromIndicies: data.needResponsesFromIndicies,
+        bigBlindAmount: data.bigBlindAmount!,
       };
 
       advance(advanceDataProps, "FOLD");
@@ -439,7 +485,7 @@ export default function Index() {
     socket.on("sendEndRoundData", (data: NextProps) => {
       setActiveBet(0);
 
-      setBet(bigBlindAmount * 2);
+      setBet(data.bigBlindAmount * 2);
 
       setGameState(data.gameState);
 
@@ -491,13 +537,14 @@ export default function Index() {
             needResponsesFrom: data.turnsThisRound + 1,
             manualAdvance: true,
             needResponsesFromIndicies: data.needResponsesFromIndicies,
+            bigBlindAmount: data.bigBlindAmount,
           };
           if (data.activePlayer.socket === socket?.id) {
             socket!.emit("advanceToEnd", advanceGameProps);
           }
         }
 
-        setBet(bigBlindAmount);
+        setBet(data.bigBlindAmount);
 
         setGameState(data.gameState);
         setDealerCards(data.dealerCards);
@@ -589,7 +636,7 @@ export default function Index() {
       let nextLittleBlindIndex = (data.hands.length + 1) % activePlayers.length;
       let nextBigBlindIndex = (data.hands.length + 2) % activePlayers.length;
 
-      setActiveBet(bigBlindAmount);
+      setActiveBet(activePlayers.length === 2 ? data.blinds[0] : data.blinds[1]);
 
       setDealer(activePlayers[nextDealerIndex]);
       setLittleBlind(activePlayers[nextLittleBlindIndex]);
@@ -598,10 +645,16 @@ export default function Index() {
       setLittleBlindIndex(nextLittleBlindIndex);
       setBigBlindIndex(nextBigBlindIndex);
 
-      setActivePlayerIndex(nextDealerIndex);
+      setActivePlayerIndex(
+        activePlayers.length >= 3 ? nextDealerIndex : nextLittleBlindIndex
+      );
 
       if (activePlayers.length > 0) {
-        setActivePlayer(activePlayers[nextDealerIndex]);
+        setActivePlayer(
+          activePlayers.length >= 3 || activePlayers.length === 0
+            ? activePlayers[nextDealerIndex]
+            : activePlayers[nextLittleBlindIndex]
+        );
       }
 
       setPots([littleBlindAmount + bigBlindAmount]);
@@ -643,72 +696,7 @@ export default function Index() {
   };
 
   const handleBet = (amount: number) => {
-    let tempPlayers = [...players];
-    let tempActivePlayer = tempPlayers.find(
-      (player) => player.name === activePlayer.name
-    );
-    let tempPrevActivePlayerIndex = tempPlayers.indexOf(tempActivePlayer!);
-    tempActivePlayer!.chips -= amount;
-
-    if (tempActivePlayer!.chips <= 0) {
-      tempActivePlayer!.allIn = true;
-    }
-
-    let tempPots = [...pots];
-    tempPots[0] += amount;
-
-    let tempNeedResponsesFromIndicies = [...needResponsesFromIndicies];
-
-    tempNeedResponsesFromIndicies.shift();
-
-    let tempActivePlayers: Player[] = [];
-    let tempActivePlayerIndicies: number[] = [];
-
-    tempPlayers.forEach((p, index) => {
-      if (!(p.folded || p.chips <= 0)) {
-        tempActivePlayers.push(p);
-        tempActivePlayerIndicies.push(index);
-      }
-    });
-
-    let newActivePlayer: Player = tempActivePlayers[0];
-    let tempAPI: number = tempActivePlayerIndicies[0];
-
-    if (tempActivePlayerIndicies.length > 0) {
-      if (tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 1)) {
-        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 1];
-        tempAPI = tempPrevActivePlayerIndex + 1;
-      } else if (
-        tempActivePlayerIndicies.includes(tempPrevActivePlayerIndex + 2)
-      ) {
-        newActivePlayer = tempPlayers[tempPrevActivePlayerIndex + 2];
-        tempAPI = tempPrevActivePlayerIndex + 2;
-      } else {
-        newActivePlayer = tempActivePlayers[0];
-        tempAPI = tempActivePlayerIndicies[0];
-      }
-    } else {
-      newActivePlayer = tempActivePlayer!;
-      tempAPI = tempPrevActivePlayerIndex;
-    }
-
-    const betProps: SendBetDataProps = {
-      players: tempPlayers,
-      pots: tempPots,
-      prevActivePlayerIndex: tempPrevActivePlayerIndex,
-      activePlayerIndex: tempAPI,
-      activePlayer: newActivePlayer,
-      turnNumber,
-      playerSocket,
-      gameState,
-      dealerCards,
-      activeBet: amount,
-      turnsNextRound,
-      turnsThisRound,
-      hands,
-      needResponsesFrom,
-      needResponsesFromIndicies: tempNeedResponsesFromIndicies,
-    };
+    let betProps = prepareForBet(values, amount);
 
     socket!.emit("playerBet", betProps);
   };
@@ -736,6 +724,17 @@ export default function Index() {
     socket!.emit("startHoldEmGame", startProps);
   };
 
+  const newGameIncreaseBlinds = () => {
+    let startProps = {
+      playerNames,
+      playerSockets,
+      playerChips: players.map((p) => 1000),
+      pastHands: hands,
+      newBlinds: [blinds[0] * 2, blinds[1] * 2],
+    };
+    socket!.emit("startHoldEmGame", startProps);
+  };
+
   const advanceGame = (data: AdvanceGameProps) => {
     socket!.emit("advanceHoldEmGame", data);
   };
@@ -745,7 +744,7 @@ export default function Index() {
   };
 
   const advanceHands = () => {
-    socket!.emit("advanceHands", { players, hands, playerSockets });
+    socket!.emit("advanceHands", { players, hands, playerSockets, blinds, });
   };
 
   const handleShowCards = (player: Player) => {
@@ -829,19 +828,42 @@ export default function Index() {
               </>
             )}
 
+            {!gameOver && gameStarted ? (
+              <div className="z-[999999] flex w-full flex-col items-center justify-center text-xl text-white">
+                <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
+                <div>{`Pot: ${!pots ? 0 : pots.join(", ")}`}</div>
+                <div>
+                  {winner
+                    ? `Hand #${hands.length}`
+                    : `Hand #${hands.length + 1}`}
+                </div>
+              </div>
+            ) : null}
+
             {gameOver && (
               <div className="flex flex-col">
-                <div
-                  className={`z-[410443] mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
-                    !winner ? "opacity-0" : "opacity-100"
-                  }`}
-                >
-                  <h1>{winner ? winner.description : null}</h1>
-                  <h1>
-                    {ultimateWinner
-                      ? `${ultimateWinner.name} wins the game!`
-                      : null}
-                  </h1>
+                <div className="flex flex-row items-center justify-center gap-4">
+                  <div
+                    className={`z-[410443] mb-8 text-center text-3xl text-white transition-all duration-[1000ms] ${
+                      !winner ? "opacity-0" : "opacity-100"
+                    }`}
+                  >
+                    <h1>{winner ? winner.description : null}</h1>
+                    <h1>
+                      {ultimateWinner
+                        ? `${ultimateWinner.name} wins the game!`
+                        : null}
+                    </h1>
+                  </div>
+                  <div className="z-[999999] flex flex-col items-center justify-center text-xl text-white">
+                    <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
+                    <div>{`Pot: ${!pots ? 0 : pots.join(", ")}`}</div>
+                    <div>
+                      {winner
+                        ? `Hand #${hands.length}`
+                        : `Hand #${hands.length + 1}`}
+                    </div>
+                  </div>
                 </div>
                 {!ultimateWinner ? (
                   <button
@@ -852,26 +874,23 @@ export default function Index() {
                     Next Hand
                   </button>
                 ) : (
-                  <button
-                    id="next-btn"
-                    className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                    onClick={() => newGame()}
-                  >
-                    New Game
-                  </button>
+                  <div className="flex w-full flex-row items-center justify-center gap-2 self-center text-center">
+                    <button
+                      id="next-btn"
+                      className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                      onClick={() => newGame()}
+                    >
+                      New Game
+                    </button>
+                    <button
+                      id="next-btn"
+                      className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                      onClick={() => newGameIncreaseBlinds()}
+                    >
+                      New Game, Increase Blinds
+                    </button>
+                  </div>
                 )}
-              </div>
-            )}
-
-            {gameStarted && (
-              <div className="flex w-full flex-col items-center justify-center">
-                <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
-                <div>{`Pot: ${!pots ? 0 : pots.join(", ")}`}</div>
-                <div>
-                  {winner
-                    ? `Hand #${hands.length}`
-                    : `Hand #${hands.length + 1}`}
-                </div>
               </div>
             )}
 
@@ -1188,12 +1207,14 @@ export default function Index() {
                             }`
                           : "Check"}
                       </button>
-                      <button
-                        className="rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                        onClick={() => handleBet(bet)}
-                      >
-                        {activeBet > 0 ? `Raise to ${bet}` : `Bet ${bet}`}
-                      </button>
+                      {activePlayer.chips > activeBet ? (
+                        <button
+                          className="rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                          onClick={() => handleBet(bet)}
+                        >
+                          {activeBet > 0 ? `Raise to ${bet}` : `Bet ${bet}`}
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 ) : null}

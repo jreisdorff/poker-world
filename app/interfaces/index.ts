@@ -25,10 +25,13 @@ export interface Player {
     turnsThisRound: number;
     hands: any[];
     needResponsesFrom: number;
+    dealerIndex: number;
     littleBlindIndex: number;
     bigBlindIndex: number;
     callAmount: number;
     needResponsesFromIndicies: number[];
+    littleBlindAmount?: number;
+    bigBlindAmount?: number;
   }
   
   export interface SendFoldDataProps {
@@ -49,6 +52,8 @@ export interface Player {
     bigBlindIndex: number;
     activeBet: number;
     needResponsesFromIndicies: number[];
+    bigBlindAmount: number;
+    littleBlindAmount: number;
   }
   
   export interface SendBetDataProps {
@@ -67,6 +72,7 @@ export interface Player {
     hands: any[];
     needResponsesFrom: number;
     needResponsesFromIndicies: number[];
+    bigBlindAmount: number;
   }
   
   export const GameState = Object.freeze({

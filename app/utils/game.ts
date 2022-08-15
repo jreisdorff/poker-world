@@ -1,4 +1,4 @@
-import { Player } from "~/routes";
+import { Player } from "~/interfaces";
 import { createCards } from "./cards";
 import { PokerWinner, TotalCards } from "./poker";
 
@@ -15,6 +15,7 @@ export interface AdvanceGameProps {
     needResponsesFrom: number;
     manualAdvance?: boolean;
     needResponsesFromIndicies: number[];
+    bigBlindAmount: number;
 };
 
 
@@ -33,4 +34,5 @@ export interface NextProps {
   manualAdvance?: boolean;
   pots: any[]
   needResponsesFromIndicies: number[];
+  bigBlindAmount: number;
 };

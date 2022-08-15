@@ -47,6 +47,7 @@ const endHoldEmRound = (props) => {
     gameOver: false,
     turnsNextRound: props.turnsNextRound,
     needResponsesFromIndicies: props.needResponsesFromIndicies,
+    bigBlindAmount: props.bigBlindAmount,
   };
 
   nextProps.gameState = GameState.Showdown;
@@ -119,6 +120,7 @@ const advanceToEnd = async (props) => {
     manualAdvance: props.manualAdvance,
     pots: props.pots,
     needResponsesFromIndicies: props.needResponsesFromIndicies,
+    bigBlindAmount: props.bigBlindAmount,
   };
 
   let tempDealerCards = [...props.dealerCards];
@@ -262,6 +264,7 @@ const advanceHoldEmGame = (props) => {
     turnsNextRound: props.turnsNextRound,
     manualAdvance: props.manualAdvance,
     needResponsesFromIndicies: props.needResponsesFromIndicies,
+    bigBlindAmount: props.bigBlindAmount,
   };
 
   if (props.gameState === GameState.Preflop) {
@@ -609,7 +612,7 @@ io.on("connection", (socket) => {
 
     let tempHands = [...data.hands];
 
-    io.emit("sendAdvanceHandsData", { players: newPlayers, hands: tempHands });
+    io.emit("sendAdvanceHandsData", { players: newPlayers, hands: tempHands, blinds: data.blinds });
   });
 
   socket.on("startHoldEmGame", (data) => {
@@ -618,6 +621,7 @@ io.on("connection", (socket) => {
     let players = data.playerNames;
     let playerChips = data.playerChips;
     let pastHands = data.pastHands;
+    let newBlinds = data.newBlinds ? data.newBlinds : [10, 20];
 
     let tempPlayers = [...players];
     let dealtCards = [];
@@ -640,11 +644,11 @@ io.on("connection", (socket) => {
       };
 
       if (index == nextLittleBlindIndex) {
-        newGuy.chips = newGuy.chips - 10;
-        tempPot = tempPot + 10;
+        newGuy.chips = newGuy.chips - newBlinds[0];
+        tempPot = tempPot + newBlinds[0];
       } else if (index == nextBigBlindIndex) {
-        newGuy.chips = newGuy.chips - 20;
-        tempPot = tempPot + 20;
+        newGuy.chips = newGuy.chips - newBlinds[1];
+        tempPot = tempPot + newBlinds[1];
       }
 
       fullPlayers.push(newGuy);
@@ -667,6 +671,8 @@ io.on("connection", (socket) => {
       bigBlind: fullPlayers[nextBigBlindIndex],
       pots: [tempPot],
       activePlayer: fullPlayers[nextDealerIndex],
+      blinds: newBlinds,
+      hands: pastHands,
     };
 
     io.emit("sendHoldEmData", startHoldEmGameProps);

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Player } from "~/routes";
+import { Player } from "~/interfaces";
 
 /*
 Example implementation used in the Think Functional course
@@ -45,6 +45,9 @@ export interface StartHoldEmGameProps {
   bigBlindIndex: number,
   pots: any[];
   activePlayer: Player,
+  blinds: number[],
+  bigBlindAmount: number;
+  hands: any[];
 };
 
 //

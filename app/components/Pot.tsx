@@ -86,6 +86,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["1000"]).keys()).map((_, index) => {
             return (
               <img
+                key={1000 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
@@ -98,6 +99,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["500"]).keys()).map((_, index) => {
             return (
               <img
+                key={500 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
@@ -110,6 +112,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["100"]).keys()).map((_, index) => {
             return (
               <img
+                key={100 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
@@ -122,6 +125,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["50"]).keys()).map((_, index) => {
             return (
               <img
+                key={50 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
@@ -134,6 +138,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["20"]).keys()).map((_, index) => {
             return (
               <img
+                key={20 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
@@ -146,6 +151,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["10"]).keys()).map((_, index) => {
             return (
               <img
+                key={10 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
@@ -158,6 +164,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["5"]).keys()).map((_, index) => {
             return (
               <img
+                key={5 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
@@ -170,6 +177,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["2"]).keys()).map((_, index) => {
             return (
               <img
+                key={2 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
@@ -182,6 +190,7 @@ export default function Pot(props: PotProps) {
         ? Array.from(Array(chips.chips["1"]).keys()).map((_, index) => {
             return (
               <img
+                key={1 + index}
                 className={`relative ${index} -ml-10`}
                 width="36px"
                 height="36px"
