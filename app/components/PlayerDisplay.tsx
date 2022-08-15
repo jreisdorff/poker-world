@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Player } from "~/routes";
+import { Player } from "~/interfaces";
+import Pot from "./Pot";
 
 interface PlayerDisplayProps {
   player: Player;
@@ -52,28 +53,29 @@ export default function PlayerDisplay(props: PlayerDisplayProps) {
   return (
     <div className={`flex flex-col z-1`}>
       <div
-        className={`w-[135px] max-w-[100vw] rounded-t-2xl bg-black/80 p-1 text-center text-white ${
-          active && !gameOver
+        className={`w-[135px] max-w-[100vw] rounded-t-2xl bg-black/80 p-1 text-center text-white ${active && !gameOver
             ? "border-x-4 border-t-4 border-x-lime-500 border-t-lime-500"
             : null
-        }`}
+          }`}
       >
         {`${player.name}`}
       </div>
       <div
-        className={`mb-1 w-[135px] max-w-[100vw] rounded-b-2xl bg-white/80 p-1 text-center text-black ${
-          active && !gameOver
+        className={`mb-1 w-[135px] max-w-[100vw] rounded-b-2xl bg-white/80 p-1 text-center text-black ${active && !gameOver
             ? "border-x-4 border-b-4 border-x-lime-500 border-b-lime-500"
             : null
-        }`}
+          }`}
       >
-        {player.allIn ? 'All In' : player.chips}
+        <div className="flex flex-row justify-between">
+          <div className="text-center">{player.allIn ? 'All In' : player.chips}</div>
+        </div>
       </div>
       {active ? (
         <div id="progressbar"></div>
       ) : (
         <div className="m-[10px] h-[20px] w-full"></div>
       )}
+      <Pot amount={player.chips} />
     </div>
   );
 }

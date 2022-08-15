@@ -18,7 +18,7 @@ export default function getNextActivePlayerDetails(needResponsesFromIndicies: an
     let tempActivePlayerIndicies: number[] = [];
 
     tempPlayers.forEach((p, index) => {
-        if (!(p.folded || p.chips <= 0)) {
+        if (!(p.folded || p.chips <= 0 || p.allIn)) {
             tempActivePlayers.push(p);
             tempActivePlayerIndicies.push(index);
         }

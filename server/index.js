@@ -34,6 +34,10 @@ const GameState = Object.freeze({
   Showdown: 4,
 });
 
+const playerIsActive = (player) => {
+  return (!(player.folded || player.chips <= 0 || player.allIn));
+};
+
 const endHoldEmRound = (props) => {
   let nextProps = {
     gameState: props.gameState,
@@ -241,7 +245,7 @@ const advanceToEnd = async (props) => {
       nextProps.gameOver = true;
     }
 
-    let turnsNext = nextProps.players.filter((player) => !player.folded).length;
+    let turnsNext = nextProps.players.filter((player) => playerIsActive(player)).length;
 
     nextProps.turnsNextRound = turnsNext;
 
@@ -605,7 +609,7 @@ io.on("connection", (socket) => {
         cards: prev.chips <= 0 ? [] : createCards(52, 2, undefined, false),
         folded: prev.chips <= 0 ? true : false,
         socket: data.playerSockets[index],
-        allIn: prev.allIn,
+        allIn: false,
       };
       return newPlayer;
     });
