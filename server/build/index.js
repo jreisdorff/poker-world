@@ -71,7 +71,7 @@ function handleRequest(request, responseStatusCode, responseHeaders, remixContex
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var root_exports = {};
 __export(root_exports, {
   default: () => App,
@@ -187,7 +187,7 @@ async function logout(request) {
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var import_react4 = require("react"), import_socket = require("socket.io-client");
 
 // app/context.tsx
@@ -201,7 +201,7 @@ function SocketProvider({ socket, children }) {
   }, children);
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var links = () => [{ rel: "stylesheet", href: tailwind_default }], meta = () => ({
   charset: "utf-8",
   title: "Remix Notes",
@@ -229,7 +229,7 @@ function App() {
   }, /* @__PURE__ */ React.createElement(import_react3.Outlet, null)), /* @__PURE__ */ React.createElement(import_react3.ScrollRestoration, null), /* @__PURE__ */ React.createElement(import_react3.Scripts, null), /* @__PURE__ */ React.createElement(import_react3.LiveReload, null)));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/healthcheck.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\healthcheck.tsx
 var healthcheck_exports = {};
 __export(healthcheck_exports, {
   loader: () => loader2
@@ -250,7 +250,7 @@ async function loader2({ request }) {
   }
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/logout.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\logout.tsx
 var logout_exports = {};
 __export(logout_exports, {
   action: () => action,
@@ -264,7 +264,7 @@ async function loader3() {
   return (0, import_node4.redirect)("/");
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var routes_exports = {};
 __export(routes_exports, {
   default: () => Index,
@@ -342,18 +342,18 @@ function Table() {
 }
 
 // app/styles/cards-ie.css
-var cards_ie_default = "/build/_assets/cards-ie-KXYXFTMX.css";
+var cards_ie_default = "/build/_assets/cards-ie-K2KFIEE6.css";
 
 // app/styles/cards-ie9.css
-var cards_ie9_default = "/build/_assets/cards-ie9-OIEF3GYU.css";
+var cards_ie9_default = "/build/_assets/cards-ie9-FJ2H4YNU.css";
 
 // app/styles/cards.css
-var cards_default = "/build/_assets/cards-DWTR5WFF.css";
+var cards_default = "/build/_assets/cards-RC2VKTQW.css";
 
 // app/styles/progress.css
-var progress_default = "/build/_assets/progress-DNTSZ2WT.css";
+var progress_default = "/build/_assets/progress-4XQ5EFCP.css";
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var import_lodash = require("lodash");
 
 // app/components/Pot.tsx
@@ -691,7 +691,7 @@ function prepareForCheckCall(values) {
   };
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var links2 = () => [
   { rel: "stylesheet", href: cards_default },
   { rel: "stylesheet", href: cards_ie_default },
@@ -794,7 +794,7 @@ function Index() {
     setNeedResponsesFromIndicies,
     setAdvancingToEnd
   } = actions, handleCheckOrCall = (callAmount) => {
-    let checkOrCallProps = prepareForCheckCall(values);
+    let checkOrCallProps = prepareForCheckCall(__spreadProps(__spreadValues({}, values), { callAmount }));
     socket.emit("playerCheckedOrCalled", checkOrCallProps);
   };
   (0, import_react10.useEffect)(() => {
@@ -1226,7 +1226,7 @@ function Index() {
   }, "Muck"))) : null) : null))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/login.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\login.tsx
 var login_exports = {};
 __export(login_exports, {
   action: () => action2,
@@ -1336,7 +1336,7 @@ function LoginPage() {
   }, "Sign up"))))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes.tsx
 var notes_exports = {};
 __export(notes_exports, {
   default: () => NotesPage,
@@ -1387,7 +1387,7 @@ function deleteNote({
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes.tsx
 async function loader5({ request }) {
   let userId = await requireUserId(request), noteListItems = await getNoteListItems({ userId });
   return (0, import_node6.json)({ noteListItems });
@@ -1427,7 +1427,7 @@ function NotesPage() {
   }, /* @__PURE__ */ React.createElement(import_react12.Outlet, null))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/$noteId.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\$noteId.tsx
 var noteId_exports = {};
 __export(noteId_exports, {
   CatchBoundary: () => CatchBoundary,
@@ -1474,7 +1474,7 @@ function CatchBoundary() {
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\index.tsx
 var notes_exports2 = {};
 __export(notes_exports2, {
   default: () => NoteIndexPage
@@ -1487,7 +1487,7 @@ function NoteIndexPage() {
   }, "create a new note."));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/new.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\new.tsx
 var new_exports = {};
 __export(new_exports, {
   action: () => action4,
@@ -1548,7 +1548,7 @@ function NewNotePage() {
   }, "Save")));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/join.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\join.tsx
 var join_exports = {};
 __export(join_exports, {
   action: () => action5,
@@ -1656,10 +1656,10 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "363e7709", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-IUA4ZOOQ.js", imports: ["/build/_shared/chunk-NT25MWPM.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-OBLKZMS6.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-KD3XF54D.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-JEXU6V47.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-JIEBQSR3.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-WIWPYHNW.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KB24HJ3S.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-E6U7HO44.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-6SMFZZ43.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-6IDDKACF.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-363E7709.js" };
+var assets_manifest_default = { version: "f87ea81c", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-YISKOBHI.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-PCBCPJMV.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-F87EA81C.js" };
 
 // server-entry-module:@remix-run/dev/server-build
-var assetsBuildDirectory = "public/build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
+var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
   root: {
     id: "root",
     parentId: void 0,

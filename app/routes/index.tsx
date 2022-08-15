@@ -15,7 +15,13 @@ import Pot from "~/components/Pot";
 import { useSocket } from "~/context";
 import useGameState from "~/hooks/useGameState";
 import { pluralize } from "~/utils";
-import { Player, SendCheckOrCallDataProps, SendBetDataProps, GameState, SendFoldDataProps } from "~/interfaces";
+import {
+  Player,
+  SendCheckOrCallDataProps,
+  SendBetDataProps,
+  GameState,
+  SendFoldDataProps,
+} from "~/interfaces";
 import prepareForFold from "~/functions/prepareForFold";
 import prepareForCheckCall from "~/functions/prepareForCheckCall";
 
@@ -39,7 +45,8 @@ export default function Index() {
 
   const { values, actions } = useGameState();
 
-  const { gameState,
+  const {
+    gameState,
     logs,
     gameStarted,
     dealerCards,
@@ -82,8 +89,10 @@ export default function Index() {
     manualAdvance,
     ultimateWinner,
     needResponsesFromIndicies,
-    advancingToEnd } = values;
-  const { setGameState,
+    advancingToEnd,
+  } = values;
+  const {
+    setGameState,
     setLogs,
     setGameStarted,
     setDealerCards,
@@ -130,7 +139,7 @@ export default function Index() {
   } = actions;
 
   const handleCheckOrCall = (callAmount: number) => {
-    let checkOrCallProps = prepareForCheckCall(values);
+    let checkOrCallProps = prepareForCheckCall({ ...values, callAmount });
 
     socket!.emit("playerCheckedOrCalled", checkOrCallProps);
   };
@@ -276,7 +285,8 @@ export default function Index() {
       setActivePlayer(data.activePlayer);
       setLogs((prev) => [
         ...prev,
-        `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet
+        `${data.players[data.prevActivePlayerIndex].name} bet ${
+          data.activeBet
         }`,
       ]);
       setSnackbarMessage(
@@ -339,8 +349,9 @@ export default function Index() {
       }
 
       let checkOrCallDescription = data.activeBet
-        ? `${data.players[data.prevActivePlayerIndex].name} called ${data.callAmount
-        }`
+        ? `${data.players[data.prevActivePlayerIndex].name} called ${
+            data.callAmount
+          }`
         : `${data.players[data.prevActivePlayerIndex].name} checked`;
 
       setLogs((prev) => [...prev, checkOrCallDescription]);
@@ -745,7 +756,7 @@ export default function Index() {
       .map((p) => p.cards);
 
     tempCards.forEach((cardArray) => {
-      cardArray.forEach((card: { faceUp: boolean; }) => {
+      cardArray.forEach((card: { faceUp: boolean }) => {
         card.faceUp = true;
       });
     });
@@ -753,7 +764,7 @@ export default function Index() {
     socket!.emit("showCards", { players: tempPlayers });
   };
 
-  const handleMuckCards = () => { };
+  const handleMuckCards = () => {};
 
   return (
     <>
@@ -798,8 +809,9 @@ export default function Index() {
                   />
                 ) : null}
                 <button
-                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${joinedGame ? "disabled" : ""
-                    }`}
+                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${
+                    joinedGame ? "disabled" : ""
+                  }`}
                   onClick={handleJoinGame}
                   disabled={joinedGame}
                 >
@@ -820,8 +832,9 @@ export default function Index() {
             {gameOver && (
               <div className="flex flex-col">
                 <div
-                  className={`z-[410443] mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${!winner ? "opacity-0" : "opacity-100"
-                    }`}
+                  className={`z-[410443] mb-8 w-full items-center justify-center self-center text-center text-3xl text-white transition-all duration-[1000ms] ${
+                    !winner ? "opacity-0" : "opacity-100"
+                  }`}
                 >
                   <h1>{winner ? winner.description : null}</h1>
                   <h1>
@@ -877,12 +890,12 @@ export default function Index() {
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                  card.rank
-                                );
-                              }).length > 0
+                                  return (
+                                    w.suit == card.suit.charAt(0) &&
+                                    w.value.toString().replace("T", "10") ===
+                                      card.rank
+                                  );
+                                }).length > 0
                               : false
                           }
                         />
@@ -901,31 +914,36 @@ export default function Index() {
                   {/* <div className="playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
                   <div className="fixed bottom-[47vh] right-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
-                      {players[1].cards.map((card: { suit: string; rank: string; faceUp: any; }, index: any) => (
-                        <Card
-                          key={`${index}-${card.suit}-${card.rank}`}
-                          suit={card.suit}
-                          rank={card.rank}
-                          faceUp={
-                            players[1].folded
-                              ? false
-                              : players[1].socket === playerSocket ||
-                              card.faceUp
-                          }
-                          folded={players[1].folded}
-                          winner={
-                            winningCards.length > 0
-                              ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                  card.rank
-                                );
-                              }).length > 0
-                              : false
-                          }
-                        />
-                      ))}
+                      {players[1].cards.map(
+                        (
+                          card: { suit: string; rank: string; faceUp: any },
+                          index: any
+                        ) => (
+                          <Card
+                            key={`${index}-${card.suit}-${card.rank}`}
+                            suit={card.suit}
+                            rank={card.rank}
+                            faceUp={
+                              players[1].folded
+                                ? false
+                                : players[1].socket === playerSocket ||
+                                  card.faceUp
+                            }
+                            folded={players[1].folded}
+                            winner={
+                              winningCards.length > 0
+                                ? winningCards.filter((w) => {
+                                    return (
+                                      w.suit == card.suit.charAt(0) &&
+                                      w.value.toString().replace("T", "10") ===
+                                        card.rank
+                                    );
+                                  }).length > 0
+                                : false
+                            }
+                          />
+                        )
+                      )}
                     </div>
                     <PlayerDisplay
                       player={players[1]}
@@ -973,31 +991,36 @@ export default function Index() {
                   {/* <div className="playingCards simpleCards fixed top-[30%] left-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
                   <div className="fixed bottom-[47vh] left-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
-                      {players[2].cards.map((card: { suit: string; rank: string; faceUp: any; }, index: any) => (
-                        <Card
-                          key={`${index}-${card.suit}-${card.rank}`}
-                          suit={card.suit}
-                          rank={card.rank}
-                          faceUp={
-                            players[2].folded
-                              ? false
-                              : players[2].socket === playerSocket ||
-                              card.faceUp
-                          }
-                          folded={players[2].folded}
-                          winner={
-                            winningCards.length > 0
-                              ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                  card.rank
-                                );
-                              }).length > 0
-                              : false
-                          }
-                        />
-                      ))}
+                      {players[2].cards.map(
+                        (
+                          card: { suit: string; rank: string; faceUp: any },
+                          index: any
+                        ) => (
+                          <Card
+                            key={`${index}-${card.suit}-${card.rank}`}
+                            suit={card.suit}
+                            rank={card.rank}
+                            faceUp={
+                              players[2].folded
+                                ? false
+                                : players[2].socket === playerSocket ||
+                                  card.faceUp
+                            }
+                            folded={players[2].folded}
+                            winner={
+                              winningCards.length > 0
+                                ? winningCards.filter((w) => {
+                                    return (
+                                      w.suit == card.suit.charAt(0) &&
+                                      w.value.toString().replace("T", "10") ===
+                                        card.rank
+                                    );
+                                  }).length > 0
+                                : false
+                            }
+                          />
+                        )
+                      )}
                     </div>
                     <PlayerDisplay
                       player={players[2]}
@@ -1042,30 +1065,35 @@ export default function Index() {
                   ) : null}
                 </div>
                 <div className="playingCards simpleCards fixed bottom-[20%] flex w-[100vw] flex-row items-center justify-center">
-                  {players[0].cards.map((card: { suit: string; rank: string; faceUp: any; }, index: any) => (
-                    <Card
-                      key={`${index}-${card.suit}-${card.rank}`}
-                      suit={card.suit}
-                      rank={card.rank}
-                      faceUp={
-                        players[0].folded
-                          ? false
-                          : players[0].socket === playerSocket || card.faceUp
-                      }
-                      folded={players[0].folded}
-                      winner={
-                        winningCards.length > 0
-                          ? winningCards.filter((w) => {
-                            return (
-                              w.suit == card.suit.charAt(0) &&
-                              w.value.toString().replace("T", "10") ===
-                              card.rank
-                            );
-                          }).length > 0
-                          : false
-                      }
-                    />
-                  ))}
+                  {players[0].cards.map(
+                    (
+                      card: { suit: string; rank: string; faceUp: any },
+                      index: any
+                    ) => (
+                      <Card
+                        key={`${index}-${card.suit}-${card.rank}`}
+                        suit={card.suit}
+                        rank={card.rank}
+                        faceUp={
+                          players[0].folded
+                            ? false
+                            : players[0].socket === playerSocket || card.faceUp
+                        }
+                        folded={players[0].folded}
+                        winner={
+                          winningCards.length > 0
+                            ? winningCards.filter((w) => {
+                                return (
+                                  w.suit == card.suit.charAt(0) &&
+                                  w.value.toString().replace("T", "10") ===
+                                    card.rank
+                                );
+                              }).length > 0
+                            : false
+                        }
+                      />
+                    )
+                  )}
                 </div>
                 <div className="fixed bottom-[7.5%] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                   <PlayerDisplay
@@ -1110,8 +1138,8 @@ export default function Index() {
                   </div>
                 ) : null}
                 {!gameOver &&
-                  !advancingToEnd &&
-                  activePlayer.socket === playerSocket ? (
+                !advancingToEnd &&
+                activePlayer.socket === playerSocket ? (
                   <div className="fixed bottom-[10%] right-0 z-[987654321] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">
@@ -1153,10 +1181,11 @@ export default function Index() {
                         }
                       >
                         {activeBet > 0
-                          ? `Call ${activePlayer.chips >= activeBet
-                            ? activeBet
-                            : activePlayer.chips
-                          }`
+                          ? `Call ${
+                              activePlayer.chips >= activeBet
+                                ? activeBet
+                                : activePlayer.chips
+                            }`
                           : "Check"}
                       </button>
                       <button
@@ -1169,11 +1198,11 @@ export default function Index() {
                   </div>
                 ) : null}
                 {gameOver &&
-                  earlyWin &&
-                  winner &&
-                  winner.winner.players
-                    .map((p) => p.socket)
-                    .includes(player!.socket) ? (
+                earlyWin &&
+                winner &&
+                winner.winner.players
+                  .map((p) => p.socket)
+                  .includes(player!.socket) ? (
                   <div className="fixed bottom-[10%] right-0 z-[10999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
                       <button
