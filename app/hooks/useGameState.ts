@@ -57,6 +57,9 @@ export default function useGameState() {
     const [bigBlindIndex, setBigBlindIndex] = useState(2);
     const [manualAdvance, setManualAdvance] = useState(false);
     const [ultimateWinner, setUltimateWinner] = useState<Player | null>(null);
+    const [chat, setChat] = useState<string[]>([]);
+    const [logsOrChat, setLogsOrChat] = useState<'logs' | 'chat'>('logs');
+    const [chatbox, setChatbox] = useState('');
   
     const [needResponsesFromIndicies, setNeedResponsesFromIndicies] = useState<
       number[]
@@ -68,6 +71,9 @@ export default function useGameState() {
         values: {
             gameState,
             logs,
+            chat,
+            logsOrChat,
+            chatbox,
             gameStarted,
             dealerCards,
             isSnackbarOpen,
@@ -115,6 +121,9 @@ export default function useGameState() {
         actions: {
             setGameState,
             setLogs,
+            setChat,
+            setLogsOrChat,
+            setChatbox,
             setGameStarted,
             setDealerCards,
             setIsSnackbarOpen,

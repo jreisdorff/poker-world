@@ -71,7 +71,7 @@ function handleRequest(request, responseStatusCode, responseHeaders, remixContex
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var root_exports = {};
 __export(root_exports, {
   default: () => App,
@@ -82,7 +82,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-TTF4MDBE.css";
+var tailwind_default = "/build/_assets/tailwind-UY5E5OVR.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -187,7 +187,7 @@ async function logout(request) {
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var import_react4 = require("react"), import_socket = require("socket.io-client");
 
 // app/context.tsx
@@ -201,7 +201,7 @@ function SocketProvider({ socket, children }) {
   }, children);
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var links = () => [{ rel: "stylesheet", href: tailwind_default }], meta = () => ({
   charset: "utf-8",
   title: "Remix Notes",
@@ -229,7 +229,7 @@ function App() {
   }, /* @__PURE__ */ React.createElement(import_react3.Outlet, null)), /* @__PURE__ */ React.createElement(import_react3.ScrollRestoration, null), /* @__PURE__ */ React.createElement(import_react3.Scripts, null), /* @__PURE__ */ React.createElement(import_react3.LiveReload, null)));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/healthcheck.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\healthcheck.tsx
 var healthcheck_exports = {};
 __export(healthcheck_exports, {
   loader: () => loader2
@@ -250,7 +250,7 @@ async function loader2({ request }) {
   }
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/logout.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\logout.tsx
 var logout_exports = {};
 __export(logout_exports, {
   action: () => action,
@@ -264,7 +264,7 @@ async function loader3() {
   return (0, import_node4.redirect)("/");
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var routes_exports = {};
 __export(routes_exports, {
   default: () => Index,
@@ -434,18 +434,18 @@ function Table() {
 }
 
 // app/styles/cards-ie.css
-var cards_ie_default = "/build/_assets/cards-ie-KXYXFTMX.css";
+var cards_ie_default = "/build/_assets/cards-ie-K2KFIEE6.css";
 
 // app/styles/cards-ie9.css
-var cards_ie9_default = "/build/_assets/cards-ie9-OIEF3GYU.css";
+var cards_ie9_default = "/build/_assets/cards-ie9-FJ2H4YNU.css";
 
 // app/styles/cards.css
-var cards_default = "/build/_assets/cards-DWTR5WFF.css";
+var cards_default = "/build/_assets/cards-RC2VKTQW.css";
 
 // app/styles/progress.css
-var progress_default = "/build/_assets/progress-DNTSZ2WT.css";
+var progress_default = "/build/_assets/progress-4XQ5EFCP.css";
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var import_lodash = require("lodash");
 
 // app/hooks/useGameState.ts
@@ -484,11 +484,14 @@ var GameState = Object.freeze({
 
 // app/hooks/useGameState.ts
 function useGameState() {
-  let [gameState, setGameState] = (0, import_react7.useState)(GameState.Preflop), [logs, setLogs] = (0, import_react7.useState)([]), [gameStarted, setGameStarted] = (0, import_react7.useState)(!1), [dealerCards, setDealerCards] = (0, import_react7.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react7.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react7.useState)(""), [dealtCards, setDealtCards] = (0, import_react7.useState)([]), [players, setPlayers] = (0, import_react7.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react7.useState)(0), [activePlayer, setActivePlayer] = (0, import_react7.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react7.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react7.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react7.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react7.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react7.useState)(20), [bet, setBet] = (0, import_react7.useState)(bigBlindAmount * 2), [pots, setPots] = (0, import_react7.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react7.useState)(0), [turnNumber, setTurnNumber] = (0, import_react7.useState)(0), [blinds, setBlinds] = (0, import_react7.useState)([10, 20]), [winner, setWinner] = (0, import_react7.useState)(null), [gameOver, setGameOver] = (0, import_react7.useState)(!1), [hands, setHands] = (0, import_react7.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react7.useState)(3), [winningCards, setWinningCards] = (0, import_react7.useState)([]), [wonAmount, setWonAmount] = (0, import_react7.useState)(0), [playerName, setPlayerName] = (0, import_react7.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react7.useState)(!1), [playerCount, setPlayerCount] = (0, import_react7.useState)(0), [playerNames, setPlayerNames] = (0, import_react7.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react7.useState)(), [playerSockets, setPlayerSockets] = (0, import_react7.useState)([]), [player, setPlayer] = (0, import_react7.useState)(), [joinedGame, setJoinedGame] = (0, import_react7.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react7.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react7.useState)(2), [earlyWin, setEarlyWin] = (0, import_react7.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react7.useState)(3), [dealerIndex, setDealerIndex] = (0, import_react7.useState)(0), [littleBlindIndex, setLittleBlindIndex] = (0, import_react7.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react7.useState)(2), [manualAdvance, setManualAdvance] = (0, import_react7.useState)(!1), [ultimateWinner, setUltimateWinner] = (0, import_react7.useState)(null), [needResponsesFromIndicies, setNeedResponsesFromIndicies] = (0, import_react7.useState)([0, 1, 2]), [advancingToEnd, setAdvancingToEnd] = (0, import_react7.useState)(!1);
+  let [gameState, setGameState] = (0, import_react7.useState)(GameState.Preflop), [logs, setLogs] = (0, import_react7.useState)([]), [gameStarted, setGameStarted] = (0, import_react7.useState)(!1), [dealerCards, setDealerCards] = (0, import_react7.useState)([]), [isSnackbarOpen, setIsSnackbarOpen] = (0, import_react7.useState)(!1), [snackbarMessage, setSnackbarMessage] = (0, import_react7.useState)(""), [dealtCards, setDealtCards] = (0, import_react7.useState)([]), [players, setPlayers] = (0, import_react7.useState)(initialPlayers), [activePlayerIndex, setActivePlayerIndex] = (0, import_react7.useState)(0), [activePlayer, setActivePlayer] = (0, import_react7.useState)(initialPlayers[activePlayerIndex]), [dealer, setDealer] = (0, import_react7.useState)(initialPlayers[0]), [littleBlind, setLittleBlind] = (0, import_react7.useState)(initialPlayers[1]), [bigBlind, setBigBlind] = (0, import_react7.useState)(initialPlayers[2]), [littleBlindAmount, setLittleBlindAmount] = (0, import_react7.useState)(10), [bigBlindAmount, setBigBlindAmount] = (0, import_react7.useState)(20), [bet, setBet] = (0, import_react7.useState)(bigBlindAmount * 2), [pots, setPots] = (0, import_react7.useState)([littleBlindAmount, bigBlindAmount]), [activeBet, setActiveBet] = (0, import_react7.useState)(0), [turnNumber, setTurnNumber] = (0, import_react7.useState)(0), [blinds, setBlinds] = (0, import_react7.useState)([10, 20]), [winner, setWinner] = (0, import_react7.useState)(null), [gameOver, setGameOver] = (0, import_react7.useState)(!1), [hands, setHands] = (0, import_react7.useState)([]), [activePlayerCount, setActivePlayerCount] = (0, import_react7.useState)(3), [winningCards, setWinningCards] = (0, import_react7.useState)([]), [wonAmount, setWonAmount] = (0, import_react7.useState)(0), [playerName, setPlayerName] = (0, import_react7.useState)(""), [buttonClicked, setButtonClicked] = (0, import_react7.useState)(!1), [playerCount, setPlayerCount] = (0, import_react7.useState)(0), [playerNames, setPlayerNames] = (0, import_react7.useState)([]), [playerSocket, setPlayerSocket] = (0, import_react7.useState)(), [playerSockets, setPlayerSockets] = (0, import_react7.useState)([]), [player, setPlayer] = (0, import_react7.useState)(), [joinedGame, setJoinedGame] = (0, import_react7.useState)(!1), [turnsThisRound, setTurnsThisRound] = (0, import_react7.useState)(2), [turnsNextRound, setTurnsNextRound] = (0, import_react7.useState)(2), [earlyWin, setEarlyWin] = (0, import_react7.useState)(!1), [needResponsesFrom, setNeedResponsesFrom] = (0, import_react7.useState)(3), [dealerIndex, setDealerIndex] = (0, import_react7.useState)(0), [littleBlindIndex, setLittleBlindIndex] = (0, import_react7.useState)(1), [bigBlindIndex, setBigBlindIndex] = (0, import_react7.useState)(2), [manualAdvance, setManualAdvance] = (0, import_react7.useState)(!1), [ultimateWinner, setUltimateWinner] = (0, import_react7.useState)(null), [chat, setChat] = (0, import_react7.useState)([]), [logsOrChat, setLogsOrChat] = (0, import_react7.useState)("logs"), [chatbox, setChatbox] = (0, import_react7.useState)(""), [needResponsesFromIndicies, setNeedResponsesFromIndicies] = (0, import_react7.useState)([0, 1, 2]), [advancingToEnd, setAdvancingToEnd] = (0, import_react7.useState)(!1);
   return {
     values: {
       gameState,
       logs,
+      chat,
+      logsOrChat,
+      chatbox,
       gameStarted,
       dealerCards,
       isSnackbarOpen,
@@ -536,6 +539,9 @@ function useGameState() {
     actions: {
       setGameState,
       setLogs,
+      setChat,
+      setLogsOrChat,
+      setChatbox,
       setGameStarted,
       setDealerCards,
       setIsSnackbarOpen,
@@ -768,7 +774,7 @@ function prepareForBet(values, amount) {
   };
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var links2 = () => [
   { rel: "stylesheet", href: cards_default },
   { rel: "stylesheet", href: cards_ie_default },
@@ -783,6 +789,9 @@ function Index() {
   let socket = useSocket(), { values, actions } = useGameState(), {
     gameState,
     logs,
+    chat,
+    logsOrChat,
+    chatbox,
     gameStarted,
     dealerCards,
     isSnackbarOpen,
@@ -828,6 +837,9 @@ function Index() {
   } = values, {
     setGameState,
     setLogs,
+    setChat,
+    setLogsOrChat,
+    setChatbox,
     setGameStarted,
     setDealerCards,
     setIsSnackbarOpen,
@@ -898,12 +910,21 @@ function Index() {
       setPlayerNames(data.playerNames), setPlayerSockets(data.playerSockets), setPlayerCount(data.playerNames.length);
     }), socket.on("dealerCards", (data) => {
       setDealerCards(data);
+    }), socket.on("sendChatData", (data) => {
+      let newChat = `${data.player.playerName}: ${data.chatbox}`;
+      if (!document.hidden) {
+        var msg = new SpeechSynthesisUtterance(`Player ${data.player.playerName} says ${data.chatbox}`);
+        window.speechSynthesis.speak(msg);
+      }
+      setChat((prevChats) => [...prevChats, newChat]);
     }), socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]), setPlayerSockets((prevPS) => [...prevPS, data.socket]), data.socket === socket.id && (setPlayerSocket(data.socket), setPlayer(data), setJoinedGame(!0));
       let newPlayerCount = 0;
       setPlayerCount((prevPC) => (newPlayerCount = prevPC + 1, newPlayerCount)), setButtonClicked(!1);
-    }), socket.on("sendHoldEmData", (data) => {
-      setGameState(data.gameState), setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setPots(data.pots), setUltimateWinner(null), setWinningCards([]);
+    }), socket.on("watcherJoined", (data) => {
+      setPlayerNames((prevPN) => [...prevPN, data.watcherName]), setPlayerSockets((prevPS) => [...prevPS, data.socket]), data.socket === socket.id && (setPlayerSocket(data.socket), setPlayer(__spreadProps(__spreadValues({}, data), { name: data.watcherName })), setJoinedGame(!0), setGameStarted(!0));
+    }), socket.on("startHoldEmGame", (data) => {
+      setGameState(data.gameState), data.players.map((p) => p.socket).includes(socket.id) && setGameStarted(data.gameStarted), setGameOver(data.gameOver), setDealtCards(data.dealtCards), setDealerCards(data.dealerCards), setPlayers(data.players), setPots(data.pots), setUltimateWinner(null), setWinningCards([]);
       let playersWithChips = data.players.filter((p) => p.chips > 0).length;
       setBet(playersWithChips === 2 ? data.blinds[0] : data.blinds[1]);
       let needResponsesIndicies = [];
@@ -1039,6 +1060,8 @@ function Index() {
   }, [buttonClicked]);
   let handleJoinGame = () => {
     setButtonClicked(!0);
+  }, handleWatchGame = () => {
+    !socket || socket.emit("watcherJoined");
   }, handleFold = () => {
     let foldProps = prepareForFold(values);
     socket.emit("playerFolded", foldProps);
@@ -1087,6 +1110,11 @@ function Index() {
       });
     }), socket.emit("showCards", { players: tempPlayers });
   }, handleMuckCards = () => {
+  }, handleChat = () => {
+    socket.emit("sendChat", {
+      chatbox,
+      player
+    }), setChatbox("");
   };
   return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("main", {
     className: "relative flex h-screen w-screen items-center justify-center overflow-visible bg-[rgb(0,90,0)]"
@@ -1094,27 +1122,61 @@ function Index() {
     className: "relative sm:pb-16 sm:pt-8"
   }, gameStarted ? /* @__PURE__ */ React.createElement(Table, null) : null, /* @__PURE__ */ React.createElement("div", {
     className: "mx-auto flex h-[80vh] w-[95vw] flex-col"
-  }, logs.length > 0 && /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-0 left-0 z-[55555] h-[75px] w-[250px] overflow-auto rounded-tr-xl bg-black/80 text-white"
+  }, gameStarted && /* @__PURE__ */ React.createElement("div", {
+    className: "fixed bottom-0 left-0 z-[987654322] min-h-[75px] w-[250px] overflow-visible bg-black/80 text-white"
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "flex flex-col",
+    className: "flex flex-row items-center justify-around"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "cursor-pointer",
+    onClick: () => {
+      setLogsOrChat("logs");
+    }
+  }, "Logs"), /* @__PURE__ */ React.createElement("div", {
+    className: "cursor-pointer",
+    onClick: () => {
+      setLogsOrChat("chat");
+    }
+  }, "Chat")), logsOrChat === "logs" ? /* @__PURE__ */ React.createElement("div", {
+    className: "flex flex-col max-h-[300px] overflowy-scroll",
     style: { boxSizing: "content-box", paddingRight: "17px" }
   }, logs.map((l, index) => /* @__PURE__ */ React.createElement("span", {
     key: index
-  }, l)))), !gameStarted && /* @__PURE__ */ React.createElement(React.Fragment, null, joinedGame ? null : /* @__PURE__ */ React.createElement("input", {
+  }, l))) : /* @__PURE__ */ React.createElement("div", {
+    className: "flex flex-col max-h-[300px] overflowy-scroll",
+    style: { boxSizing: "content-box", paddingRight: "17px" }
+  }, chat.length > 0 ? chat.map((c, index) => /* @__PURE__ */ React.createElement("span", {
+    key: index
+  }, c)) : /* @__PURE__ */ React.createElement("span", null, "No chats yet.")), logsOrChat === "chat" && /* @__PURE__ */ React.createElement("div", {
+    className: "flex flex-row"
+  }, /* @__PURE__ */ React.createElement("input", {
+    className: "w-fit self-center rounded bg-black px-4 py-2 text-white",
+    type: "text",
+    placeholder: "Chat here...",
+    value: chatbox,
+    onChange: (e) => setChatbox(e.target.value)
+  }), /* @__PURE__ */ React.createElement("button", {
+    className: "w-fit rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
+    onClick: handleChat
+  }, "Chat"))), !gameStarted && /* @__PURE__ */ React.createElement(React.Fragment, null, !joinedGame && playerNames.length < 3 ? /* @__PURE__ */ React.createElement("input", {
     placeholder: "Enter player name",
     type: "text",
     value: playerName,
     onChange: (e) => setPlayerName(e.target.value),
     className: "absolute mt-24 self-center rounded bg-black px-4 py-2 text-white"
-  }), /* @__PURE__ */ React.createElement("button", {
+  }) : null, !joinedGame && playerNames.length < 3 && /* @__PURE__ */ React.createElement("button", {
     className: `absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${joinedGame ? "disabled" : ""}`,
     onClick: handleJoinGame,
     disabled: joinedGame
-  }, joinedGame ? "Joined, awaiting players" : "Join Game"), playerNames.length > 0 ? /* @__PURE__ */ React.createElement("div", {
+  }, joinedGame ? "Joined, awaiting players" : "Join Game"), !joinedGame && playerNames.length >= 3 && /* @__PURE__ */ React.createElement("button", {
+    className: `absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${joinedGame ? "disabled" : ""}`,
+    onClick: handleWatchGame,
+    disabled: joinedGame
+  }, "Watch Game"), playerNames.length > 0 ? /* @__PURE__ */ React.createElement("div", {
     className: "absolute mt-[30%] self-center text-3xl text-black"
   }, `${playerNames.length} ${pluralize(playerNames.length, "player", "players")} joined`) : null), !gameOver && gameStarted ? /* @__PURE__ */ React.createElement("div", {
-    style: { textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" },
+    style: {
+      textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
+    },
     className: "z-[999999] flex w-full flex-col items-center justify-center text-xl text-white"
   }, /* @__PURE__ */ React.createElement("div", null, `Blinds: ${blinds[0]}/${blinds[1]}`), /* @__PURE__ */ React.createElement("div", null, `Pot: ${pots ? pots.join(", ") : 0}`), /* @__PURE__ */ React.createElement("div", null, winner ? `Hand #${hands.length}` : `Hand #${hands.length + 1}`)) : null, gameOver && /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col"
@@ -1123,28 +1185,28 @@ function Index() {
   }, /* @__PURE__ */ React.createElement("div", {
     className: `z-[410443] mb-8 text-center text-3xl text-white transition-all duration-[1000ms] ${winner ? "opacity-100" : "opacity-0"}`
   }, /* @__PURE__ */ React.createElement("h1", {
-    style: { textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }
+    style: {
+      textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
+    }
   }, winner ? winner.description : null), /* @__PURE__ */ React.createElement("h1", {
-    style: { textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }
+    style: {
+      textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
+    }
   }, ultimateWinner ? `${ultimateWinner.name} wins the game!` : null)), /* @__PURE__ */ React.createElement("div", {
     className: "z-[999999] flex flex-col items-center justify-center text-xl text-white"
   }, /* @__PURE__ */ React.createElement("div", {
-    style: { textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }
+    style: {
+      textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
+    }
   }, `Blinds: ${blinds[0]}/${blinds[1]}`), /* @__PURE__ */ React.createElement("div", {
-    style: { textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }
+    style: {
+      textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
+    }
   }, `Pot: ${pots ? pots.join(", ") : 0}`), /* @__PURE__ */ React.createElement("div", {
-    style: { textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }
-  }, winner ? `Hand #${hands.length}` : `Hand #${hands.length + 1}`))), ultimateWinner ? /* @__PURE__ */ React.createElement("div", {
-    className: "flex w-full flex-row items-center justify-center gap-2 self-center text-center"
-  }, /* @__PURE__ */ React.createElement("button", {
-    id: "next-btn",
-    className: "z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
-    onClick: () => newGame()
-  }, "New Game"), /* @__PURE__ */ React.createElement("button", {
-    id: "next-btn",
-    className: "z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
-    onClick: () => newGameIncreaseBlinds()
-  }, "New Game, Increase Blinds")) : /* @__PURE__ */ React.createElement("div", {
+    style: {
+      textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
+    }
+  }, winner ? `Hand #${hands.length}` : `Hand #${hands.length + 1}`))), players.map((p) => p.socket).includes(playerSocket) && !ultimateWinner && /* @__PURE__ */ React.createElement("div", {
     className: "flex w-full flex-row items-center justify-center gap-2 self-center text-center"
   }, /* @__PURE__ */ React.createElement("button", {
     id: "next-btn",
@@ -1154,7 +1216,17 @@ function Index() {
     id: "next-btn",
     className: "z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
     onClick: () => advanceHandsIncreaseBlinds()
-  }, "Next Hand, Increase Blinds"))), gameStarted ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", {
+  }, "Next Hand, Increase Blinds")), players.map((p) => p.socket).includes(playerSocket) && ultimateWinner && /* @__PURE__ */ React.createElement("div", {
+    className: "flex w-full flex-row items-center justify-center gap-2 self-center text-center"
+  }, /* @__PURE__ */ React.createElement("button", {
+    id: "next-btn",
+    className: "z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
+    onClick: () => newGame()
+  }, "New Game"), /* @__PURE__ */ React.createElement("button", {
+    id: "next-btn",
+    className: "z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black",
+    onClick: () => newGameIncreaseBlinds()
+  }, "New Game, Increase Blinds"))), gameStarted ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col items-center justify-center"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "absolute bottom-[45%] z-[9999] flex w-[100vw] flex-col items-center justify-center"
@@ -1254,7 +1326,7 @@ function Index() {
     height: "50px",
     className: "relative object-cover"
   })) : null), /* @__PURE__ */ React.createElement("div", {
-    className: "fixed bottom-[5%] flex flex-col gap-1 w-[100vw] items-center justify-center z-[9999853]"
+    className: "fixed bottom-[5%] z-[9999853] flex w-[100vw] flex-col items-center justify-center gap-1"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "playingCards simpleCards flex flex-row items-center justify-center"
   }, players[0].cards.map((card, index) => /* @__PURE__ */ React.createElement(Card, {
@@ -1335,7 +1407,7 @@ function Index() {
   }, "Muck"))) : null) : null))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/login.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\login.tsx
 var login_exports = {};
 __export(login_exports, {
   action: () => action2,
@@ -1445,7 +1517,7 @@ function LoginPage() {
   }, "Sign up"))))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes.tsx
 var notes_exports = {};
 __export(notes_exports, {
   default: () => NotesPage,
@@ -1496,7 +1568,7 @@ function deleteNote({
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes.tsx
 async function loader5({ request }) {
   let userId = await requireUserId(request), noteListItems = await getNoteListItems({ userId });
   return (0, import_node6.json)({ noteListItems });
@@ -1536,7 +1608,7 @@ function NotesPage() {
   }, /* @__PURE__ */ React.createElement(import_react12.Outlet, null))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/$noteId.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\$noteId.tsx
 var noteId_exports = {};
 __export(noteId_exports, {
   CatchBoundary: () => CatchBoundary,
@@ -1583,7 +1655,7 @@ function CatchBoundary() {
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\index.tsx
 var notes_exports2 = {};
 __export(notes_exports2, {
   default: () => NoteIndexPage
@@ -1596,7 +1668,7 @@ function NoteIndexPage() {
   }, "create a new note."));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/new.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\new.tsx
 var new_exports = {};
 __export(new_exports, {
   action: () => action4,
@@ -1657,7 +1729,7 @@ function NewNotePage() {
   }, "Save")));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/join.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\join.tsx
 var join_exports = {};
 __export(join_exports, {
   action: () => action5,
@@ -1765,10 +1837,10 @@ function Join() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "026985ed", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-YQ4IJNOD.js", imports: ["/build/_shared/chunk-NT25MWPM.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-OBLKZMS6.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-JAOZMLDV.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-JEXU6V47.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-JIEBQSR3.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-WIWPYHNW.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KB24HJ3S.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-E6U7HO44.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-6SMFZZ43.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-6IDDKACF.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-026985ED.js" };
+var assets_manifest_default = { version: "a1ed48f9", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-WLNANMJU.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-BP2OA5S6.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-A1ED48F9.js" };
 
 // server-entry-module:@remix-run/dev/server-build
-var assetsBuildDirectory = "public/build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
+var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
   root: {
     id: "root",
     parentId: void 0,

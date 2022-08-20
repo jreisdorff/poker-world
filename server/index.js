@@ -532,6 +532,9 @@ const createCards = (max, n, remaining = [], faceUp) => {
 let playerNames = [];
 let playerSockets = [];
 
+let watcherNames = [];
+let watcherSockets = [];
+
 // Then you can use `io` to listen the `connection` event and get a socket
 // from a client
 io.on("connection", (socket) => {
@@ -567,12 +570,26 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("watcherJoined", (data) => {
+    let watcherName = `Watcher ${watcherNames.length + 1}`;
+    watcherNames.push(watcherName);
+    watcherSockets.push(socket.id);
+    io.emit("watcherJoined", {
+      watcherName,
+      socket: socket.id,
+    });
+  });
+
   socket.on("playerBet", (data) => {
     io.emit("sendBetData", data);
   });
 
   socket.on("playerCheckedOrCalled", (data) => {
     io.emit("sendCheckOrCallData", data);
+  });
+
+  socket.on("sendChat", (data) => {
+    io.emit("sendChatData", data);
   });
 
   socket.on("playerFolded", (data) => {
@@ -679,7 +696,7 @@ io.on("connection", (socket) => {
       hands: pastHands,
     };
 
-    io.emit("sendHoldEmData", startHoldEmGameProps);
+    io.emit("startHoldEmGame", startHoldEmGameProps);
   });
 });
 

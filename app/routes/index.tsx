@@ -49,6 +49,9 @@ export default function Index() {
   const {
     gameState,
     logs,
+    chat,
+    logsOrChat,
+    chatbox,
     gameStarted,
     dealerCards,
     isSnackbarOpen,
@@ -95,6 +98,9 @@ export default function Index() {
   const {
     setGameState,
     setLogs,
+    setChat,
+    setLogsOrChat,
+    setChatbox,
     setGameStarted,
     setDealerCards,
     setIsSnackbarOpen,
@@ -224,6 +230,19 @@ export default function Index() {
       setDealerCards(data);
     });
 
+    socket.on("sendChatData", (data) => {
+      let newChat = `${data.player.playerName}: ${data.chatbox}`;
+
+      if (!document.hidden) {
+        var msg = new SpeechSynthesisUtterance(
+          `Player ${data.player.playerName} says ${data.chatbox}`
+        );
+        window.speechSynthesis.speak(msg);
+      }
+
+      setChat((prevChats) => [...prevChats, newChat]);
+    });
+
     socket.on("playerJoined", (data) => {
       setPlayerNames((prevPN) => [...prevPN, data.playerName]);
       setPlayerSockets((prevPS) => [...prevPS, data.socket]);
@@ -240,9 +259,24 @@ export default function Index() {
       setButtonClicked(false);
     });
 
-    socket.on("sendHoldEmData", (data: StartHoldEmGameProps) => {
+    socket.on("watcherJoined", (data) => {
+      setPlayerNames((prevPN) => [...prevPN, data.watcherName]);
+      setPlayerSockets((prevPS) => [...prevPS, data.socket]);
+      if (data.socket === socket.id) {
+        setPlayerSocket(data.socket);
+        setPlayer({ ...data, name: data.watcherName });
+        setJoinedGame(true);
+        setGameStarted(true);
+      }
+    });
+
+    socket.on("startHoldEmGame", (data: StartHoldEmGameProps) => {
       setGameState(data.gameState);
-      setGameStarted(data.gameStarted);
+
+      if (data.players.map((p) => p.socket).includes(socket.id)) {
+        setGameStarted(data.gameStarted);
+      }
+
       setGameOver(data.gameOver);
       setDealtCards(data.dealtCards);
       setDealerCards(data.dealerCards);
@@ -280,16 +314,20 @@ export default function Index() {
 
       tempPlayers.forEach((p, index) => {
         if (!(p.folded || p.chips <= 0 || p.allIn)) {
-            tempActivePlayers.push(p);
-            tempActivePlayerIndicies.push(index);
+          tempActivePlayers.push(p);
+          tempActivePlayerIndicies.push(index);
         }
-    });
+      });
 
       let nextDealerIndex = data.hands.length % tempActivePlayers.length;
-      let nextLittleBlindIndex = (data.hands.length + 1) % tempActivePlayers.length;
-      let nextBigBlindIndex = (data.hands.length + 2) % tempActivePlayers.length;
+      let nextLittleBlindIndex =
+        (data.hands.length + 1) % tempActivePlayers.length;
+      let nextBigBlindIndex =
+        (data.hands.length + 2) % tempActivePlayers.length;
 
-      setActiveBet(tempActivePlayers.length === 2 ? data.blinds[0] : data.blinds[1]);
+      setActiveBet(
+        tempActivePlayers.length === 2 ? data.blinds[0] : data.blinds[1]
+      );
 
       setDealer(tempActivePlayers[nextDealerIndex]);
       setLittleBlind(tempActivePlayers[nextLittleBlindIndex]);
@@ -329,7 +367,8 @@ export default function Index() {
       setActivePlayer(data.activePlayer);
       setLogs((prev) => [
         ...prev,
-        `${data.players[data.prevActivePlayerIndex].name} bet ${data.activeBet
+        `${data.players[data.prevActivePlayerIndex].name} bet ${
+          data.activeBet
         }`,
       ]);
       setSnackbarMessage(
@@ -408,8 +447,9 @@ export default function Index() {
       }
 
       let checkOrCallDescription = data.activeBet
-        ? `${data.players[data.prevActivePlayerIndex].name} called ${data.callAmount
-        }`
+        ? `${data.players[data.prevActivePlayerIndex].name} called ${
+            data.callAmount
+          }`
         : `${data.players[data.prevActivePlayerIndex].name} checked`;
 
       setLogs((prev) => [...prev, checkOrCallDescription]);
@@ -651,7 +691,9 @@ export default function Index() {
       let nextLittleBlindIndex = (data.hands.length + 1) % activePlayers.length;
       let nextBigBlindIndex = (data.hands.length + 2) % activePlayers.length;
 
-      setActiveBet(activePlayers.length === 2 ? data.blinds[0] : data.blinds[1]);
+      setActiveBet(
+        activePlayers.length === 2 ? data.blinds[0] : data.blinds[1]
+      );
 
       setDealer(activePlayers[nextDealerIndex]);
       setLittleBlind(activePlayers[nextLittleBlindIndex]);
@@ -702,6 +744,11 @@ export default function Index() {
 
   const handleJoinGame = () => {
     setButtonClicked(true);
+  };
+
+  const handleWatchGame = () => {
+    if (!socket) return;
+    socket.emit("watcherJoined");
   };
 
   const handleFold = () => {
@@ -759,7 +806,7 @@ export default function Index() {
   };
 
   const advanceHands = () => {
-    socket!.emit("advanceHands", { players, hands, playerSockets, blinds, });
+    socket!.emit("advanceHands", { players, hands, playerSockets, blinds });
   };
 
   const advanceHandsIncreaseBlinds = () => {
@@ -787,7 +834,15 @@ export default function Index() {
     socket!.emit("showCards", { players: tempPlayers });
   };
 
-  const handleMuckCards = () => { };
+  const handleMuckCards = () => {};
+
+  const handleChat = () => {
+    socket!.emit("sendChat", {
+      chatbox,
+      player,
+    });
+    setChatbox("");
+  };
 
   return (
     <>
@@ -795,16 +850,64 @@ export default function Index() {
         <div className="relative sm:pb-16 sm:pt-8">
           {gameStarted ? <Table /> : null}
           <div className="mx-auto flex h-[80vh] w-[95vw] flex-col">
-            {logs.length > 0 && (
-              <div className="fixed bottom-0 left-0 z-[55555] h-[75px] w-[250px] overflow-auto rounded-tr-xl bg-black/80 text-white">
-                <div
-                  className="flex flex-col"
-                  style={{ boxSizing: "content-box", paddingRight: "17px" }}
-                >
-                  {logs.map((l, index) => (
-                    <span key={index}>{l}</span>
-                  ))}
+            {gameStarted && (
+              <div className="fixed bottom-0 left-0 z-[987654322] min-h-[75px] w-[250px] overflow-visible bg-black/80 text-white">
+                <div className="flex flex-row items-center justify-around">
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setLogsOrChat("logs");
+                    }}
+                  >
+                    Logs
+                  </div>
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setLogsOrChat("chat");
+                    }}
+                  >
+                    Chat
+                  </div>
                 </div>
+                {logsOrChat === "logs" ? (
+                  <div
+                    className="flex flex-col max-h-[300px] overflowy-scroll"
+                    style={{ boxSizing: "content-box", paddingRight: "17px" }}
+                  >
+                    {logs.map((l, index) => (
+                      <span key={index}>{l}</span>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    className="flex flex-col max-h-[300px] overflowy-scroll"
+                    style={{ boxSizing: "content-box", paddingRight: "17px" }}
+                  >
+                    {chat.length > 0 ? (
+                      chat.map((c, index) => <span key={index}>{c}</span>)
+                    ) : (
+                      <span>No chats yet.</span>
+                    )}
+                  </div>
+                )}
+                {logsOrChat === "chat" && (
+                  <div className="flex flex-row">
+                    <input
+                      className="w-fit self-center rounded bg-black px-4 py-2 text-white"
+                      type="text"
+                      placeholder="Chat here..."
+                      value={chatbox}
+                      onChange={(e) => setChatbox(e.target.value)}
+                    />
+                    <button
+                      className="w-fit rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                      onClick={handleChat}
+                    >
+                      Chat
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             {/* <div className="fixed top-0 right-0 z-[55555] h-[75px] w-[250px] overflow-auto bg-black/80 text-white">
@@ -822,7 +925,7 @@ export default function Index() {
             </div> */}
             {!gameStarted && (
               <>
-                {!joinedGame ? (
+                {!joinedGame && playerNames.length < 3 ? (
                   <input
                     placeholder="Enter player name"
                     type="text"
@@ -831,14 +934,31 @@ export default function Index() {
                     className="absolute mt-24 self-center rounded bg-black px-4 py-2 text-white"
                   />
                 ) : null}
-                <button
-                  className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${joinedGame ? "disabled" : ""
+
+                {!joinedGame && playerNames.length < 3 && (
+                  <button
+                    className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${
+                      joinedGame ? "disabled" : ""
                     }`}
-                  onClick={handleJoinGame}
-                  disabled={joinedGame}
-                >
-                  {!joinedGame ? "Join Game" : "Joined, awaiting players"}
-                </button>
+                    onClick={handleJoinGame}
+                    disabled={joinedGame}
+                  >
+                    {!joinedGame ? "Join Game" : "Joined, awaiting players"}
+                  </button>
+                )}
+
+                {!joinedGame && playerNames.length >= 3 && (
+                  <button
+                    className={`absolute self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black ${
+                      joinedGame ? "disabled" : ""
+                    }`}
+                    onClick={handleWatchGame}
+                    disabled={joinedGame}
+                  >
+                    Watch Game
+                  </button>
+                )}
+
                 {playerNames.length > 0 ? (
                   <div className="absolute mt-[30%] self-center text-3xl text-black">
                     {`${playerNames.length} ${pluralize(
@@ -852,7 +972,12 @@ export default function Index() {
             )}
 
             {!gameOver && gameStarted ? (
-              <div style={{ textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000` }} className="z-[999999] flex w-full flex-col items-center justify-center text-xl text-white">
+              <div
+                style={{
+                  textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000`,
+                }}
+                className="z-[999999] flex w-full flex-col items-center justify-center text-xl text-white"
+              >
                 <div>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
                 <div>{`Pot: ${!pots ? 0 : pots.join(", ")}`}</div>
                 <div>
@@ -867,61 +992,88 @@ export default function Index() {
               <div className="flex flex-col">
                 <div className="flex flex-row items-center justify-center gap-4">
                   <div
-                    className={`z-[410443] mb-8 text-center text-3xl text-white transition-all duration-[1000ms] ${!winner ? "opacity-0" : "opacity-100"
-                      }`}
+                    className={`z-[410443] mb-8 text-center text-3xl text-white transition-all duration-[1000ms] ${
+                      !winner ? "opacity-0" : "opacity-100"
+                    }`}
                   >
-                    <h1 style={{ textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000` }}>{winner ? winner.description : null}</h1>
-                    <h1 style={{ textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000` }}>
+                    <h1
+                      style={{
+                        textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000`,
+                      }}
+                    >
+                      {winner ? winner.description : null}
+                    </h1>
+                    <h1
+                      style={{
+                        textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000`,
+                      }}
+                    >
                       {ultimateWinner
                         ? `${ultimateWinner.name} wins the game!`
                         : null}
                     </h1>
                   </div>
                   <div className="z-[999999] flex flex-col items-center justify-center text-xl text-white">
-                    <div style={{ textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000` }}>{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
-                    <div style={{ textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000` }}>{`Pot: ${!pots ? 0 : pots.join(", ")}`}</div>
-                    <div style={{ textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000` }}>
+                    <div
+                      style={{
+                        textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000`,
+                      }}
+                    >{`Blinds: ${blinds[0]}/${blinds[1]}`}</div>
+                    <div
+                      style={{
+                        textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000`,
+                      }}
+                    >{`Pot: ${!pots ? 0 : pots.join(", ")}`}</div>
+                    <div
+                      style={{
+                        textShadow: `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000`,
+                      }}
+                    >
                       {winner
                         ? `Hand #${hands.length}`
                         : `Hand #${hands.length + 1}`}
                     </div>
                   </div>
                 </div>
-                {!ultimateWinner ? (
-                  <div className="flex w-full flex-row items-center justify-center gap-2 self-center text-center">
-                    <button
-                      id="next-btn"
-                      className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                      onClick={() => advanceHands()}
-                    >
-                      Next Hand
-                    </button>
-                    <button
-                      id="next-btn"
-                      className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                      onClick={() => advanceHandsIncreaseBlinds()}
-                    >
-                      Next Hand, Increase Blinds
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex w-full flex-row items-center justify-center gap-2 self-center text-center">
-                    <button
-                      id="next-btn"
-                      className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                      onClick={() => newGame()}
-                    >
-                      New Game
-                    </button>
-                    <button
-                      id="next-btn"
-                      className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
-                      onClick={() => newGameIncreaseBlinds()}
-                    >
-                      New Game, Increase Blinds
-                    </button>
-                  </div>
-                )}
+
+                {players.map((p) => p.socket).includes(playerSocket) &&
+                  !ultimateWinner && (
+                    <div className="flex w-full flex-row items-center justify-center gap-2 self-center text-center">
+                      <button
+                        id="next-btn"
+                        className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={() => advanceHands()}
+                      >
+                        Next Hand
+                      </button>
+                      <button
+                        id="next-btn"
+                        className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={() => advanceHandsIncreaseBlinds()}
+                      >
+                        Next Hand, Increase Blinds
+                      </button>
+                    </div>
+                  )}
+                {players.map((p) => p.socket).includes(playerSocket) &&
+                  ultimateWinner && (
+                    <div className="flex w-full flex-row items-center justify-center gap-2 self-center text-center">
+                      <button
+                        id="next-btn"
+                        className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={() => newGame()}
+                      >
+                        New Game
+                      </button>
+                      <button
+                        id="next-btn"
+                        className="z-[410444] self-center rounded bg-black px-4 py-2 text-white active:bg-white active:text-black"
+                        onClick={() => newGameIncreaseBlinds()}
+                      >
+                        New Game, Increase Blinds
+                      </button>
+                    </div>
+                  )}
               </div>
             )}
 
@@ -940,12 +1092,12 @@ export default function Index() {
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                  card.rank
-                                );
-                              }).length > 0
+                                  return (
+                                    w.suit == card.suit.charAt(0) &&
+                                    w.value.toString().replace("T", "10") ===
+                                      card.rank
+                                  );
+                                }).length > 0
                               : false
                           }
                         />
@@ -977,18 +1129,18 @@ export default function Index() {
                               players[1].folded
                                 ? false
                                 : players[1].socket === playerSocket ||
-                                card.faceUp
+                                  card.faceUp
                             }
                             folded={players[1].folded}
                             winner={
                               winningCards.length > 0
                                 ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                    card.rank
-                                  );
-                                }).length > 0
+                                    return (
+                                      w.suit == card.suit.charAt(0) &&
+                                      w.value.toString().replace("T", "10") ===
+                                        card.rank
+                                    );
+                                  }).length > 0
                                 : false
                             }
                           />
@@ -1054,18 +1206,18 @@ export default function Index() {
                               players[2].folded
                                 ? false
                                 : players[2].socket === playerSocket ||
-                                card.faceUp
+                                  card.faceUp
                             }
                             folded={players[2].folded}
                             winner={
                               winningCards.length > 0
                                 ? winningCards.filter((w) => {
-                                  return (
-                                    w.suit == card.suit.charAt(0) &&
-                                    w.value.toString().replace("T", "10") ===
-                                    card.rank
-                                  );
-                                }).length > 0
+                                    return (
+                                      w.suit == card.suit.charAt(0) &&
+                                      w.value.toString().replace("T", "10") ===
+                                        card.rank
+                                    );
+                                  }).length > 0
                                 : false
                             }
                           />
@@ -1114,7 +1266,7 @@ export default function Index() {
                     </div>
                   ) : null}
                 </div>
-                <div className="fixed bottom-[5%] flex flex-col gap-1 w-[100vw] items-center justify-center z-[9999853]">
+                <div className="fixed bottom-[5%] z-[9999853] flex w-[100vw] flex-col items-center justify-center gap-1">
                   <div className="playingCards simpleCards flex flex-row items-center justify-center">
                     {players[0].cards.map(
                       (
@@ -1128,18 +1280,19 @@ export default function Index() {
                           faceUp={
                             players[0].folded
                               ? false
-                              : players[0].socket === playerSocket || card.faceUp
+                              : players[0].socket === playerSocket ||
+                                card.faceUp
                           }
                           folded={players[0].folded}
                           winner={
                             winningCards.length > 0
                               ? winningCards.filter((w) => {
-                                return (
-                                  w.suit == card.suit.charAt(0) &&
-                                  w.value.toString().replace("T", "10") ===
-                                  card.rank
-                                );
-                              }).length > 0
+                                  return (
+                                    w.suit == card.suit.charAt(0) &&
+                                    w.value.toString().replace("T", "10") ===
+                                      card.rank
+                                  );
+                                }).length > 0
                               : false
                           }
                         />
@@ -1188,8 +1341,8 @@ export default function Index() {
                   </div>
                 ) : null}
                 {!gameOver &&
-                  !advancingToEnd &&
-                  activePlayer.socket === playerSocket ? (
+                !advancingToEnd &&
+                activePlayer.socket === playerSocket ? (
                   <div className="fixed bottom-[10%] right-0 z-[987654321] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="flex w-[100%] flex-row items-end">
                       <div className="m-2">
@@ -1231,10 +1384,11 @@ export default function Index() {
                         }
                       >
                         {activeBet > 0
-                          ? `Call ${activePlayer.chips >= activeBet
-                            ? activeBet
-                            : activePlayer.chips
-                          }`
+                          ? `Call ${
+                              activePlayer.chips >= activeBet
+                                ? activeBet
+                                : activePlayer.chips
+                            }`
                           : "Check"}
                       </button>
                       {activePlayer.chips > activeBet ? (
@@ -1249,11 +1403,11 @@ export default function Index() {
                   </div>
                 ) : null}
                 {gameOver &&
-                  earlyWin &&
-                  winner &&
-                  winner.winner.players
-                    .map((p) => p.socket)
-                    .includes(player!.socket) ? (
+                earlyWin &&
+                winner &&
+                winner.winner.players
+                  .map((p) => p.socket)
+                  .includes(player!.socket) ? (
                   <div className="fixed bottom-[10%] right-0 z-[109999] flex w-[220px] flex-row items-end justify-end pr-8">
                     <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
                       <button
