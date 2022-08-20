@@ -236,7 +236,7 @@ export default function Index() {
       var msg = new SpeechSynthesisUtterance(
         `Player ${data.player.playerName} says ${data.chatbox}`
       );
-      window.speechSynthesis.speak(msg);
+      speechSynthesis.speak(msg);
 
       setChat((prevChats) => [...prevChats, newChat]);
     });
