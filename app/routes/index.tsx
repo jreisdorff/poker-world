@@ -52,6 +52,9 @@ export default function Index() {
     chat,
     logsOrChat,
     chatbox,
+    preCheck,
+    preBet,
+    preFold,
     gameStarted,
     dealerCards,
     isSnackbarOpen,
@@ -101,6 +104,9 @@ export default function Index() {
     setChat,
     setLogsOrChat,
     setChatbox,
+    setPreCheck,
+    setPreFold,
+    setPreBet,
     setGameStarted,
     setDealerCards,
     setIsSnackbarOpen,
@@ -717,6 +723,24 @@ export default function Index() {
   }, [socket]);
 
   useEffect(() => {
+    if (gameStarted) {
+      console.log(players, player);
+      if (players[activePlayerIndex].socket === player!.socket) {
+        if (preCheck[0]) {
+          setPreCheck((prevPreCheck) => [false, prevPreCheck[1]]);
+          handleCheckOrCall(preCheck[1] as number);
+        } else if (preBet[0]) {
+          setPreBet((prevPreBet) => [false, prevPreBet[1]]);
+          handleBet(preBet[1] as number);
+        } else if (preFold) {
+          setPreFold(false);
+          handleFold();
+        }
+      }
+    }
+  }, [activePlayerIndex]);
+
+  useEffect(() => {
     if (playerCount === 3) {
       // if you're the third player, aka if you were the player
       // who joined last, you'll be the one to emit the event
@@ -759,6 +783,18 @@ export default function Index() {
     let betProps = prepareForBet(values, amount);
 
     socket!.emit("playerBet", betProps);
+  };
+
+  const handlePreBet = (amount: number) => {
+    setPreBet([true, amount]);
+  };
+
+  const handlePreFold = () => {
+    setPreFold(true);
+  };
+
+  const handlePreCheckOrCall = (callAmount: number) => {
+    setPreCheck([true, callAmount]);
   };
 
   const handlePlayerTimeout = (player: Player) => {
@@ -1395,6 +1431,82 @@ export default function Index() {
                           onClick={() => handleBet(bet)}
                         >
                           {activeBet > 0 ? `Raise to ${bet}` : `Bet ${bet}`}
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
+                {!gameOver &&
+                !advancingToEnd &&
+                activePlayer.socket !== playerSocket ? (
+                  <div className="fixed bottom-[10%] right-0 z-[987654321] flex w-[220px] flex-row items-end justify-end pr-8">
+                    <div className="flex w-[100%] flex-row items-end">
+                      <div className="m-2">
+                        <input
+                          type="range"
+                          className="form-range w-full p-0 focus:shadow-none focus:outline-none focus:ring-0"
+                          min={
+                            activeBet > 0
+                              ? activeBet + bigBlindAmount
+                              : bigBlindAmount * 2
+                          }
+                          max={activePlayer.chips}
+                          value={bet}
+                          onChange={(event) => {
+                            setBet(+event.target.value);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1" />
+                      <button className="rounded bg-transparent px-4 py-2 text-white">
+                        {bet}
+                      </button>
+                    </div>
+                    <div className="fixed bottom-[5%] flex w-[100vw] flex-row items-end justify-end">
+                      <button
+                        className={`mr-1 rounded px-4 py-2 active:bg-white active:text-black  ${
+                          preFold
+                            ? "bg-white text-black"
+                            : "bg-black text-white"
+                        }`}
+                        onClick={handlePreFold}
+                      >
+                        Pre-Fold
+                      </button>
+                      <button
+                        className={`mr-1 rounded px-4 py-2 active:bg-white active:text-black ${
+                          preCheck[0]
+                            ? "bg-white text-black"
+                            : "bg-black text-white"
+                        }`}
+                        onClick={() =>
+                          handlePreCheckOrCall(
+                            activePlayer.chips >= activeBet
+                              ? activeBet
+                              : activePlayer.chips
+                          )
+                        }
+                      >
+                        {activeBet > 0
+                          ? `Pre-Call ${
+                              activePlayer.chips >= activeBet
+                                ? activeBet
+                                : activePlayer.chips
+                            }`
+                          : "Pre-Check"}
+                      </button>
+                      {activePlayer.chips > activeBet ? (
+                        <button
+                          className={`rounded px-4 py-2 active:bg-white active:text-black ${
+                            preBet[0]
+                              ? "bg-white text-black"
+                              : "bg-black text-white"
+                          }`}
+                          onClick={() => handlePreBet(bet)}
+                        >
+                          {activeBet > 0
+                            ? `Pre-Raise to ${bet}`
+                            : `Pre-Bet ${bet}`}
                         </button>
                       ) : null}
                     </div>

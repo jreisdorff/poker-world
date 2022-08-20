@@ -60,6 +60,10 @@ export default function useGameState() {
     const [chat, setChat] = useState<string[]>([]);
     const [logsOrChat, setLogsOrChat] = useState<'logs' | 'chat'>('logs');
     const [chatbox, setChatbox] = useState('');
+
+    const [preCheck, setPreCheck] = useState<(boolean | number)[]>([false, 0]);
+    const [preFold, setPreFold] = useState(false);
+    const [preBet, setPreBet] = useState<(boolean | number)[]>([false, 0]);
   
     const [needResponsesFromIndicies, setNeedResponsesFromIndicies] = useState<
       number[]
@@ -74,6 +78,9 @@ export default function useGameState() {
             chat,
             logsOrChat,
             chatbox,
+            preCheck,
+            preFold,
+            preBet,
             gameStarted,
             dealerCards,
             isSnackbarOpen,
@@ -124,6 +131,9 @@ export default function useGameState() {
             setChat,
             setLogsOrChat,
             setChatbox,
+            setPreCheck,
+            setPreFold,
+            setPreBet,
             setGameStarted,
             setDealerCards,
             setIsSnackbarOpen,
