@@ -887,6 +887,8 @@ export default function Index() {
                     </div>
                   </div>
                 </div>
+
+
                 {!ultimateWinner ? (
                   <div className="flex w-full flex-row items-center justify-center gap-2 self-center text-center">
                     <button
@@ -922,6 +924,8 @@ export default function Index() {
                     </button>
                   </div>
                 )}
+
+
               </div>
             )}
 
@@ -929,6 +933,8 @@ export default function Index() {
               <>
                 <div className="flex flex-col items-center justify-center">
                   <div className="absolute bottom-[45%] z-[9999] flex w-[100vw] flex-col items-center justify-center">
+
+
                     <div className="playingCards simpleCards flex flex-row">
                       {dealerCards.map((card, index) => (
                         <Card
@@ -951,6 +957,8 @@ export default function Index() {
                         />
                       ))}
                     </div>
+
+
                     {pots.length > 0 ? (
                       <div className="flex w-screen flex-row items-center justify-center">
                         {pots.map((p: number) => {
@@ -958,10 +966,11 @@ export default function Index() {
                         })}
                       </div>
                     ) : null}
+
+
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                  {/* <div className="playingCards simpleCards fixed top-[30%] right-[35vw] flex w-[100vw] flex-row items-center justify-center"></div> */}
                   <div className="fixed bottom-[47vh] right-[35vw] z-[4000] flex w-[100vw] flex-col items-center justify-center">
                     <div className="playingCards simpleCards flex flex-row items-center justify-center">
                       {players[1].cards.map(

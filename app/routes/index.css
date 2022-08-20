@@ -1,0 +1,11 @@
+a-scene {
+    position: absolute; height: 100% !important; width: 100% !important;
+  }
+  
+  .a-canvas {
+    height: 100% !important;
+  }
+  
+  body {
+    background-color: #e9e9e9
+  }

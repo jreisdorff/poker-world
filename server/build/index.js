@@ -17,6 +17,9 @@ var __objRest = (source, exclude) => {
       exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop) && (target[prop] = source[prop]);
   return target;
 };
+var __commonJS = (cb, mod) => function() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: !0 });
@@ -26,6 +29,20 @@ var __export = (target, all) => {
       !__hasOwnProp.call(target, key) && (copyDefault || key !== "default") && __defProp(target, key, { get: () => module2[key], enumerable: !(desc = __getOwnPropDesc(module2, key)) || desc.enumerable });
   return target;
 }, __toESM = (module2, isNodeMode) => __reExport(__markAsModule(__defProp(module2 != null ? __create(__getProtoOf(module2)) : {}, "default", !isNodeMode && module2 && module2.__esModule ? { get: () => module2.default, enumerable: !0 } : { value: module2, enumerable: !0 })), module2), __toCommonJS = /* @__PURE__ */ ((cache) => (module2, temp) => cache && cache.get(module2) || (temp = __reExport(__markAsModule({}), module2, 1), cache && cache.set(module2, temp), temp))(typeof WeakMap != "undefined" ? /* @__PURE__ */ new WeakMap() : 0);
+
+// app/components/burger-icon.svg
+var require_burger_icon = __commonJS({
+  "app/components/burger-icon.svg"(exports, module2) {
+    module2.exports = "/build/_assets/burger-icon-26GFPLZD.svg";
+  }
+});
+
+// app/components/left-arrow.svg
+var require_left_arrow = __commonJS({
+  "app/components/left-arrow.svg"(exports, module2) {
+    module2.exports = "/build/_assets/left-arrow-HO4YBP37.svg";
+  }
+});
 
 // <stdin>
 var stdin_exports = {};
@@ -71,7 +88,7 @@ function handleRequest(request, responseStatusCode, responseHeaders, remixContex
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var root_exports = {};
 __export(root_exports, {
   default: () => App,
@@ -82,7 +99,7 @@ __export(root_exports, {
 var import_node3 = require("@remix-run/node"), import_react3 = require("@remix-run/react");
 
 // app/styles/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-TTF4MDBE.css";
+var tailwind_default = "/build/_assets/tailwind-WVKXEBX4.css";
 
 // app/session.server.ts
 var import_node2 = require("@remix-run/node"), import_tiny_invariant = __toESM(require("tiny-invariant"));
@@ -187,7 +204,7 @@ async function logout(request) {
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var import_react4 = require("react"), import_socket = require("socket.io-client");
 
 // app/context.tsx
@@ -201,7 +218,7 @@ function SocketProvider({ socket, children }) {
   }, children);
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/root.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\root.tsx
 var links = () => [{ rel: "stylesheet", href: tailwind_default }], meta = () => ({
   charset: "utf-8",
   title: "Remix Notes",
@@ -222,14 +239,23 @@ function App() {
   }, []), /* @__PURE__ */ React.createElement("html", {
     lang: "en",
     className: "h-full"
-  }, /* @__PURE__ */ React.createElement("head", null, /* @__PURE__ */ React.createElement(import_react3.Meta, null), /* @__PURE__ */ React.createElement(import_react3.Links, null)), /* @__PURE__ */ React.createElement("body", {
+  }, /* @__PURE__ */ React.createElement("head", null, /* @__PURE__ */ React.createElement(import_react3.Meta, null), /* @__PURE__ */ React.createElement(import_react3.Links, null), /* @__PURE__ */ React.createElement("script", {
+    src: "https://threejs.org/build/three.js"
+  }), /* @__PURE__ */ React.createElement("script", {
+    src: "js/aframe-master.0.8.2.min.js",
+    type: "text/javascript"
+  }), /* @__PURE__ */ React.createElement("script", {
+    src: "https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"
+  })), /* @__PURE__ */ React.createElement("body", {
     className: "h-full"
   }, /* @__PURE__ */ React.createElement(SocketProvider, {
     socket
-  }, /* @__PURE__ */ React.createElement(import_react3.Outlet, null)), /* @__PURE__ */ React.createElement(import_react3.ScrollRestoration, null), /* @__PURE__ */ React.createElement(import_react3.Scripts, null), /* @__PURE__ */ React.createElement(import_react3.LiveReload, null)));
+  }, /* @__PURE__ */ React.createElement("main", {
+    id: "root"
+  }), /* @__PURE__ */ React.createElement(import_react3.Outlet, null)), /* @__PURE__ */ React.createElement(import_react3.ScrollRestoration, null), /* @__PURE__ */ React.createElement(import_react3.Scripts, null), /* @__PURE__ */ React.createElement(import_react3.LiveReload, null)));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/healthcheck.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\healthcheck.tsx
 var healthcheck_exports = {};
 __export(healthcheck_exports, {
   loader: () => loader2
@@ -250,7 +276,7 @@ async function loader2({ request }) {
   }
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/logout.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\logout.tsx
 var logout_exports = {};
 __export(logout_exports, {
   action: () => action,
@@ -264,7 +290,7 @@ async function loader3() {
   return (0, import_node4.redirect)("/");
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var routes_exports = {};
 __export(routes_exports, {
   default: () => Index,
@@ -434,18 +460,18 @@ function Table() {
 }
 
 // app/styles/cards-ie.css
-var cards_ie_default = "/build/_assets/cards-ie-KXYXFTMX.css";
+var cards_ie_default = "/build/_assets/cards-ie-K2KFIEE6.css";
 
 // app/styles/cards-ie9.css
-var cards_ie9_default = "/build/_assets/cards-ie9-OIEF3GYU.css";
+var cards_ie9_default = "/build/_assets/cards-ie9-FJ2H4YNU.css";
 
 // app/styles/cards.css
-var cards_default = "/build/_assets/cards-DWTR5WFF.css";
+var cards_default = "/build/_assets/cards-RC2VKTQW.css";
 
 // app/styles/progress.css
-var progress_default = "/build/_assets/progress-DNTSZ2WT.css";
+var progress_default = "/build/_assets/progress-4XQ5EFCP.css";
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var import_lodash = require("lodash");
 
 // app/hooks/useGameState.ts
@@ -768,7 +794,7 @@ function prepareForBet(values, amount) {
   };
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\index.tsx
 var links2 = () => [
   { rel: "stylesheet", href: cards_default },
   { rel: "stylesheet", href: cards_ie_default },
@@ -1335,7 +1361,7 @@ function Index() {
   }, "Muck"))) : null) : null))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/login.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\login.tsx
 var login_exports = {};
 __export(login_exports, {
   action: () => action2,
@@ -1445,7 +1471,7 @@ function LoginPage() {
   }, "Sign up"))))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes.tsx
 var notes_exports = {};
 __export(notes_exports, {
   default: () => NotesPage,
@@ -1496,7 +1522,7 @@ function deleteNote({
   });
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes.tsx
 async function loader5({ request }) {
   let userId = await requireUserId(request), noteListItems = await getNoteListItems({ userId });
   return (0, import_node6.json)({ noteListItems });
@@ -1536,7 +1562,7 @@ function NotesPage() {
   }, /* @__PURE__ */ React.createElement(import_react12.Outlet, null))));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/$noteId.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\$noteId.tsx
 var noteId_exports = {};
 __export(noteId_exports, {
   CatchBoundary: () => CatchBoundary,
@@ -1583,7 +1609,7 @@ function CatchBoundary() {
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/index.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\index.tsx
 var notes_exports2 = {};
 __export(notes_exports2, {
   default: () => NoteIndexPage
@@ -1596,7 +1622,7 @@ function NoteIndexPage() {
   }, "create a new note."));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/notes/new.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\notes\new.tsx
 var new_exports = {};
 __export(new_exports, {
   action: () => action4,
@@ -1657,7 +1683,7 @@ function NewNotePage() {
   }, "Save")));
 }
 
-// route:/Users/jreisdorff/Sites/poker-world/app/routes/join.tsx
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\join.tsx
 var join_exports = {};
 __export(join_exports, {
   action: () => action5,
@@ -1764,11 +1790,199 @@ function Join() {
   }, "Log in"))))));
 }
 
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\new.tsx
+var new_exports2 = {};
+__export(new_exports2, {
+  default: () => NewPage
+});
+var React8 = __toESM(require("react"));
+var import_react19 = require("react"), import_client2 = require("react-dom/client");
+
+// app/components/Pag3DModel.tsx
+var import_react18 = __toESM(require("react"));
+
+// app/components/LoaderCmp.tsx
+var React5 = __toESM(require("react")), Loader = class extends React5.PureComponent {
+  constructor(props) {
+    super(props);
+    this.containerStyle = {
+      zIndex: 11,
+      position: "absolute",
+      width: "100%",
+      top: "41%",
+      textAlign: "center"
+    };
+    this.contentStyle = {
+      color: "black",
+      backgroundColor: "white",
+      display: "block",
+      margin: "auto",
+      padding: "20px",
+      borderRadius: "4px",
+      fontFamily: "verdana, sans-serif",
+      fontSize: "small",
+      width: "70px",
+      textAlign: "center"
+    };
+    let shadowColor = this.props.shadowColor || "grey", shadowDeep = this.props.shadowDeep || "10";
+    this.contentStyle.boxShadow = `${shadowColor} 0 0 ${shadowDeep}px 0`;
+  }
+  hide() {
+    this.loaderElement.style.display = "none";
+  }
+  show() {
+    this.loaderElement.style.display = "block";
+  }
+  hideWhen(entity, eventName = "loaded") {
+    entity && entity.addEventListener(eventName, () => {
+      this.hide();
+    });
+  }
+  render() {
+    return /* @__PURE__ */ React5.createElement("div", {
+      id: "loader-element",
+      ref: (loader8) => this.loaderElement = loader8,
+      style: this.containerStyle,
+      className: "fade-in"
+    }, /* @__PURE__ */ React5.createElement("div", {
+      style: this.contentStyle
+    }, /* @__PURE__ */ React5.createElement("img", {
+      id: "loader-image",
+      src: "img/history3.svg",
+      style: { verticalAlign: "middle" }
+    }), /* @__PURE__ */ React5.createElement("div", {
+      style: { paddingTop: "5px" }
+    }, this.props.children)));
+  }
+};
+
+// app/components/TopMenuCmp.tsx
+var import_react17 = __toESM(require("react"));
+var burgerIconSvg = require_burger_icon(), leftArrowSvg = require_left_arrow(), TopMenu = class extends import_react17.default.PureComponent {
+  constructor() {
+    super(...arguments);
+    this.onClickMenuBtn = () => {
+      this.props.onClickMenuBtn && this.props.onClickMenuBtn();
+    };
+    this.onClickBtnGoBack = () => {
+      window.history.back();
+    };
+  }
+  render() {
+    let { leftIcon, children } = this.props;
+    return window.location.hash !== "#/" ? /* @__PURE__ */ import_react17.default.createElement("div", {
+      className: "top-menu"
+    }, /* @__PURE__ */ import_react17.default.createElement("img", {
+      src: leftArrowSvg,
+      className: "top-menu-icon-right",
+      onClick: this.onClickBtnGoBack
+    }), children, /* @__PURE__ */ import_react17.default.createElement("img", {
+      src: leftIcon || burgerIconSvg,
+      className: "top-menu-icon-left",
+      onClick: this.onClickMenuBtn
+    })) : /* @__PURE__ */ import_react17.default.createElement("div", {
+      className: "top-menu"
+    }, children, /* @__PURE__ */ import_react17.default.createElement("img", {
+      src: leftIcon || burgerIconSvg,
+      className: "top-menu-icon-left",
+      onClick: this.onClickMenuBtn
+    }));
+  }
+};
+
+// app/components/Pag3DModel.tsx
+function Pag3DModel() {
+  let [botStatus, setBotStatus] = (0, import_react18.useState)("idle" /* IDLE */), [hidden, setHidden] = (0, import_react18.useState)(!1), loaderRef = (0, import_react18.createRef)(), botRef = (0, import_react18.createRef)(), crossFadeDuration = 0.5, orbitControls = {
+    autoRotate: !0,
+    target: "#bot",
+    enableDamping: !0,
+    dampingFactor: 0.1,
+    rotateSpeed: 0.1,
+    autoRotateSpeed: 0.15,
+    zoomSpeed: 0.5,
+    minDistance: 0,
+    maxDistance: 100,
+    invertZoom: !0
+  };
+  return console.log(botRef), console.log(botRef.current), (0, import_react18.useEffect)(() => {
+    console.log(loaderRef), console.log(botRef), loaderRef && loaderRef.current && botRef && botRef.current && !hidden && (loaderRef.current.hide(), setHidden(!0));
+  }), /* @__PURE__ */ import_react18.default.createElement("div", null, /* @__PURE__ */ import_react18.default.createElement(Loader, {
+    ref: loaderRef
+  }, "Loading"), /* @__PURE__ */ import_react18.default.createElement(TopMenu, {
+    onClickMenuBtn: () => {
+    }
+  }, /* @__PURE__ */ import_react18.default.createElement("a", {
+    id: "btnIdle",
+    onClick: () => {
+      setBotStatus("walk" /* WALK */);
+    },
+    className: "top-menu-item"
+  }, "Walk"), /* @__PURE__ */ import_react18.default.createElement("a", {
+    id: "btnRun",
+    onClick: () => {
+      setBotStatus("run" /* RUN */);
+    },
+    className: "top-menu-item"
+  }, "Run"), /* @__PURE__ */ import_react18.default.createElement("a", {
+    id: "btnIdle",
+    onClick: () => {
+      setBotStatus("jump" /* JUMP */);
+    },
+    className: "top-menu-item"
+  }, "Jump"), /* @__PURE__ */ import_react18.default.createElement("a", {
+    id: "btnIdle",
+    onClick: () => {
+      setBotStatus("idle" /* IDLE */);
+    },
+    className: "top-menu-item"
+  }, "Stop")), /* @__PURE__ */ import_react18.default.createElement("a-scene", null, /* @__PURE__ */ import_react18.default.createElement("a-assets", null, /* @__PURE__ */ import_react18.default.createElement("img", {
+    id: "sky",
+    src: "img/square.jpg"
+  }), /* @__PURE__ */ import_react18.default.createElement("a-asset-item", {
+    id: "pokermodel",
+    src: "assets/3d-model.gltf"
+  })), /* @__PURE__ */ import_react18.default.createElement("a-gltf-model", {
+    src: "#pokermodel"
+  }), /* @__PURE__ */ import_react18.default.createElement("a-sky", {
+    src: "#sky",
+    rotation: "0 -90 0"
+  }), /* @__PURE__ */ import_react18.default.createElement("a-entity", {
+    position: "0 1 0"
+  }, /* @__PURE__ */ import_react18.default.createElement("a-entity", {
+    position: "0 -0.5 1.25",
+    camera: "near: 0.5; fov: 100",
+    "orbit-controls": AFRAME.utils.styleParser.stringify(orbitControls)
+  })), /* @__PURE__ */ import_react18.default.createElement("a-entity", {
+    id: "bot",
+    ref: botRef,
+    scale: "1 1 1",
+    position: "0 0 0",
+    animationMixer: `clip: ${botStatus}; crossFadeDuration: ${crossFadeDuration}`,
+    "json-model": "src: #pokermodel"
+  }), /* @__PURE__ */ import_react18.default.createElement("a-plane", {
+    height: "100",
+    width: "33",
+    color: "#4d672b",
+    rotation: "-90 0 0"
+  })));
+}
+
+// route:C:\Users\jreis\Desktop\Sites\poker-world\app\routes\new.tsx
+function NewPage() {
+  let [created, setCreated] = (0, import_react19.useState)(!1);
+  return (0, import_react19.useEffect)(() => {
+    if (document && typeof window < "u" && !created) {
+      let container = document.getElementById("root"), root = (0, import_client2.hydrateRoot)(container, /* @__PURE__ */ React8.createElement(Pag3DModel, null));
+      setCreated(!0);
+    }
+  }), null;
+}
+
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "026985ed", entry: { module: "/build/entry.client-IRIG7MIQ.js", imports: ["/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-YQ4IJNOD.js", imports: ["/build/_shared/chunk-NT25MWPM.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-OBLKZMS6.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-JAOZMLDV.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-JEXU6V47.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-JIEBQSR3.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-WIWPYHNW.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-KB24HJ3S.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-E6U7HO44.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-6SMFZZ43.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-6IDDKACF.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-026985ED.js" };
+var assets_manifest_default = { version: "7dba6454", entry: { module: "/build/entry.client-HOXSP2WE.js", imports: ["/build/_shared/chunk-GHBCZPPI.js", "/build/_shared/chunk-LI4H3HRL.js", "/build/_shared/chunk-AWG3O6NZ.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-KA5I3D2J.js", imports: ["/build/_shared/chunk-Y6XVBMDT.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/healthcheck": { id: "routes/healthcheck", parentId: "root", path: "healthcheck", index: void 0, caseSensitive: void 0, module: "/build/routes/healthcheck-D2FTVWR5.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-H5G2IFRL.js", imports: ["/build/_shared/chunk-SXLZWW2B.js"], hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/join": { id: "routes/join", parentId: "root", path: "join", index: void 0, caseSensitive: void 0, module: "/build/routes/join-XUBLHJTH.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/login": { id: "routes/login", parentId: "root", path: "login", index: void 0, caseSensitive: void 0, module: "/build/routes/login-FEEKEKAC.js", imports: ["/build/_shared/chunk-5FXPDKBM.js", "/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-VH5G5TMR.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/new": { id: "routes/new", parentId: "root", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/new-LN3MLJWI.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes": { id: "routes/notes", parentId: "root", path: "notes", index: void 0, caseSensitive: void 0, module: "/build/routes/notes-6XS3BOES.js", imports: ["/build/_shared/chunk-SXLZWW2B.js", "/build/_shared/chunk-F4EOO5R2.js", "/build/_shared/chunk-2FM4UGS6.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/$noteId": { id: "routes/notes/$noteId", parentId: "routes/notes", path: ":noteId", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/$noteId-MDG7BMYH.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/notes/index": { id: "routes/notes/index", parentId: "routes/notes", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/notes/index-BGM45BK3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/notes/new": { id: "routes/notes/new", parentId: "routes/notes", path: "new", index: void 0, caseSensitive: void 0, module: "/build/routes/notes/new-T2YVMLZP.js", imports: void 0, hasAction: !0, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, url: "/build/manifest-7DBA6454.js" };
 
 // server-entry-module:@remix-run/dev/server-build
-var assetsBuildDirectory = "public/build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
+var assetsBuildDirectory = "public\\build", publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
   root: {
     id: "root",
     parentId: void 0,
@@ -1848,6 +2062,14 @@ var assetsBuildDirectory = "public/build", publicPath = "/build/", entry = { mod
     index: void 0,
     caseSensitive: void 0,
     module: join_exports
+  },
+  "routes/new": {
+    id: "routes/new",
+    parentId: "root",
+    path: "new",
+    index: void 0,
+    caseSensitive: void 0,
+    module: new_exports2
   }
 };
 module.exports = __toCommonJS(stdin_exports);
