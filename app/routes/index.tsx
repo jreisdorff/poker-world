@@ -233,12 +233,10 @@ export default function Index() {
     socket.on("sendChatData", (data) => {
       let newChat = `${data.player.playerName}: ${data.chatbox}`;
 
-      if (!document.hidden) {
-        var msg = new SpeechSynthesisUtterance(
-          `Player ${data.player.playerName} says ${data.chatbox}`
-        );
-        window.speechSynthesis.speak(msg);
-      }
+      var msg = new SpeechSynthesisUtterance(
+        `Player ${data.player.playerName} says ${data.chatbox}`
+      );
+      window.speechSynthesis.speak(msg);
 
       setChat((prevChats) => [...prevChats, newChat]);
     });
@@ -872,7 +870,7 @@ export default function Index() {
                 </div>
                 {logsOrChat === "logs" ? (
                   <div
-                    className="flex flex-col max-h-[300px] overflowy-scroll"
+                    className="overflowy-scroll flex max-h-[300px] flex-col"
                     style={{ boxSizing: "content-box", paddingRight: "17px" }}
                   >
                     {logs.map((l, index) => (
@@ -881,7 +879,7 @@ export default function Index() {
                   </div>
                 ) : (
                   <div
-                    className="flex flex-col max-h-[300px] overflowy-scroll"
+                    className="overflowy-scroll flex max-h-[300px] flex-col"
                     style={{ boxSizing: "content-box", paddingRight: "17px" }}
                   >
                     {chat.length > 0 ? (
