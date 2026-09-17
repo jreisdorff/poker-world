@@ -13,3 +13,6 @@ node_modules
 
 # Local Netlify folder
 .netlify
+
+# Remix server build output (built by Dockerfile and CI)
+/server/build
